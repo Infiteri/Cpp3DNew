@@ -2,12 +2,19 @@
 
 #include "Base.h"
 #include "Application.h"
+#include "Window.h"
 
 namespace Core
 {
     class CE_API Engine
     {
     public:
+        struct State
+        {
+            Window *_Window;
+            Application *_GApp;
+        };
+
         Engine() {}
         ~Engine() {}
 
@@ -16,9 +23,8 @@ namespace Core
         static void Update();
         static void Render();
         static void Shutdown();
-
         static bool ShouldRun();
-
-        static void FeedApplication(Application* _App);
+        static Window *GetWindow();
+        static void FeedApplication(Application *_App);
     };
 }

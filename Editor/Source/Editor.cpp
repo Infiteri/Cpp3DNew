@@ -1,6 +1,8 @@
 #include "Core.h"
 #include "Core/Launch/EntryPoint.h"
 
+#include "EditorLayer.h"
+
 namespace Core
 {
     class Editor : public Application
@@ -8,6 +10,11 @@ namespace Core
     public:
         Editor(){};
         ~Editor(){};
+
+        void Init()
+        {
+            LayerStack::PushLayer(new EditorLayer());
+        }
     };
 
     Application *CreateApplication()

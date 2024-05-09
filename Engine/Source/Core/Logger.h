@@ -11,7 +11,7 @@
 
 namespace Core
 {
-    class Logger
+    class CE_API Logger
     {
     public:
         struct Settings

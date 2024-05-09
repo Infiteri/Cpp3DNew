@@ -4,10 +4,10 @@ OBJ_DIR := Bin-Obj
 
 ASSEMBLY := Engine
 EXTENSION := .dll
-VP = Engine/Vendor
 COMPILER_FLAGS := -g -std=c++2a #-fPIC
-INCLUDE_FLAGS := -IEngine\Source 
-LINKER_FLAGS := -g -shared -LBin
+VP := -IEngine/Vendor 
+INCLUDE_FLAGS := -IEngine\Source -IEngine/Vendor/GLFW/include 
+LINKER_FLAGS := -g -shared -LBin -lglfw3
 DEFINES := -D_DEBUG -DCE_BUILD_DLL -D_CRT_SECURE_NO_WARNINGS
 
 # Make does not offer a recursive wildcard function, so here's one:
