@@ -53,6 +53,8 @@ namespace Core
 
 #define CE_DEFINE_LOG_CATEGORY(name, pending) Core::Logger::RegisterCategory(name, pending)
 
+#define CE_LOG(name, level, msg, ...) Core::Logger::Log(name, Core::Logger::Level::level, msg, ##__VA_ARGS__)
+
 #define CE_ERROR(message, ...) Core::Logger::Log(CE_USER_CATEGORY_NAME, Core::Logger::Error, message, ##__VA_ARGS__)
 #define CE_CORE_ERROR(message, ...) Core::Logger::Log(CE_CORE_CATEGORY_NAME, Core::Logger::Error, message, ##__VA_ARGS__)
 

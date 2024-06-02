@@ -2,10 +2,14 @@
 #include "Logger.h"
 #include "Input.h"
 
+#include "Renderer/Renderer.h"
+
 #include <GLFW/glfw3.h>
 
 namespace Core
 {
+    static void Viewport(GLFWwindow *window, int w, int h);
+
     Window::Window(const Information &_Info)
     {
         info = _Info;
@@ -36,6 +40,8 @@ namespace Core
         // Handle VSYnc
         if (info.VSync)
             glfwSwapInterval(1);
+
+        glfwSetWindowSizeCallback(handle, Viewport);
 
         //! Update state.
         glfwGetWindowPos(handle, &info.X, &info.Y);
@@ -72,6 +78,11 @@ namespace Core
     bool Window::ShouldRun()
     {
         return !glfwWindowShouldClose(handle);
+    }
+
+    void Viewport(GLFWwindow *window, int w, int h)
+    {
+        Renderer::Viewport(w, h);
     }
 
 }

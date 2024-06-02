@@ -4,6 +4,8 @@
 #include "Application.h"
 #include "Window.h"
 
+#include <string>
+
 namespace Core
 {
     class CE_API Engine
@@ -26,5 +28,7 @@ namespace Core
         static bool ShouldRun();
         static Window *GetWindow();
         static void FeedApplication(Application *_App);
+
+        static std::string ReadFileContent(const std::string& filename);
     };
 }

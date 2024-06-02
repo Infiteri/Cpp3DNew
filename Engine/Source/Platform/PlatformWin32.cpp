@@ -61,6 +61,16 @@ namespace Core
     {
         memset(Block, Value, Size);
     }
+
+    void *Platform::MemALloc(CeU64 Size)
+    {
+        return malloc(Size);
+    }
+
+    void Platform::Free(void* Memo)
+    {
+        free(Memo);
+    }
 }
 
 #endif

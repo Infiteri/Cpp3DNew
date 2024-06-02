@@ -26,6 +26,8 @@ namespace Core
 
         // -- MEMORY --
         static void MemSet(void *Block, int Value, CeU64 Size);
+        static void *MemALloc(CeU64 Size);
+        static void Free(void* Memo);
         // ------------
     };
 

@@ -15,3 +15,23 @@
 - Added more configuration to window (decoration, VSync, ...)
 - Started Input
 - Added Layers
+
+# 0.0.3 - 10.05.2024
+
+- Added GLAD
+- Started Renderer
+- Renderer structure
+- Started shaders
+- Added Buffer
+- Added FrameBuffer
+- Added VertexArray
+- Reused code
+- Added Shaders need
+- Other stuff
+
+# 0.0.4 - 02.06.2024
+
+- Started objects
+- Added Object Shader
+- Added Viewport
+- Added GPUScreen
