@@ -6,6 +6,8 @@
 #include "Buffer/VertexArray.h"
 #include "Shader/Shader.h"
 
+#include "Camera/PerspectiveCamera.h"
+
 #include "GPUScreen.h"
 
 namespace Core
@@ -21,9 +23,11 @@ namespace Core
 
         struct RendererState
         {
-            bool InitializedContext = false;
             GPUScreen Screen;
             Viewport ScreenViewport;
+            Shader *objectShader;
+
+            bool initializedContext = false;
         };
 
     public:

@@ -27,49 +27,49 @@ namespace Core
         WindowInformation.Width = 1280;
         WindowInformation.Height = 720;
         WindowInformation.Title = "Hello Core";
-        state._Window = new Window(WindowInformation);
+        state.Window = new Window(WindowInformation);
 
         Renderer::InitializeRenderingContext();
         Renderer::Init();
 
-        Renderer::Viewport(state._Window->GetInfo()->Width, state._Window->GetInfo()->Height);
+        Renderer::Viewport(state.Window->GetInfo()->Width, state.Window->GetInfo()->Height);
     }
 
     void Engine::Init()
     {
-        if (state._GApp)
-            state._GApp->Init();
+        if (state.GApp)
+            state.GApp->Init();
     }
 
     void Engine::Update()
     {
         LayerStack::Update();
-        state._Window->Update();
+        state.Window->Update();
 
-        if (state._GApp)
-            state._GApp->Update();
+        if (state.GApp)
+            state.GApp->Update();
     }
 
     void Engine::Render()
     {
         Renderer::BeginFrame();
         Renderer::Render();
-        if (state._GApp)
-            state._GApp->Render();
+        if (state.GApp)
+            state.GApp->Render();
         Renderer::EndFrame();
         Renderer::RenderScreenImage();
     }
 
     void Engine::Shutdown()
     {
-        if (state._GApp)
+        if (state.GApp)
         {
-            state._GApp->Shutdown();
-            delete state._GApp;
-            state._GApp = nullptr;
+            state.GApp->Shutdown();
+            delete state.GApp;
+            state.GApp = nullptr;
         }
 
-        delete state._Window;
+        delete state.Window;
         Logger::Shutdown();
         LayerStack::Shutdown();
         Input::Shutdown();
@@ -78,17 +78,17 @@ namespace Core
 
     bool Engine::ShouldRun()
     {
-        return state._Window->ShouldRun();
+        return state.Window->ShouldRun();
     }
 
     Window *Engine::GetWindow()
     {
-        return state._Window;
+        return state.Window;
     }
 
     void Engine::FeedApplication(Application *_App)
     {
-        state._GApp = _App;
+        state.GApp = _App;
     }
 
     std::string Engine::ReadFileContent(const std::string &filename)

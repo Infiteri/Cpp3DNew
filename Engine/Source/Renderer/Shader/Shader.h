@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Base.h"
+#include "Math/Matrix4.h"
 
 #include <string>
 
@@ -17,8 +18,11 @@ namespace Core
 
     private:
         CeU32 id;
+        bool valid = false;
 
         void Compile(const std::string &vertexSource, const std::string &fragmentSource);
+
+        CeU32 GetUniLoc(const char* n);
 
     public:
         Shader(const ShaderConstructor &constructor);
@@ -28,5 +32,10 @@ namespace Core
         void Use();
 
         inline CeU32 GetID() { return id; };
+        inline bool GetValid() { return valid; };
+
+        void Mat4(const Matrix4 &matrix, const char *name);
+        void Mat4(Matrix4 *matrix, const char *name);
+        void Mat4(const float *matrix, const char *name);
     };
 }

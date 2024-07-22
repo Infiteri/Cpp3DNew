@@ -13,8 +13,8 @@ namespace Core
     public:
         struct State
         {
-            Window *_Window;
-            Application *_GApp;
+            Window *Window;
+            Application *GApp;
         };
 
         Engine() {}
@@ -27,8 +27,8 @@ namespace Core
         static void Shutdown();
         static bool ShouldRun();
         static Window *GetWindow();
-        static void FeedApplication(Application *_App);
+        static void FeedApplication(Application *App);
 
-        static std::string ReadFileContent(const std::string& filename);
+        static std::string ReadFileContent(const std::string &filename);
     };
 }

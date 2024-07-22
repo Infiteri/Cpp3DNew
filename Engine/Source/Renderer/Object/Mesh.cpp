@@ -3,7 +3,6 @@
 
 namespace Core
 {
-    static Shader *shader = nullptr;
 
     float vertices[] = {
         0.5f, 0.5f, 0.0f,   // top right
@@ -19,7 +18,6 @@ namespace Core
 
     Mesh::Mesh()
     {
-        shader = new Shader("EngineResources/Shaders/Object.vs.glsl", "EngineResources/Shaders/Object.fs.glsl");
 
         vertex = new VertexArray();
 
@@ -34,8 +32,6 @@ namespace Core
 
     void Mesh::Render()
     {
-        shader->Use();
-
         vertex->Bind();
         vertex->GetVertexBuffer()->Bind();
         vertex->GetIndexBuffer()->Draw();

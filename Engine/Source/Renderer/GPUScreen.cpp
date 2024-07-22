@@ -1,4 +1,5 @@
 #include "GPUScreen.h"
+#include "Shader/ShaderSystem.h"
 #include "Platform/Platform.h"
 #include <glad/glad.h>
 
@@ -17,7 +18,7 @@ namespace Core
 
     void GPUScreen::Setup()
     {
-        SShader = new Shader("EngineResources/Shaders/Screen.vs.glsl", "EngineResources/Shaders/Screen.fs.glsl");
+        SShader = ShaderSystem::GetFromEngineResource("Screen");
 
         FrameBufferSpecification spec;
         spec.width = 1920;

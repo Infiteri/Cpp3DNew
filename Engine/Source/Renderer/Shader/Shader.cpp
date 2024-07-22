@@ -40,6 +40,7 @@ namespace Core
     void Shader::Compile(const std::string &vertexSource, const std::string &fragmentSource)
     {
         id = 0;
+        valid = false;
         CeU32 vertexShader = LoadShader(Engine::ReadFileContent(vertexSource).c_str(), GL_VERTEX_SHADER);
         CeU32 fragmentShader = LoadShader(Engine::ReadFileContent(fragmentSource).c_str(), GL_FRAGMENT_SHADER);
 
@@ -63,10 +64,20 @@ namespace Core
 
             CE_CORE_ERROR("ProgramError: %s", infoLog.data());
         }
+        valid = true;
 
         // Delete shaders
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
+    }
+
+    CeU32 Shader::GetUniLoc(const char *n)
+    {
+        if (!valid)
+            return 0;
+
+        Use();
+        return glGetUniformLocation(id, n);
     }
 
     Shader::Shader(const ShaderConstructor &constructor)
@@ -87,5 +98,24 @@ namespace Core
     void Shader::Use()
     {
         glUseProgram(id);
+    }
+
+    void Shader::Mat4(const Matrix4 &matrix, const char *name)
+    {
+        Mat4(matrix.data, name);
+    }
+
+    void Shader::Mat4(Matrix4 *matrix, const char *name)
+    {
+        Mat4(matrix->data, name);
+    }
+
+    void Shader::Mat4(const float *matrix, const char *name)
+    {
+        if (!valid)
+            return;
+
+        Use();
+        glUniformMatrix4fv(GetUniLoc(name), 1, false, matrix);
     }
 }

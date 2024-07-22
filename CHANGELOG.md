@@ -35,3 +35,11 @@
 - Added Object Shader
 - Added Viewport
 - Added GPUScreen
+
+# 0.0.5 - 22.07.2024
+
+- Added ShaderSystem
+- Reused old matrices code
+- Started Cameras
+- Added Vector3
+- Added CameraSystem
