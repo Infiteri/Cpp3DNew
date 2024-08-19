@@ -4,6 +4,8 @@
 
 #include "Object/Mesh.h"
 #include "Shader/ShaderSystem.h"
+#include "Texture/TextureSystem.h"
+#include "Material/MaterialSystem.h"
 
 #include "Camera/CameraSystem.h"
 
@@ -12,8 +14,6 @@
 
 namespace Core
 {
-    static Mesh *mesh;
-
     static float screenQuadVertices[] = {
         // positions   // texCoords
         -1.0f, 1.0f, 0.0f, 1.0f,
@@ -49,13 +49,14 @@ namespace Core
 
         ShaderSystem::Init();
         CameraSystem::Init();
+        TextureSystem::Init();
+        MaterialSystem::Init(); // Post texture system as the material relies on the default texture. :)
         state.objectShader = ShaderSystem::GetFromEngineResource("Object");
 
         CameraSystem::CreatePerspective("Main Camera");
         CameraSystem::Activate("Main Camera");
 
         state.Screen.Setup();
-        mesh = new Mesh();
     }
 
     void Renderer::BeginFrame()
@@ -66,7 +67,7 @@ namespace Core
         state.Screen.Begin();
 
         glClearColor(0.4, 0.1, 0.1, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     void Renderer::Render()
@@ -76,15 +77,11 @@ namespace Core
 
         state.objectShader->Use();
 
-        auto c = CameraSystem::GetPerspectiveActive();
+        auto activeCamera = CameraSystem::GetPerspectiveActive();
+        activeCamera->UpdateView();
 
-        c->GetPosition().Set(0, 0, -10);
-        c->UpdateView();
-
-        state.objectShader->Mat4(c->GetProjection(), "uProjection");
-        state.objectShader->Mat4(c->GetView(), "uView");
-
-        mesh->Render();
+        state.objectShader->Mat4(activeCamera->GetProjection(), "uProjection");
+        state.objectShader->Mat4(activeCamera->GetViewInverted(), "uView");
     }
 
     void Renderer::EndFrame()
@@ -96,14 +93,16 @@ namespace Core
 
     void Renderer::RenderScreenImage()
     {
-        state.Screen.Array->Bind();
-
         // Bind texture
         RenderPassSpecification *renderPass = state.Screen.Buffer->GetRenderPass(0);
-        glActiveTexture(GL_TEXTURE0 + renderPass->index);
-        glBindTexture(GL_TEXTURE_2D, renderPass->id);
 
         state.Screen.SShader->Use();
+        state.Screen.Array->Bind();
+
+        glActiveTexture(GL_TEXTURE0 + renderPass->index);
+        glBindTexture(GL_TEXTURE_2D, renderPass->id);
+        ShaderSystem::GetFromEngineResource("Screen")->Int(renderPass->index, "uScreenTexture");
+
         state.Screen.Array->GetVertexBuffer()->Bind();
         state.Screen.Array->GetVertexBuffer()->Draw();
     }

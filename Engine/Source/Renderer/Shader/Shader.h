@@ -2,6 +2,7 @@
 
 #include "Base.h"
 #include "Math/Matrix4.h"
+#include "Renderer/Color.h"
 
 #include <string>
 
@@ -22,7 +23,7 @@ namespace Core
 
         void Compile(const std::string &vertexSource, const std::string &fragmentSource);
 
-        CeU32 GetUniLoc(const char* n);
+        CeU32 GetUniLoc(const char *n);
 
     public:
         Shader(const ShaderConstructor &constructor);
@@ -33,6 +34,10 @@ namespace Core
 
         inline CeU32 GetID() { return id; };
         inline bool GetValid() { return valid; };
+
+        void Int(int i, const char *name);
+
+        void Vec4(const Color &color, const char *name);
 
         void Mat4(const Matrix4 &matrix, const char *name);
         void Mat4(Matrix4 *matrix, const char *name);

@@ -100,6 +100,22 @@ namespace Core
         glUseProgram(id);
     }
 
+    void Shader::Int(int i, const char *name)
+    {
+        if (!valid)
+            return;
+        Use();
+        glUniform1i(GetUniLoc(name), i);
+    }
+
+    void Shader::Vec4(const Color &color, const char *name)
+    {
+        if (!valid)
+            return;
+        Use();
+        glUniform4f(GetUniLoc(name), color.r / 255, color.g / 255, color.b / 255, color.a / 255);
+    }
+
     void Shader::Mat4(const Matrix4 &matrix, const char *name)
     {
         Mat4(matrix.data, name);

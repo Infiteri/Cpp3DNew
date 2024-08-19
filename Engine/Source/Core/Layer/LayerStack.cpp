@@ -26,8 +26,15 @@ namespace Core
             l->OnUpdate();
     }
 
+    void LayerStack::RenderImGui()
+    {
+        for (auto l : layers)
+            l->OnImGuiRender();
+    }
+
     void LayerStack::PushLayer(Layer *layer)
     {
         layers.push_back(layer);
+        layer->OnAttach();
     }
 }

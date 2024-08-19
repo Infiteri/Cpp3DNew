@@ -3,6 +3,7 @@
 #include "Input.h"
 
 #include "Layer/LayerStack.h"
+#include "Layer/ImGuiLayer.h"
 
 #include "Renderer/Renderer.h"
 
@@ -22,10 +23,9 @@ namespace Core
         Input::Init();
         LayerStack::Init();
 
+        // TODO: From configuration or project
         Window::Information WindowInformation;
-        WindowInformation.X = WindowInformation.Y = 100;
-        WindowInformation.Width = 1280;
-        WindowInformation.Height = 720;
+        WindowInformation.SizeMode = Window::Windowed;
         WindowInformation.Title = "Hello Core";
         state.Window = new Window(WindowInformation);
 
@@ -33,6 +33,8 @@ namespace Core
         Renderer::Init();
 
         Renderer::Viewport(state.Window->GetInfo()->Width, state.Window->GetInfo()->Height);
+
+        ImGuiLayer::Init(); // NOTE: Requires window
     }
 
     void Engine::Init()
@@ -43,7 +45,7 @@ namespace Core
 
     void Engine::Update()
     {
-        LayerStack::Update();
+        // LayerStack::Update(); TODO: Add back (funny bugs with post processing) NOOOOOOOOOOOOOOO
         state.Window->Update();
 
         if (state.GApp)
@@ -56,8 +58,13 @@ namespace Core
         Renderer::Render();
         if (state.GApp)
             state.GApp->Render();
+        LayerStack::Update(); // TODO: REMOVE PLS REMIND ME THIS IS ME BEING LAZY
         Renderer::EndFrame();
         Renderer::RenderScreenImage();
+
+        ImGuiLayer::BeginFrame();
+        LayerStack::RenderImGui();
+        ImGuiLayer::EndFrame();
     }
 
     void Engine::Shutdown()
@@ -97,7 +104,6 @@ namespace Core
         std::ifstream inVert(filename, std::ios::in | std::ios::binary);
         if (inVert)
         {
-
             inVert.seekg(0, std::ios::end);
             vertResult.resize(inVert.tellg());
             inVert.seekg(0, std::ios::beg);

@@ -6,10 +6,10 @@ namespace Core
 {
     enum RenderPassTextureType
     {
+        Rgb,
         Rgba8,
         Depth,
     };
-    
 
     struct RenderPassSpecification
     {
@@ -19,7 +19,7 @@ namespace Core
 
         RenderPassSpecification() { textureType = RenderPassTextureType::Rgba8; };
         RenderPassSpecification(RenderPassTextureType type) { textureType = type; };
-        ~RenderPassSpecification(){};
+        ~RenderPassSpecification() {};
     };
 
     struct FrameBufferSpecification
@@ -29,7 +29,7 @@ namespace Core
 
         CeU32 renderPassSpecificationCount;
         RenderPassSpecification *renderPassSpecifications;
-        ~FrameBufferSpecification(){};
+        ~FrameBufferSpecification() {};
     };
 
     class CE_API FrameBuffer

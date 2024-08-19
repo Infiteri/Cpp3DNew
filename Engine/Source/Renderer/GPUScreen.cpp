@@ -13,7 +13,6 @@ namespace Core
 
         -1.0f, 1.0f, 0.0f, 1.0f,
         1.0f, -1.0f, 1.0f, 0.0f,
-
         1.0f, 1.0f, 1.0f, 1.0f};
 
     void GPUScreen::Setup()
@@ -26,7 +25,7 @@ namespace Core
 
         spec.renderPassSpecificationCount = 2;
         spec.renderPassSpecifications = (RenderPassSpecification *)Platform::MemALloc(sizeof(RenderPassSpecification) * spec.renderPassSpecificationCount);
-        spec.renderPassSpecifications[0].textureType = RenderPassTextureType::Rgba8;
+        spec.renderPassSpecifications[0].textureType = RenderPassTextureType::Rgb;
         spec.renderPassSpecifications[1].textureType = RenderPassTextureType::Depth;
 
         Buffer = new FrameBuffer(spec);
@@ -40,6 +39,7 @@ namespace Core
     void GPUScreen::Begin()
     {
         Buffer->Bind();
+        glEnable(GL_DEPTH_TEST);
     }
 
     void GPUScreen::End()

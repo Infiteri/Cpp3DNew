@@ -18,6 +18,10 @@ namespace Core
     {
     }
 
+    void Layer::OnImGuiRender()
+    {
+    }
+
     void Layer::OnDetach()
     {
     }

@@ -12,6 +12,7 @@ namespace Core
 
         virtual void OnAttach();
         virtual void OnUpdate();
+        virtual void OnImGuiRender();
         virtual void OnDetach();
     };
 }

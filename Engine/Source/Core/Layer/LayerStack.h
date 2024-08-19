@@ -15,6 +15,7 @@ namespace Core
         static void Shutdown();
 
         static void Update();
+        static void RenderImGui();
 
         static void PushLayer(Layer *layer);
     };

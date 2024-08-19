@@ -11,6 +11,7 @@ namespace Core
         ~EditorLayer() {};
 
         void OnAttach();
+        void OnImGuiRender();
         void OnUpdate();
     };
 }

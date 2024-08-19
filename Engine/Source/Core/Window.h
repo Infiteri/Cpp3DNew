@@ -44,6 +44,9 @@ namespace Core
         void Update();
         bool ShouldRun();
 
+        inline float GetWidth() { return info.Width; };
+        inline float GetHeight() { return info.Height; };
+
         Information *GetInfo() { return &info; };
         GLFWwindow *GetHandle() { return handle; };
     };

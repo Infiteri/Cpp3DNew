@@ -11,3 +11,17 @@
 
 #include "Core/Layer/Layer.h"
 #include "Core/Layer/LayerStack.h"
+
+#include "Renderer/Color.h"
+#include "Renderer/Renderer.h"
+
+#include "Renderer/Material/Material.h"
+
+#include "Renderer/Shader/Shader.h"
+#include "Renderer/Shader/ShaderSystem.h"
+
+#include "Renderer/Object/Mesh.h"
+
+#include "Renderer/Camera/CameraSystem.h"
+#include "Renderer/Camera/Camera.h"
+#include "Renderer/Camera/PerspectiveCamera.h"

@@ -13,6 +13,10 @@ namespace Core
             return GL_RGBA8;
             break;
 
+        case RenderPassTextureType::Rgb:
+            return GL_RGB;
+            break;
+
         case RenderPassTextureType::Depth:
             return GL_DEPTH24_STENCIL8;
             break;
@@ -109,14 +113,9 @@ namespace Core
                 glBindTexture(GL_TEXTURE_2D, pass->id);
 
                 // Colors go from 0 to 255, a unsigned byte or u8 is a char which holds 1 byte of memory, that goes from 0, to 255.
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, specification.width, specification.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+                glTexImage2D(GL_TEXTURE_2D, 0, ClearToGL(pass->textureType), specification.width, specification.height, 0, ClearToGL(pass->textureType), GL_UNSIGNED_BYTE, nullptr);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                glBindTexture(GL_TEXTURE_2D, 0);
-
                 // Attach to framebuffer
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, pass->id, 0);
                 pass->index = i;
@@ -126,7 +125,6 @@ namespace Core
                 glGenRenderbuffers(1, &pass->id);
                 glBindRenderbuffer(GL_RENDERBUFFER, pass->id);
                 glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, specification.width, specification.height);
-                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pass->id);
                 glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, pass->id);
             }
         }

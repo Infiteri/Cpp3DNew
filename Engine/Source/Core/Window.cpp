@@ -17,6 +17,7 @@ namespace Core
         glfwInit();
         glfwWindowHint(GLFW_VISIBLE, false);
         glfwWindowHint(GLFW_DECORATED, info.Decorated);
+        glfwWindowHint(GLFW_SAMPLES, 4);
 
         // Setup monitor
         GLFWmonitor *Monitor = NULL;

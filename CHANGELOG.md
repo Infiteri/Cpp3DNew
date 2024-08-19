@@ -43,3 +43,21 @@
 - Started Cameras
 - Added Vector3
 - Added CameraSystem
+
+# 0.0.6 - 22.07.2024
+
+- Added ImGui
+- Started materials
+- Screen texture bug fixes
+- Started Textures
+- Texture structure
+- Added TextureSystem
+- Added "TexturePair" concept
+- Added material functions for textures
+
+# 0.0.7 - 05.08.2024
+
+- Fixed bugs
+- Started MaterialSystem
+- Added material functions to meshes
+- Started Geometry
