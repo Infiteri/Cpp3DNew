@@ -59,10 +59,10 @@ namespace Core
 
         vertex = new VertexArray();
         vertex->GenVertexBuffer(geometry->Vertices.data(), geometry->Vertices.size() * sizeof(Vertex3D));
+        vertex->GenIndexBuffer(geometry->Indices.data(), geometry->Indices.size() * sizeof(CeU32));
         vertex->GetVertexBuffer()->AddLayout(0, 0, 3);
         vertex->GetVertexBuffer()->AddLayout(1, 3, 2);
-        vertex->GetVertexBuffer()->AddLayout(2, 5, 2);
-        vertex->GenIndexBuffer(geometry->Indices.data(), geometry->Indices.size());
+        vertex->GetVertexBuffer()->AddLayout(2, 5, 3);
     }
 
     Mesh::Mesh()
