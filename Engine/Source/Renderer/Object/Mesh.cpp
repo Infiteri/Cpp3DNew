@@ -4,20 +4,6 @@
 
 namespace Core
 {
-    float vertices[] = {
-        0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
-        0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.0f, 0.0f, 1.0f
-
-    };
-
-    unsigned int indices[] = {
-        // note that we start from 0!
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
-    };
-
     void Mesh::_ReleaseMaterial()
     {
         if (!material)
@@ -92,6 +78,11 @@ namespace Core
 
     void Mesh::SetGeometry(Geometry *newGeometry)
     {
+        _ReleaseGeometry();
+
+        geometry = newGeometry;
+
+        _BufferArrayWithGeometry();
     }
 
     void Mesh::MakeMaterialDefault()

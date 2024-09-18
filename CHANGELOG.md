@@ -55,9 +55,10 @@
 - Added "TexturePair" concept
 - Added material functions for textures
 
-# 0.0.7 - 05.08.2024
+# 0.0.7 - 18.09.2024
 
 - Fixed bugs
 - Started MaterialSystem
 - Added material functions to meshes
 - Started Geometry
+- Added geometry functionality to meshes
