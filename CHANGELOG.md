@@ -62,3 +62,12 @@
 - Added material functions to meshes
 - Started Geometry
 - Added geometry functionality to meshes
+
+# 0.0.8 - 21.09.2024
+
+- Started Actors
+- Started Scene
+- Started World
+- Tied up World in Editor Layer (ATM)
+- Added Components
+- MAde scenes work through the World system

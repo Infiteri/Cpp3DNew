@@ -7,6 +7,8 @@
 
 #include "Renderer/Renderer.h"
 
+#include "Scene/World.h"
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -31,8 +33,9 @@ namespace Core
 
         Renderer::InitializeRenderingContext();
         Renderer::Init();
-
         Renderer::Viewport(state.Window->GetInfo()->Width, state.Window->GetInfo()->Height);
+
+        World::Init();
 
         ImGuiLayer::Init(); // NOTE: Requires window
     }
@@ -58,6 +61,8 @@ namespace Core
         Renderer::Render();
         if (state.GApp)
             state.GApp->Render();
+
+        World::RenderActiveScene();
         LayerStack::Update(); // TODO: REMOVE PLS REMIND ME THIS IS ME BEING LAZY
         Renderer::EndFrame();
         Renderer::RenderScreenImage();
@@ -77,10 +82,11 @@ namespace Core
         }
 
         delete state.Window;
-        Logger::Shutdown();
         LayerStack::Shutdown();
         Input::Shutdown();
         Renderer::Shutdown();
+        World::Shutdown();
+        Logger::Shutdown();
     }
 
     bool Engine::ShouldRun()

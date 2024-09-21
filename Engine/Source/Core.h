@@ -25,3 +25,8 @@
 #include "Renderer/Camera/CameraSystem.h"
 #include "Renderer/Camera/Camera.h"
 #include "Renderer/Camera/PerspectiveCamera.h"
+
+#include "Scene/Actor.h"
+#include "Scene/Scene.h"
+#include "Scene/World.h"
+#include "Scene/Components/Components.h"

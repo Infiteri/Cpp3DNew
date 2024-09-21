@@ -54,7 +54,7 @@ namespace Core
     Mesh::Mesh()
     {
         vertex = nullptr;
-        geometry = new BoxGeometry(2, 1, 1);
+        geometry = new BoxGeometry(1, 1, 1);
 
         MakeMaterialDefault();
 
