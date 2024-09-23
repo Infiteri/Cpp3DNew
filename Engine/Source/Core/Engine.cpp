@@ -63,7 +63,6 @@ namespace Core
             state.GApp->Render();
 
         World::RenderActiveScene();
-        LayerStack::Update(); // TODO: REMOVE PLS REMIND ME THIS IS ME BEING LAZY
         Renderer::EndFrame();
         Renderer::RenderScreenImage();
 

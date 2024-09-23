@@ -25,9 +25,10 @@ namespace Core
         static void LogMessage(const char *Message);
 
         // -- MEMORY --
-        static void MemSet(void *Block, int Value, CeU64 Size);
+        static void *MemSet(void *Block, CeU32 Value, CeU64 Size);
         static void *MemALloc(CeU64 Size);
-        static void Free(void* Memo);
+        static void *MemCpy(void *Block, const void *Source, CeU64 size);
+        static void Free(void *Memo);
         // ------------
     };
 

@@ -57,9 +57,14 @@ namespace Core
         WriteConsoleA(hConsole, msg, strlen(msg), &bytesWritten, NULL);
     }
 
-    void Platform::MemSet(void *Block, int Value, CeU64 Size)
+    void *Platform::MemSet(void *Block, CeU32 Value, CeU64 Size)
     {
-        memset(Block, Value, Size);
+        return memset(Block, Value, Size);
+    }
+
+    void *Platform::MemCpy(void *Block, const void *Source, CeU64 size)
+    {
+        return memcpy(Block, Source, size);
     }
 
     void *Platform::MemALloc(CeU64 Size)
@@ -67,7 +72,7 @@ namespace Core
         return malloc(Size);
     }
 
-    void Platform::Free(void* Memo)
+    void Platform::Free(void *Memo)
     {
         free(Memo);
     }

@@ -71,3 +71,14 @@
 - Tied up World in Editor Layer (ATM)
 - Added Components
 - MAde scenes work through the World system
+
+# 0.0.9 - 23.09.2024
+
+- Started Editor work
+- Added Panel/PanelSystem
+- Added ImGui Dockspace
+- Added Scene Hierarchy Panel
+- Actor UI gets rendered
+- Added CeMemory
+- Added Transform (along side shader transform and complexities that come along (future world/local matrices for parenting/ownership between actors))
+- Added temporary position/rotation transform control in scene hierarchy panel

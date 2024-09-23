@@ -16,6 +16,14 @@ namespace Core
             From(Matrix4::Multiply(*this, m));
         }
 
+        Matrix4 operator*(const Matrix4 &m)
+        {
+            Matrix4 a;
+            a.From(this);
+            a *= m;
+            return a;
+        }
+
         float data[16];
         void From(Matrix4 *other);
         void From(Matrix4 other);

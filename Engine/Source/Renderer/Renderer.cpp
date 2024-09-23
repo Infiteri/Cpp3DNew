@@ -123,6 +123,11 @@ namespace Core
             state.Screen.Buffer->Resize(width, height);
     }
 
+    CeU32 Renderer::GetPassID(int index)
+    {
+        return state.Screen.Buffer->GetRenderPass(index)->id;
+    }
+
     void Renderer::Shutdown()
     {
         delete state.Screen.Array;

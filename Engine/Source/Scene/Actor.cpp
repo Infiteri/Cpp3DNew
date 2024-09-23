@@ -1,5 +1,6 @@
 #include "Actor.h"
 #include "Renderer/Object/Mesh.h"
+#include "Renderer/Shader/ShaderSystem.h"
 
 namespace Core
 {
@@ -12,6 +13,12 @@ namespace Core
 
     Actor::~Actor()
     {
+    }
+
+    void Actor::_CalculateMatrices()
+    {
+        localMatrix = transform.GetTransformMatrix();
+        worldMatrix.From(&localMatrix);
     }
 
     void Actor::Start()
@@ -33,6 +40,12 @@ namespace Core
             return;
 
         state = Running;
+
+        //? what
+        _CalculateMatrices();
+        auto shader = ShaderSystem::GetFromEngineResource("Object");
+        if (shader)
+            shader->Mat4(&worldMatrix, "uTransform");
 
         for (auto comp : components)
         {

@@ -7,10 +7,12 @@
 
 namespace Core
 {
+    typedef std::vector<Actor *> ActorList;
+
     class CE_API Scene
     {
     private:
-        std::vector<Actor *> actors;
+        ActorList actors;
         std::string name;
 
     public:
@@ -37,5 +39,7 @@ namespace Core
         /// @param uuid The UUID of the actor.
         /// @return Pointer to an actor, nullptr if no actor exists with this UUID.
         Actor *GetActorByUUID(const UUID &uuid);
+
+        inline ActorList GetActors() { return actors; };
     };
 }

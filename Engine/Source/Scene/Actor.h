@@ -2,6 +2,8 @@
 
 #include "Base.h"
 #include "Core/UUID.h"
+#include "Math/Transform.h"
+#include "Math/Matrix4.h"
 #include "Components/Components.h"
 #include <string>
 #include <vector>
@@ -28,6 +30,14 @@ namespace Core
 
         std::vector<Component *> components;
 
+        // transform and stuff
+        Transform transform;
+
+        Matrix4 localMatrix;
+        Matrix4 worldMatrix; // when parenting and stuff comes along
+
+        void _CalculateMatrices();
+
     public:
         Actor();
         ~Actor();
@@ -43,6 +53,9 @@ namespace Core
         void Render();
         void Update();
         void Stop();
+
+        inline Transform *GetTransform() { return &transform; };
+        inline Matrix4 GetTransformMatrix() { return worldMatrix; };
 
         // ---------- COMPONENTS ----------
         template <typename T, typename... Args>

@@ -8,9 +8,10 @@
 #include "Core/Logger.h"
 #include "Core/Window.h"
 #include "Core/Input.h"
-
 #include "Core/Layer/Layer.h"
 #include "Core/Layer/LayerStack.h"
+
+#include "Core/Memory/CeMemory.h"
 
 #include "Renderer/Color.h"
 #include "Renderer/Renderer.h"
