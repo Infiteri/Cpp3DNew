@@ -9,6 +9,7 @@ namespace Core
     {
         name = "Actor";
         state = Initialized;
+        id = UUID();
     }
 
     Actor::~Actor()
@@ -17,13 +18,15 @@ namespace Core
 
     void Actor::_CalculateMatrices()
     {
-        localMatrix = transform.GetTransformMatrix();
-        worldMatrix.From(&localMatrix);
+        worldMatrix = localMatrix = transform.GetTransformMatrix();
+
+        if (owner)
+            worldMatrix = owner->worldMatrix * localMatrix;
     }
 
     void Actor::Start()
     {
-        if (state == Running)
+        if (state == Running || state == Started)
             return;
 
         state = Started;
@@ -32,11 +35,16 @@ namespace Core
         {
             comp->Start();
         }
+
+        for (auto a : children)
+        {
+            a->Start();
+        }
     }
 
     void Actor::Render()
     {
-        if (state == Started)
+        if ((state != Started) && (state != Running))
             return;
 
         state = Running;
@@ -51,11 +59,16 @@ namespace Core
         {
             comp->Render();
         }
+
+        for (auto a : children)
+        {
+            a->Render();
+        }
     }
 
     void Actor::Update()
     {
-        if (state == Started)
+        if (state != Started)
             return;
 
         state = Running;
@@ -63,6 +76,11 @@ namespace Core
         for (auto comp : components)
         {
             comp->Update();
+        }
+
+        for (auto a : children)
+        {
+            a->Update();
         }
     }
 
@@ -77,5 +95,60 @@ namespace Core
         {
             comp->Stop();
         }
+
+        for (auto a : children)
+        {
+            a->Stop();
+        }
+    }
+
+    void Actor::AddChild(Actor *actor)
+    {
+        if (!actor)
+            return;
+
+        if (state != Initialized || state != Stopped)
+            actor->Start();
+
+        actor->owner = this;
+        children.push_back(actor);
+    }
+
+    Actor *Actor::SpawnChild()
+    {
+        Actor *a = new Actor();
+        AddChild(a);
+        return a;
+    }
+
+    Actor *Actor::FindChildByUUID(const UUID &uuid)
+    {
+        if (id == uuid)
+            return this;
+
+        for (auto c : children)
+            if (c->GetUUID() == uuid)
+                return c;
+
+        return nullptr;
+    }
+
+    Actor *Actor::FindChildInHierarchyByUUID(const UUID &uuid)
+    {
+        if (this->id == uuid)
+            return this;
+
+        for (auto child : children)
+            if (child->GetUUID() == id)
+                return child;
+
+        for (Actor *child : children)
+        {
+            Actor *result = child->FindChildInHierarchyByUUID(uuid);
+            if (result != nullptr)
+                return result;
+        }
+
+        return nullptr;
     }
 }

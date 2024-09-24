@@ -7,8 +7,6 @@
 
 namespace Core
 {
-    typedef std::vector<Actor *> ActorList;
-
     class CE_API Scene
     {
     private:

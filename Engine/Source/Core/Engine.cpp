@@ -22,6 +22,10 @@ namespace Core
     {
         Logger::Settings LogSettings; // TODO: Maybe parse a file?
         Logger::Init(LogSettings);
+
+        // -- Cool --
+        CE_CORE_INFO("VERSION: %s", CE_VERSION);
+
         Input::Init();
         LayerStack::Init();
 
@@ -50,18 +54,12 @@ namespace Core
     {
         // LayerStack::Update(); TODO: Add back (funny bugs with post processing) NOOOOOOOOOOOOOOO
         state.Window->Update();
-
-        if (state.GApp)
-            state.GApp->Update();
     }
 
     void Engine::Render()
     {
         Renderer::BeginFrame();
         Renderer::Render();
-        if (state.GApp)
-            state.GApp->Render();
-
         World::RenderActiveScene();
         Renderer::EndFrame();
         Renderer::RenderScreenImage();

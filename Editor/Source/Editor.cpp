@@ -8,8 +8,8 @@ namespace Core
     class Editor : public Application
     {
     public:
-        Editor(){};
-        ~Editor(){};
+        Editor() {};
+        ~Editor() {};
 
         void Init()
         {

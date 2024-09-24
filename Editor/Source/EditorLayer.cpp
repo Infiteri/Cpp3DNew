@@ -16,6 +16,22 @@ namespace Core
 
         auto testActor = scene->SpawnActor();
         auto mesh = testActor->AddComponent<MeshComponent>();
+
+        auto testActor2 = testActor->SpawnChild();
+        testActor2->SetName("Child");
+        auto mesh2 = testActor2->AddComponent<MeshComponent>();
+
+        auto testActor3 = testActor2->SpawnChild();
+        testActor3->SetName("Child");
+        auto mesh3 = testActor3->AddComponent<MeshComponent>();
+
+        testActor2->GetTransform()->Position = {6, 1, 0};
+        testActor2->GetTransform()->Rotation = {0, 90 * CE_DEG_TO_RAD, 0};
+        testActor3->GetTransform()->Position = {5, 0, 0};
+
+        CE_DEBUG("FOUND: %i", testActor->FindChildByUUID(testActor2->GetUUID()) != nullptr);
+        CE_DEBUG("FOUND: %i", testActor->FindChildByUUID(testActor3->GetUUID()) != nullptr);
+        CE_DEBUG("FOUND: %i", testActor->FindChildInHierarchyByUUID(testActor3->GetUUID()) != nullptr);
     }
 
     void EditorLayer::OnImGuiRender()

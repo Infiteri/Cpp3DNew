@@ -14,14 +14,6 @@ namespace Core
     {
     }
 
-    void Application::Render()
-    {
-    }
-
-    void Application::Update()
-    {
-    }
-
     void Application::Shutdown()
     {
     }

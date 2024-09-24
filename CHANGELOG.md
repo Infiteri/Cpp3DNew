@@ -82,3 +82,11 @@
 - Added CeMemory
 - Added Transform (along side shader transform and complexities that come along (future world/local matrices for parenting/ownership between actors))
 - Added temporary position/rotation transform control in scene hierarchy panel
+
+# 1.0.0 - 24.09.2024
+
+- Started Parenting
+- Added parenting related functions to actors
+- Transforms are now calculated correctly based on its owner
+- Added child searching functions
+- Changed some structural application concepts

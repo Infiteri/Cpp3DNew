@@ -51,6 +51,9 @@ namespace Core
             return;
         }
 
+        if (actor->GetState() != Actor::Started)
+            actor->Start();
+
         actors.push_back(actor);
     }
 

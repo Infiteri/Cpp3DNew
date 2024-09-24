@@ -10,6 +10,8 @@
 
 namespace Core
 {
+    typedef std::vector<Actor *> ActorList;
+
     class CE_API Actor
     {
     public:
@@ -38,6 +40,10 @@ namespace Core
 
         void _CalculateMatrices();
 
+        // children
+        ActorList children;
+        Actor *owner = nullptr;
+
     public:
         Actor();
         ~Actor();
@@ -47,7 +53,7 @@ namespace Core
 
         inline State GetState() { return state; };
 
-        UUID GetUUID() { return UUID(id); };
+        UUID GetUUID() { return UUID(id.Get()); };
 
         void Start();
         void Render();
@@ -56,6 +62,25 @@ namespace Core
 
         inline Transform *GetTransform() { return &transform; };
         inline Matrix4 GetTransformMatrix() { return worldMatrix; };
+
+        // --------- PARENTING ------------
+        inline ActorList GetChildren() { return children; };
+        inline Actor *GetOwner() { return owner; };
+        inline bool IsOwned() { return owner != nullptr; };
+
+        void AddChild(Actor *actor);
+        Actor *SpawnChild();
+
+        /// @brief Searches for an actor in the children list of this actor. Goes only one level deep.
+        /// @param uuid The uuid.
+        /// @return Actor * or nullptr.
+        Actor *FindChildByUUID(const UUID &uuid);
+
+        /// @brief Searches for an actor in the children list of this actor. Goes fully deep (recursive).
+        /// @param uuid The uuid.
+        /// @return Actor * or nullptr.
+        Actor *FindChildInHierarchyByUUID(const UUID &uuid);
+        // --------------------------------
 
         // ---------- COMPONENTS ----------
         template <typename T, typename... Args>

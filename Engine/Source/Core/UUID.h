@@ -15,9 +15,9 @@ namespace Core
         UUID(const UUID &) = default;
         ~UUID();
 
-        operator CeU64() const { return id; };
+        operator CeU64() { return id; };
 
-        inline CeU64 Get() const { return id; };
+        inline CeU64 Get() { return id; };
 
         bool operator==(const UUID &o) { return id == o.id; };
     };

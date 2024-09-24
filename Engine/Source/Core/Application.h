@@ -11,8 +11,6 @@ namespace Core
         virtual ~Application();
 
         virtual void Init();
-        virtual void Render();
-        virtual void Update();
         virtual void Shutdown();
     };
 
