@@ -1,4 +1,14 @@
 #include "SceneHierarchyPanel.h"
+#include "EditorUtils.h"
+
+#define CE_UTIL_ADD_RENDER(name, type, cb)                                           \
+    int index##type = -1;                                                            \
+    for (auto Component##type : a->GetComponents<type>())                            \
+    {                                                                                \
+        index##type++;                                                               \
+        ImGui::NewLine();                                                            \
+        EditorUtils::DrawComponentBaseUI(name, Component##type, index##type, a, cb); \
+    }
 
 namespace Core
 {
@@ -58,26 +68,80 @@ namespace Core
             ImGui::TreePop();
     }
 
+    void RenderMeshUI(MeshComponent *mesh, Actor *a);
+
     void SceneHierarchyPanel::RenderActorComponents(Actor *a)
     {
         if (!a)
             return;
 
         {
-            static char buffer[256];
-            CeMemory::Zero(&buffer, 256);
-            CeMemory::Copy(&buffer, a->GetName().c_str(), a->GetName().size() <= 256 ? a->GetName().size() : 256);
-            if (ImGui::InputText("Name", buffer, 256))
-                a->SetName(buffer);
+            std::string name = EditorUtils::ImGuiStringEdit("Name", a->GetName());
+            a->SetName(name);
         }
 
-        auto t = a->GetTransform();
-        float data[3] = {t->Position.x, t->Position.y, t->Position.z};
-        if (ImGui::DragFloat3("Position", data))
-            t->Position.Set(data[0], data[1], data[2]);
+        ImGui::Dummy({0, 10});
 
-        float data2[3] = {t->Rotation.x * CE_RAD_TO_DEG, t->Rotation.y * CE_RAD_TO_DEG, t->Rotation.z * CE_RAD_TO_DEG};
-        if (ImGui::DragFloat3("Rotation", data2, 0.1))
-            t->Rotation.Set(data2[0] * CE_DEG_TO_RAD, data2[1] * CE_DEG_TO_RAD, data2[2] * CE_DEG_TO_RAD);
+        if (ImGui::TreeNode("Transform"))
+        {
+            EditorUtils::TransformGUIRender(a->GetTransform());
+            ImGui::TreePop();
+        }
+
+        CE_UTIL_ADD_RENDER("Mesh Component", MeshComponent, RenderMeshUI);
     }
+
+    void RenderMeshUI(MeshComponent *mesh, Actor *a)
+    {
+        if (ImGui::TreeNode("Material"))
+        {
+            auto mat = mesh->mesh->GetMaterial();
+
+            // UI Editing;
+            {
+                switch (mat->GetType())
+                {
+                case Material::Config:
+                    EditorUtils::ImGuiColorEdit("Color", &mat->GetState().Color);
+
+                    if (ImGui::TreeNode("Color Texture"))
+                    {
+                        EditorUtils::DrawTextureUI("Color Texture", EditorUtils::TextureColor, mat);
+                        ImGui::TreePop();
+                    }
+                    break;
+
+                case Material::Default:
+                default:
+                    ImGui::Text("Material is default.");
+                    break;
+                }
+            }
+
+            // UI Button
+            {
+
+                switch (mat->GetType())
+                {
+                case Material::Config:
+                    if (ImGui::Button("Make Default"))
+                    {
+                        mesh->mesh->MakeMaterialDefault();
+                    }
+                    break;
+
+                case Material::Default:
+                default:
+                    if (ImGui::Button("Make Unique"))
+                    {
+                        mesh->mesh->MakeMaterialUnique();
+                    }
+                    break;
+                }
+            }
+
+            ImGui::TreePop();
+        }
+    }
+
 }

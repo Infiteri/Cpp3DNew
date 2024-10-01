@@ -7,7 +7,6 @@
 
 namespace Core
 {
-
     class CE_API Texture : public BaseTexture
     {
     private:
@@ -37,5 +36,6 @@ namespace Core
                 return "";
             return image->GetPath();
         }
+        inline Image* GetImage() {return image;};
     };
 }

@@ -110,6 +110,16 @@ namespace Core
         };
 
         template <typename T>
+        std::vector<T *> GetComponents()
+        {
+            std::vector<T *> v;
+            for (Component *c : components)
+                v.push_back((T *)c);
+
+            return v;
+        };
+
+        template <typename T>
         bool HasComponent()
         {
             return GetComponent<T>() != nullptr;
@@ -126,6 +136,26 @@ namespace Core
                     components.erase(it);
                     delete typedComponent;
                     break;
+                }
+            }
+        };
+
+        template <typename T>
+        void RemoveComponent(int index)
+        {
+            int currentIndex = -1;
+            for (auto it = components.begin(); it != components.end(); ++it)
+            {
+                T *typedComponent = dynamic_cast<T *>(*it);
+                if (typedComponent)
+                {
+                    currentIndex++;
+                    if (index == currentIndex)
+                    {
+                        components.erase(it);
+                        delete typedComponent;
+                        break;
+                    }
                 }
             }
         };

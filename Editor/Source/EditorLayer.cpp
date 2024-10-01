@@ -11,6 +11,11 @@ namespace Core
 
     void EditorLayer::OnAttach()
     {
+        state.Camera.camera = CameraSystem::CreatePerspective("EditorCamera", 120.0f);
+        CameraSystem::Activate("EditorCamera");
+
+        ImGuiLayer::SetFont("EngineResources/Font/Open_Sans/static/OpenSans-Bold.ttf", 12.0f);
+
         scene = World::CreateScene("Scene");
         World::ActivateScene("Scene");
 
@@ -28,10 +33,6 @@ namespace Core
         testActor2->GetTransform()->Position = {6, 1, 0};
         testActor2->GetTransform()->Rotation = {0, 90 * CE_DEG_TO_RAD, 0};
         testActor3->GetTransform()->Position = {5, 0, 0};
-
-        CE_DEBUG("FOUND: %i", testActor->FindChildByUUID(testActor2->GetUUID()) != nullptr);
-        CE_DEBUG("FOUND: %i", testActor->FindChildByUUID(testActor3->GetUUID()) != nullptr);
-        CE_DEBUG("FOUND: %i", testActor->FindChildInHierarchyByUUID(testActor3->GetUUID()) != nullptr);
     }
 
     void EditorLayer::OnImGuiRender()
@@ -41,50 +42,31 @@ namespace Core
         state.Panels.RenderImGui(&state.PanelInfo);
         RenderSceneViewport();
         EndDockspace();
-
-        // TODO: Move to editor layer camera class
-        {
-            auto cam = Core::CameraSystem::GetPerspectiveActive();
-            if (cam)
-            {
-                cam->UpdateView();
-
-                if (Input::GetKey(Keys::W))
-                    cam->GetPosition().z -= speed;
-
-                if (Input::GetKey(Keys::S))
-                    cam->GetPosition().z += speed;
-
-                if (Input::GetKey(Keys::A))
-                    cam->GetPosition().x -= speed;
-
-                if (Input::GetKey(Keys::D))
-                    cam->GetPosition().x += speed;
-
-                if (Input::GetKey(Keys::Q))
-                    cam->GetPosition().x += speed;
-
-                if (Input::GetKey(Keys::E))
-                    cam->GetPosition().x -= speed;
-
-                if (Input::GetKey(Keys::I))
-                    cam->GetRotation().x += rotationSpeed * CE_DEG_TO_RAD;
-
-                if (Input::GetKey(Keys::K))
-                    cam->GetRotation().x -= rotationSpeed * CE_DEG_TO_RAD;
-
-                if (Input::GetKey(Keys::J))
-                    cam->GetRotation().y -= rotationSpeed * CE_DEG_TO_RAD;
-
-                if (Input::GetKey(Keys::L))
-                    cam->GetRotation().y += rotationSpeed * CE_DEG_TO_RAD;
-            }
-        }
     }
 
     void EditorLayer::OnUpdate()
     {
         World::UpdateActiveScene(); // TODO: Add this to the engine somehow please thank you :)
+
+        if (state.Camera.updateWithMouse)
+        {
+            state.Camera.UpdateMouse();
+            state.Camera.UpdateMovement();
+        }
+
+        if (Input::GetButton(Buttons::Right))
+        {
+            Vector2 position = Input::GetMousePosition();
+            if (position.x > state.Dockspace.ViewportLeftTop.x &&
+                position.y > state.Dockspace.ViewportLeftTop.y &&
+                position.x < state.Dockspace.ViewportLeftTop.x + state.Dockspace.ViewportRightBottom.x &&
+                position.y < state.Dockspace.ViewportLeftTop.y + state.Dockspace.ViewportRightBottom.y)
+                state.Camera.updateWithMouse = true;
+        }
+        else
+        {
+            state.Camera.updateWithMouse = false;
+        }
     }
 
     void EditorLayer::PreparePanelInfo()
@@ -138,11 +120,15 @@ namespace Core
 
         // Update renderer viewport
         ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+        state.LastFrameViewport = viewportSize;
         if (viewportSize.x != state.LastFrameViewport.x || viewportSize.y != state.LastFrameViewport.y)
         {
-            state.LastFrameViewport = viewportSize;
             Renderer::Viewport(viewportSize.x, viewportSize.y);
         }
+
+        state.Dockspace.ViewportLeftTop = ImGui::GetWindowPos();
+        state.Dockspace.ViewportRightBottom = ImGui::GetWindowSize();
+
         // End update renderer viewport
         ImGui::Image((void *)(CeU64)(CeU32)(Renderer::GetPassID(0)), viewportSize, ImVec2{0, 1}, ImVec2{1, 0});
 

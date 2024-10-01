@@ -20,9 +20,9 @@ namespace Core
             delete material;
             break;
 
-        case Material::File: // Will matter at some point
-            MaterialSystem::Release(material->GetState().Name);
-            break;
+        // case Material::File: // Will matter at some point
+        //     MaterialSystem::Release(material->GetState().Name);
+        //     break;
         }
 
         material = nullptr;

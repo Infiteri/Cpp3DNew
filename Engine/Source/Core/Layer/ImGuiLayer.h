@@ -4,7 +4,7 @@
 
 namespace Core
 {
-    class ImGuiLayer
+    class CE_API ImGuiLayer
     {
     public:
         ImGuiLayer(){};
@@ -14,5 +14,7 @@ namespace Core
         static void Shutdown();
         static void BeginFrame();
         static void EndFrame();
+
+        static void SetFont(const char* path, float size);
     };
 }

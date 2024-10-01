@@ -30,6 +30,7 @@ namespace Core
 
     Material::~Material()
     {
+        ReleaseTexture(&colorTexture);
     }
 
     void Material::Use()
@@ -59,7 +60,7 @@ namespace Core
     {
         Configuration config;
         config.Color.Set(255, 255, 255, 255);
-        colorTexture.texture = TextureSystem::Get("EngineResources/Images/crate.png");
+        colorTexture.texture = TextureSystem::GetDefault();
         colorTexture.isDefault = true;
 
         Create(&config);

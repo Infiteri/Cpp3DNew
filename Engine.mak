@@ -7,7 +7,7 @@ EXTENSION := .dll
 COMPILER_FLAGS := -g -std=c++2a #-fPIC
 VP := -IEngine/Vendor
 INCLUDE_FLAGS := -IEngine\Source $(VP)/GLFW/include $(VP)/glad/include $(VP)/ImGui $(VP)/stb
-LINKER_FLAGS := -g -shared -LBin -lglfw3 -lglad -lImGui
+LINKER_FLAGS := -g -shared -LBin -lglfw3 -lglad -lImGui -lcomdlg32 -lShlwapi
 DEFINES := -D_DEBUG -DCE_BUILD_DLL -D_CRT_SECURE_NO_WARNINGS
 
 # Make does not offer a recursive wildcard function, so here's one:

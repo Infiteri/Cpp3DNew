@@ -128,6 +128,11 @@ namespace Core
         }
     }
 
+    Vector2 Input::GetMousePosition()
+    {
+        return {mouse_state.position.x, mouse_state.position.y};
+    }
+
     void InputUpdateKey(Keys key, bool p)
     {
         lastKeys[key] = keys[key];

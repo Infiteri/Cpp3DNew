@@ -10,7 +10,7 @@ namespace Core
     }
 
     void LayerStack::Shutdown()
-    {
+    { 
         for (auto l : layers)
         {
             l->OnDetach();

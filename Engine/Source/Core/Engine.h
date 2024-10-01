@@ -15,6 +15,10 @@ namespace Core
         {
             Window *Window;
             Application *GApp;
+
+            // Delta
+            float DeltaTime;
+            float LastTime;
         };
 
         Engine() {}
@@ -28,6 +32,8 @@ namespace Core
         static bool ShouldRun();
         static Window *GetWindow();
         static void FeedApplication(Application *App);
+
+        static float GetDeltaTime();
 
         static std::string ReadFileContent(const std::string &filename);
     };

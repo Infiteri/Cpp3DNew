@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <glfw/glfw3.h>
 
 namespace Core
 {
@@ -52,8 +53,12 @@ namespace Core
 
     void Engine::Update()
     {
-        // LayerStack::Update(); TODO: Add back (funny bugs with post processing) NOOOOOOOOOOOOOOO
         state.Window->Update();
+        LayerStack::Update();
+
+        double currentFrameTime = glfwGetTime();
+        state.DeltaTime = (float)(currentFrameTime - state.LastTime);
+        state.LastTime = (float)(currentFrameTime);
     }
 
     void Engine::Render()
@@ -99,6 +104,11 @@ namespace Core
     void Engine::FeedApplication(Application *_App)
     {
         state.GApp = _App;
+    }
+
+    float Engine::GetDeltaTime()
+    {
+        return state.DeltaTime;
     }
 
     std::string Engine::ReadFileContent(const std::string &filename)

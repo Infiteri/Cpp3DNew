@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Base.h"
+#include "Math/Vectors.h"
 
 namespace Core
 {
@@ -153,8 +154,8 @@ namespace Core
     class CE_API Input
     {
     public:
-        Input(){};
-        ~Input(){};
+        Input() {};
+        ~Input() {};
 
         static void Init();
         static void Shutdown();
@@ -209,6 +210,10 @@ namespace Core
         /// @brief Sets the mouse mode to the specified mode.
         /// @param mode The mode of the mouse.
         static void SetMouseMode(MouseMode mode);
+
+        /// @brief Will return a Vector2 with the mouse position.
+        /// @return The Vector.
+        static Vector2 GetMousePosition();
     };
 
     void InputUpdateKey(Keys key, bool p);

@@ -5,7 +5,7 @@
 namespace Core
 {
     enum class TextureFilter
-    {
+    {   
         Linear,
         Nearest,
     };

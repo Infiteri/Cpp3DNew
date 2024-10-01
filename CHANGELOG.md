@@ -90,3 +90,13 @@
 - Transforms are now calculated correctly based on its owner
 - Added child searching functions
 - Changed some structural application concepts
+
+# 1.0.1 - 01.10.2024
+
+- Added Transform GUI
+- Added Mesh GUI
+- Actor component related stuff
+- Added Delta Time
+- Added Editor camera
+- Added Fonts to GUI
+- Other stuff

@@ -18,7 +18,7 @@ namespace Core
             Config,
 
             /// @brief From file, TODO: Implement
-            File
+            // File
         };
 
         struct Configuration
@@ -39,9 +39,8 @@ namespace Core
             bool isDefault = true;
         };
 
-        void ReleaseTexture(TexturePair *pair);
-
         TexturePair colorTexture;
+        void ReleaseTexture(TexturePair *pair);
 
     public:
         Material();
@@ -55,6 +54,8 @@ namespace Core
 
         inline Configuration &GetState() { return state; };
         inline MaterialTypes GetType() { return type; };
+
+        inline Texture *GetColorTexture() { return colorTexture.texture; };
 
         /// @brief Do not call if you dont know what you doing (ultra bad btw)
         /// @param t The new type
