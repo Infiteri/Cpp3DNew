@@ -1,3 +1,4 @@
+// VERTEX
 #version 330 core
 
 layout(location = 0) in vec3 aPosition;
@@ -13,4 +14,19 @@ out vec2 vUVs;
 void main() {
     vUVs = aUVS;
     gl_Position = uProjection * uView * uTransform * vec4(aPosition, 1.0);
+}
+
+// FRAGMENT
+
+#version 330 core
+
+in vec2 vUVs;
+
+uniform sampler2D uColorTexture;
+uniform vec4 uColor;
+
+out vec4 aColor;
+
+void main() {
+    aColor = uColor * texture2D(uColorTexture, vUVs);
 }

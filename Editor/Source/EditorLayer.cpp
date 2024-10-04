@@ -27,12 +27,17 @@ namespace Core
         auto mesh2 = testActor2->AddComponent<MeshComponent>();
 
         auto testActor3 = testActor2->SpawnChild();
-        testActor3->SetName("Child");
+        testActor3->SetName("Child 2");
         auto mesh3 = testActor3->AddComponent<MeshComponent>();
+
+        auto testActor4 = scene->SpawnActor();
+        testActor4->SetName("Testingar");
+        testActor4->AddComponent<MeshComponent>();
 
         testActor2->GetTransform()->Position = {6, 1, 0};
         testActor2->GetTransform()->Rotation = {0, 90 * CE_DEG_TO_RAD, 0};
         testActor3->GetTransform()->Position = {5, 0, 0};
+        testActor4->GetTransform()->Position = {-5, 0, 0};
     }
 
     void EditorLayer::OnImGuiRender()
@@ -120,9 +125,9 @@ namespace Core
 
         // Update renderer viewport
         ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-        state.LastFrameViewport = viewportSize;
         if (viewportSize.x != state.LastFrameViewport.x || viewportSize.y != state.LastFrameViewport.y)
         {
+            state.LastFrameViewport = viewportSize;
             Renderer::Viewport(viewportSize.x, viewportSize.y);
         }
 

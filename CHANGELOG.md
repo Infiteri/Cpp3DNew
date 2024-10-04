@@ -100,3 +100,10 @@
 - Added Editor camera
 - Added Fonts to GUI
 - Other stuff
+
+# 1.0.2 - 04.10.2024
+
+- Started single file shader
+- Fixed ImGui Image framebuffer issue (lost my mind (can go into details tho))
+- Editor actor children get rendered
+- Moving actors in the hierarchy and parenting to others is now possible

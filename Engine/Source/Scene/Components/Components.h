@@ -19,6 +19,8 @@ namespace Core
         virtual void Render() {};
         virtual void Update() {};
         virtual void Stop() {};
+
+        virtual void From(Component *c) {};
     };
 
     class CE_API MeshComponent : public Component
@@ -30,6 +32,8 @@ namespace Core
 
         void Destroy();
         void Render();
+
+        void From(MeshComponent *c);
     };
 
 }

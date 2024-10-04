@@ -94,15 +94,25 @@ namespace Core
     void Renderer::RenderScreenImage()
     {
         // Bind texture
+        // TODO: Refactor into different functions so that it can be chosen between filling the PostBuffer Framebuffer with correct textures or immediately render to the screen
         RenderPassSpecification *renderPass = state.Screen.Buffer->GetRenderPass(0);
+        auto post = state.Screen.PostBuffer;
 
+        post->Bind();
         state.Screen.SShader->Use();
-        state.Screen.Array->Bind();
 
-        glActiveTexture(GL_TEXTURE0 + renderPass->index);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, renderPass->id);
-        ShaderSystem::GetFromEngineResource("Screen")->Int(renderPass->index, "uScreenTexture");
+        ShaderSystem::GetFromEngineResource("Screen")->Int(0, "uScreenTexture");
 
+        state.Screen.Array->Bind();
+        state.Screen.Array->GetVertexBuffer()->Bind();
+        state.Screen.Array->GetVertexBuffer()->Draw();
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindTexture(GL_TEXTURE_2D, post->GetRenderPass(0)->id);
+
+        state.Screen.Array->Bind();
         state.Screen.Array->GetVertexBuffer()->Bind();
         state.Screen.Array->GetVertexBuffer()->Draw();
     }
@@ -121,11 +131,14 @@ namespace Core
 
         if (state.Screen.Buffer)
             state.Screen.Buffer->Resize(width, height);
+
+        if (state.Screen.PostBuffer)
+            state.Screen.PostBuffer->Resize(width, height);
     }
 
     CeU32 Renderer::GetPassID(int index)
     {
-        return state.Screen.Buffer->GetRenderPass(index)->id;
+        return state.Screen.PostBuffer->GetRenderPass(index)->id;
     }
 
     void Renderer::Shutdown()

@@ -9,15 +9,16 @@ namespace Core
     {
     public:
         Actor *selectionContext;
+        int actorIndex;
 
         SceneHierarchyPanel();
         ~SceneHierarchyPanel();
 
         virtual void OnImGuiRender(PanelInformation *information) override;
 
-        void RenderActor(Actor *a);
+        void RenderActor(Actor *a, Actor *parent, bool parentNodeOpen);
+        void RenderActorComponents(Actor *a);
 
-        void RenderActorComponents(Actor* a);
     };
 
 }

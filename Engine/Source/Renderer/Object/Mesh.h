@@ -12,7 +12,8 @@ namespace Core
     private:
         VertexArray *vertex = nullptr;
         Material *material = nullptr;
-        Geometry* geometry;
+        Geometry *geometry;
+        bool isMaterialUnique;
 
         void _ReleaseMaterial();
         void _ReleaseGeometry();
@@ -26,10 +27,11 @@ namespace Core
 
         inline Material *GetMaterial() { return material; };
         inline Geometry *GetGeometry() { return geometry; };
+        inline bool IsMaterialUnique() { return isMaterialUnique; };
 
         /// @brief Sets geometry and takes ownership.
         /// @param newGeometry The new geometry
-        void SetGeometry(Geometry* newGeometry);
+        void SetGeometry(Geometry *newGeometry);
 
         void MakeMaterialDefault();
         void MakeMaterialUnique();

@@ -19,16 +19,26 @@ namespace Core
     {
         SShader = ShaderSystem::GetFromEngineResource("Screen");
 
-        FrameBufferSpecification spec;
-        spec.width = 1920;
-        spec.height = 1080;
+        {
+            FrameBufferSpecification spec;
+            spec.width = 1920;
+            spec.height = 1080;
+            spec.renderPassSpecificationCount = 2;
+            spec.renderPassSpecifications = (RenderPassSpecification *)Platform::MemALloc(sizeof(RenderPassSpecification) * spec.renderPassSpecificationCount);
+            spec.renderPassSpecifications[0].textureType = RenderPassTextureType::Rgb;
+            spec.renderPassSpecifications[1].textureType = RenderPassTextureType::Depth;
+            Buffer = new FrameBuffer(spec);
+        }
 
-        spec.renderPassSpecificationCount = 2;
-        spec.renderPassSpecifications = (RenderPassSpecification *)Platform::MemALloc(sizeof(RenderPassSpecification) * spec.renderPassSpecificationCount);
-        spec.renderPassSpecifications[0].textureType = RenderPassTextureType::Rgb;
-        spec.renderPassSpecifications[1].textureType = RenderPassTextureType::Depth;
-
-        Buffer = new FrameBuffer(spec);
+        {
+            FrameBufferSpecification spec;
+            spec.width = 1920;
+            spec.height = 1080;
+            spec.renderPassSpecificationCount = 1;
+            spec.renderPassSpecifications = (RenderPassSpecification *)Platform::MemALloc(sizeof(RenderPassSpecification) * spec.renderPassSpecificationCount);
+            spec.renderPassSpecifications[0].textureType = RenderPassTextureType::Rgb;
+            PostBuffer = new FrameBuffer(spec);
+        }
 
         Array = new VertexArray();
         Array->GenVertexBuffer(screenQuadVertices, sizeof(screenQuadVertices)); // ! NO sizeof(float) cuz it makes the final image broken;

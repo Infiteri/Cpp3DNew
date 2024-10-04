@@ -3,6 +3,7 @@
 #include "Base.h"
 #include "Actor.h"
 #include <vector>
+#include <unordered_map>
 #include <string>
 
 namespace Core
@@ -39,5 +40,11 @@ namespace Core
         Actor *GetActorByUUID(const UUID &uuid);
 
         inline ActorList GetActors() { return actors; };
+
+        Actor *GetActorInHierarchy(const UUID &uuid);
+
+        void RemoveActorByUUID(const UUID &uid);
+
+        void MoveChildInHierarchy(const UUID &uid, int newIndex);
     };
 }

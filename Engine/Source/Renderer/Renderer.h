@@ -26,6 +26,7 @@ namespace Core
             GPUScreen Screen;
             Viewport ScreenViewport;
             Shader *objectShader;
+            Shader *gray;
 
             bool initializedContext = false;
         };

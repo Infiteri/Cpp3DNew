@@ -18,4 +18,7 @@ namespace Core
         mesh->Render();
     }
 
+    void MeshComponent::From(MeshComponent *c)
+    {
+    }
 }

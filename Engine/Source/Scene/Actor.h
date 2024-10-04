@@ -42,11 +42,13 @@ namespace Core
 
         // children
         ActorList children;
-        Actor *owner = nullptr;
+        Actor *parent = nullptr;
 
     public:
         Actor();
         ~Actor();
+
+        static Actor *From(Actor *a);
 
         void SetName(const std::string &name) { this->name = name; };
         inline std::string GetName() { return name; };
@@ -65,8 +67,8 @@ namespace Core
 
         // --------- PARENTING ------------
         inline ActorList GetChildren() { return children; };
-        inline Actor *GetOwner() { return owner; };
-        inline bool IsOwned() { return owner != nullptr; };
+        inline Actor *GetParent() { return parent; };
+        inline bool IsOwned() { return parent != nullptr; };
 
         void AddChild(Actor *actor);
         Actor *SpawnChild();
@@ -80,6 +82,8 @@ namespace Core
         /// @param uuid The uuid.
         /// @return Actor * or nullptr.
         Actor *FindChildInHierarchyByUUID(const UUID &uuid);
+
+        void RemoveActorByUUID(const UUID& uuid);
         // --------------------------------
 
         // ---------- COMPONENTS ----------

@@ -39,10 +39,33 @@ namespace Core
 
     void Shader::Compile(const std::string &vertexSource, const std::string &fragmentSource)
     {
+        CompileFromSource(
+            Engine::ReadFileContent(vertexSource),
+            Engine::ReadFileContent(fragmentSource));
+    }
+
+    void Shader::Compile(const std::string &shaderSource)
+    {
+        std::string fileContent = Engine::ReadFileContent(shaderSource);
+        auto vertexCommentPosition = fileContent.find("// VERTEX");
+        auto fragmentCommentPosition = fileContent.find("// FRAGMENT");
+        if (vertexCommentPosition == std::string::npos || fragmentCommentPosition == std::string::npos)
+        {
+            CE_ERROR("Shader file invalid.");
+            return;
+        }
+        std::string vertexShaderSource = fileContent.substr(vertexCommentPosition, fragmentCommentPosition - vertexCommentPosition);
+        std::string fragmentShaderSource = fileContent.substr(fragmentCommentPosition);
+
+        CompileFromSource(vertexShaderSource, fragmentShaderSource);
+    }
+
+    void Shader::CompileFromSource(const std::string &vertexSource, const std::string &fragmentSource)
+    {
         id = 0;
         valid = false;
-        CeU32 vertexShader = LoadShader(Engine::ReadFileContent(vertexSource).c_str(), GL_VERTEX_SHADER);
-        CeU32 fragmentShader = LoadShader(Engine::ReadFileContent(fragmentSource).c_str(), GL_FRAGMENT_SHADER);
+        CeU32 vertexShader = LoadShader(vertexSource.c_str(), GL_VERTEX_SHADER);
+        CeU32 fragmentShader = LoadShader(fragmentSource.c_str(), GL_FRAGMENT_SHADER);
 
         id = glCreateProgram();
         glAttachShader(id, vertexShader);
@@ -83,6 +106,11 @@ namespace Core
     Shader::Shader(const ShaderConstructor &constructor)
     {
         Compile(constructor.VertexSource, constructor.FragmentSource);
+    }
+
+    Shader::Shader(const std::string &shaderSource)
+    {
+        Compile(shaderSource);
     }
 
     Shader::Shader(const std::string &vertexSource, const std::string &fragmentSource)

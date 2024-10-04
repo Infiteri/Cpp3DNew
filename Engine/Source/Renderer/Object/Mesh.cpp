@@ -20,9 +20,9 @@ namespace Core
             delete material;
             break;
 
-        // case Material::File: // Will matter at some point
-        //     MaterialSystem::Release(material->GetState().Name);
-        //     break;
+            // case Material::File: // Will matter at some point
+            //     MaterialSystem::Release(material->GetState().Name);
+            //     break;
         }
 
         material = nullptr;
@@ -98,6 +98,7 @@ namespace Core
 
         _ReleaseMaterial();
         material = MaterialSystem::GetDefault();
+        isMaterialUnique = false;
     }
 
     void Mesh::MakeMaterialUnique()
@@ -107,5 +108,6 @@ namespace Core
 
         material = new Material();
         material->SetType(Material::Config);
+        isMaterialUnique = true;
     }
 }

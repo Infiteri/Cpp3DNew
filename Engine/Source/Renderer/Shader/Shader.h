@@ -22,11 +22,14 @@ namespace Core
         bool valid = false;
 
         void Compile(const std::string &vertexSource, const std::string &fragmentSource);
+        void Compile(const std::string &shaderSource);
+        void CompileFromSource(const std::string &vertexSource, const std::string &fragmentSource);
 
         CeU32 GetUniLoc(const char *n);
 
     public:
         Shader(const ShaderConstructor &constructor);
+        Shader(const std::string &shaderSource);
         Shader(const std::string &vertexSource, const std::string &fragmentSource);
         ~Shader();
 

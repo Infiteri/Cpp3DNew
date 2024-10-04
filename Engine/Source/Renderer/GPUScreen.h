@@ -12,6 +12,7 @@ namespace Core
     {
         VertexArray *Array;
         FrameBuffer *Buffer;
+        FrameBuffer *PostBuffer;
         Shader *SShader;
 
         void Setup();

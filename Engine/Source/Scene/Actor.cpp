@@ -16,12 +16,36 @@ namespace Core
     {
     }
 
+    Actor *Actor::From(Actor *other)
+    {
+
+        if (!other)
+            return nullptr;
+
+        Actor *outActor = new Actor();
+        outActor->SetName(other->GetName());
+        outActor->parent = other->GetParent();
+
+        auto transform = other->GetTransform();
+        auto mesh = other->GetComponent<MeshComponent>();
+
+        outActor->GetTransform()->From(transform);
+
+        if (mesh)
+            outActor->AddComponent<MeshComponent>()->From(mesh);
+
+        for (Actor *a : other->GetChildren())
+            outActor->AddChild(Actor::From(a));
+
+        return other;
+    }
+
     void Actor::_CalculateMatrices()
     {
         worldMatrix = localMatrix = transform.GetTransformMatrix();
 
-        if (owner)
-            worldMatrix = owner->worldMatrix * localMatrix;
+        if (parent)
+            worldMatrix = parent->worldMatrix * localMatrix;
     }
 
     void Actor::Start()
@@ -110,7 +134,7 @@ namespace Core
         if (state != Initialized || state != Stopped)
             actor->Start();
 
-        actor->owner = this;
+        actor->parent = this;
         children.push_back(actor);
     }
 
@@ -150,5 +174,22 @@ namespace Core
         }
 
         return nullptr;
+    }
+
+    void Actor::RemoveActorByUUID(const UUID &uuid)
+    {
+        Actor *a;
+
+        int index = -1;
+        for (auto child : children)
+        {
+            index++;
+            if (child->id == uuid)
+            {
+                child->parent = nullptr;
+                children.erase(children.begin() + index);
+                break;
+            }
+        }
     }
 }

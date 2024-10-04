@@ -48,7 +48,7 @@ namespace Core
         if (Exists(name))
             return true;
 
-        Shaders[name] = new Shader(name + ".vs.glsl", name + ".fs.glsl");
+        Shaders[name] = new Shader(name + ".glsl");
         if (!Shaders[name]->GetValid())
         {
             CE_LOG("CE_SHD", Error, "Shader '%s' not valid.");
