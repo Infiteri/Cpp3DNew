@@ -1,19 +1,24 @@
 #pragma once
 
 #include "Base.h"
+#include <string>
 
 namespace Core
 {
     enum class TextureFilter
-    {   
+    {
         Linear,
         Nearest,
     };
 
     struct TextureConfiguration
     {
+        std::string FilePath;
         TextureFilter MinFilter = TextureFilter::Linear;
         TextureFilter MagFilter = TextureFilter::Linear;
+
+        /// @brief Internal flag, do not touch TODO: Make better
+        bool INTERNAL_IGNORE = false;
     };
 
     class BaseTexture

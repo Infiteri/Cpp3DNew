@@ -6,8 +6,8 @@ ASSEMBLY := Engine
 EXTENSION := .dll
 COMPILER_FLAGS := -g -std=c++2a #-fPIC
 VP := -IEngine/Vendor
-INCLUDE_FLAGS := -IEngine\Source $(VP)/GLFW/include $(VP)/glad/include $(VP)/ImGui $(VP)/stb
-LINKER_FLAGS := -g -shared -LBin -lglfw3 -lglad -lImGui -lcomdlg32 -lShlwapi
+INCLUDE_FLAGS := -IEngine\Source $(VP)/GLFW/include $(VP)/glad/include $(VP)/ImGui $(VP)/stb $(VP)/YAML/include
+LINKER_FLAGS := -g -shared -LBin -lglfw3 -lglad -lImGui -lcomdlg32 -lShlwapi -lyaml 
 DEFINES := -D_DEBUG -DCE_BUILD_DLL -D_CRT_SECURE_NO_WARNINGS
 
 # Make does not offer a recursive wildcard function, so here's one:
@@ -39,4 +39,4 @@ clean: # clean build directory
 
 $(OBJ_DIR)/%.cpp.o: %.cpp # compile .cpp to .cpp.o object
 	@echo   $<...
-	@g++ $< $(COMPILER_FLAGS) -c -o $@ $(DEFINES) $(INCLUDE_FLAGS)
+	@g++ $< $(COMPILER_FLAGS) -c -o $@ $(DEFINES) $(INCLUDE_FLAGS) 

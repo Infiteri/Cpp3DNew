@@ -37,6 +37,5 @@ void main() {
         color = vec4(vec3(1.0 - texture2D(uScreenTexture, vUVs)), 1.0);
     }
 
-    // Output the final color
     oColor = color;
 }

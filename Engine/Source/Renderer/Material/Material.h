@@ -25,6 +25,7 @@ namespace Core
         {
             std::string Name;
             Color Color;
+            TextureConfiguration TextureConfig;
 
             void From(Configuration *config);
         };
@@ -63,6 +64,18 @@ namespace Core
 
         /// @brief Will set the texture to the default white.
         void SetColorTexture();
+
+        /// @brief Will set the texture from the name, name being its path with no configuration.
+        /// @note For using any kind of configuration, use the other overload, FilePath being equal to name.
+        /// @param name The name of the texture / path of the image.
         void SetColorTexture(const std::string &name /* const TextureConfiguration &ref = {}*/);
+
+        /// @brief Will set the texture from configuration.
+        /// @param configuration The configuration to use.
+        void SetColorTexture(TextureConfiguration &configuration);
+
+        /// @brief Will set the color of the material.
+        /// @param color The color to use.
+        void SetColor(const Color& color);
     };
 }

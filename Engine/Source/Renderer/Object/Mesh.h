@@ -13,7 +13,6 @@ namespace Core
         VertexArray *vertex = nullptr;
         Material *material = nullptr;
         Geometry *geometry;
-        bool isMaterialUnique;
 
         void _ReleaseMaterial();
         void _ReleaseGeometry();
@@ -27,7 +26,7 @@ namespace Core
 
         inline Material *GetMaterial() { return material; };
         inline Geometry *GetGeometry() { return geometry; };
-        inline bool IsMaterialUnique() { return isMaterialUnique; };
+        inline bool IsMaterialUnique() { return material->GetType() == Material::Config; };
 
         /// @brief Sets geometry and takes ownership.
         /// @param newGeometry The new geometry
@@ -35,6 +34,7 @@ namespace Core
 
         void MakeMaterialDefault();
         void MakeMaterialUnique();
+        void MakeMaterialUnique(Material::Configuration &config);
         // void SetMaterial(const std::string& name);
     };
 }

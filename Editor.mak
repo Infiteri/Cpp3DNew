@@ -5,7 +5,7 @@ OBJ_DIR := Bin-Obj
 ASSEMBLY := Editor
 EXTENSION := .exe
 COMPILER_FLAGS := -g -std=c++17 #-fPIC
-INCLUDE_FLAGS := -IEditor\Source -IEngine/Source -IEngine/Vendor/ImGui -IEngine/Vendor/stb
+INCLUDE_FLAGS := -IEditor\Source -IEngine/Source -IEngine/Vendor/ImGui -IEngine/Vendor/stb -IEngine/Vendor/YAML/include
 LINKER_FLAGS := -g -lEngine -L$(BUILD_DIR) -lImGui
 DEFINES := -D_DEBUG -D_CRT_SECURE_NO_WARNINGS -DCE_WITH_EDITOR
 

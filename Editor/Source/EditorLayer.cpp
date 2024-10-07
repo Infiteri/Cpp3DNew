@@ -16,8 +16,11 @@ namespace Core
 
         ImGuiLayer::SetFont("EngineResources/Font/Open_Sans/static/OpenSans-Bold.ttf", 12.0f);
 
+        // TODO:This type of scene creation sucks
         scene = World::CreateScene("Scene");
         World::ActivateScene("Scene");
+
+#if 0
 
         auto testActor = scene->SpawnActor();
         auto mesh = testActor->AddComponent<MeshComponent>();
@@ -38,6 +41,7 @@ namespace Core
         testActor2->GetTransform()->Rotation = {0, 90 * CE_DEG_TO_RAD, 0};
         testActor3->GetTransform()->Position = {5, 0, 0};
         testActor4->GetTransform()->Position = {-5, 0, 0};
+#endif
     }
 
     void EditorLayer::OnImGuiRender()
@@ -46,6 +50,22 @@ namespace Core
         PreparePanelInfo();
         state.Panels.RenderImGui(&state.PanelInfo);
         RenderSceneViewport();
+
+        ImGui::Begin("Debug");
+        if (ImGui::Button("Save"))
+        {
+            SceneSerializer serializer(scene);
+            serializer.Serialize("EngineResources/Scene.ce_scene");
+        }
+
+        if (ImGui::Button("Load"))
+        {
+            SceneSerializer serializer(scene);
+            serializer.Deserialize("EngineResources/Scene.ce_scene");
+        }
+
+        ImGui::End();
+
         EndDockspace();
     }
 
@@ -69,9 +89,7 @@ namespace Core
                 state.Camera.updateWithMouse = true;
         }
         else
-        {
             state.Camera.updateWithMouse = false;
-        }
     }
 
     void EditorLayer::PreparePanelInfo()

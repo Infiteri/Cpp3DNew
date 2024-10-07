@@ -11,8 +11,10 @@ namespace Core
     {
     private:
         Image *image = nullptr;
+        TextureConfiguration config;
 
         void DestroyImageIfExistent();
+        void DestroyGLTexture();
 
     public:
         Texture();
@@ -29,6 +31,9 @@ namespace Core
         void Bind();
         void Use();
 
+        void UpdateWithConfig(TextureConfiguration& config);
+
+        inline TextureConfiguration &GetConfig() { return config; };
         inline bool HasImage() { return image != nullptr; };
         inline std::string GetImagePath()
         {
@@ -36,6 +41,6 @@ namespace Core
                 return "";
             return image->GetPath();
         }
-        inline Image* GetImage() {return image;};
+        inline Image *GetImage() { return image; };
     };
 }

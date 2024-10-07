@@ -117,6 +117,8 @@ namespace Core
                 // NOTE: Should be last for the drag-drop feature.
                 float div = 5.0f;
                 ImGui::Image((void *)(CeU64)(CeU32)texture->GetID(), {imgW / div, imgH / div});
+
+                DrawTextureUIChangeFilter(texture);
             }
 
             if (ImGui::Button("Load"))
@@ -150,6 +152,42 @@ namespace Core
                 default:
                     break;
                 }
+            }
+        }
+    }
+
+    void EditorUtils::DrawTextureUIChangeFilter(Texture *texture)
+    {
+        auto &cfg = texture->GetConfig();
+
+        for (int i = 0; i < 2; i++)
+        {
+            const int Count = 2;
+            const char *FilterType[Count] = {"Nearest", "Linear"};
+            const char *Current = FilterType[i == 0 ? (int)cfg.MinFilter : (int)cfg.MagFilter];
+
+            if (ImGui::BeginCombo(i == 0 ? "MinFilter" : "MagFilter", Current))
+            {
+                for (int ci = 0; ci < Count; ci++)
+                {
+                    bool isSelected = (Current == FilterType[ci]);
+                    if (ImGui::Selectable(FilterType[ci], isSelected))
+                    {
+                        Current = FilterType[ci];
+
+                        if (i == 0)
+                            cfg.MinFilter = (TextureFilter)ci;
+                        else
+                            cfg.MagFilter = (TextureFilter)ci;
+
+                        texture->UpdateWithConfig(cfg);
+                    }
+
+                    if (isSelected)
+                        ImGui::SetItemDefaultFocus();
+                }
+
+                ImGui::EndCombo();
             }
         }
     }

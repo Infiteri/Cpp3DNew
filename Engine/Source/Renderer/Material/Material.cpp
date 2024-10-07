@@ -10,6 +10,9 @@ namespace Core
     {
         Name = config->Name;
         Color.Set(config->Color);
+        TextureConfig.FilePath = config->TextureConfig.FilePath;
+        TextureConfig.MinFilter = config->TextureConfig.MinFilter;
+        TextureConfig.MagFilter = config->TextureConfig.MagFilter;
     }
 
     void Material::ReleaseTexture(TexturePair *pair)
@@ -54,35 +57,45 @@ namespace Core
     {
         this->state.From(config);
         SetType(Config);
+        SetColorTexture(config->TextureConfig);
     }
 
     void Material::MakeDefault()
     {
-        Configuration config;
-        config.Color.Set(255, 255, 255, 255);
-        colorTexture.texture = TextureSystem::GetDefault();
-        colorTexture.isDefault = true;
-
-        Create(&config);
         SetType(Default);
+        state.Color.Set(255, 255, 255, 255);
+        SetColorTexture();
     }
 
     void Material::SetColorTexture()
     {
-        if (!colorTexture.texture)
-            return;
+        if (colorTexture.texture)
+            ReleaseTexture(&colorTexture);
 
-        ReleaseTexture(&colorTexture);
         colorTexture.texture = TextureSystem::GetDefault();
     }
 
     void Material::SetColorTexture(const std::string &name /* const TextureConfiguration &ref */)
     {
+        if (colorTexture.texture)
+            ReleaseTexture(&colorTexture);
 
-        if (!colorTexture.texture)
+        colorTexture.texture = TextureSystem::Get(name); // TODO: use configuration
+    }
+
+    void Material::SetColorTexture(TextureConfiguration &configuration)
+    {
+        if (configuration.INTERNAL_IGNORE)
             return;
 
-        ReleaseTexture(&colorTexture);
-        colorTexture.texture = TextureSystem::Get(name); // TODO: use configuration
+        if (colorTexture.texture)
+            ReleaseTexture(&colorTexture);
+
+        colorTexture.texture = TextureSystem::Get(configuration); // TODO: use configuration
+    }
+
+    void Material::SetColor(const Color &color)
+    {
+        state.Color.Set(color);
     }
 }

@@ -13,6 +13,12 @@ namespace Core
         image = nullptr;
     }
 
+    void Texture::DestroyGLTexture()
+    {
+        glDeleteTextures(1, &id);
+        id = 0;
+    }
+
     Texture::Texture()
     {
         id = 0;
@@ -39,6 +45,7 @@ namespace Core
 
     void Texture::Load(const std::string &imagePath, TextureConfiguration texConfig)
     {
+        DestroyGLTexture();
         DestroyImageIfExistent();
         image = new Image(imagePath);
 
@@ -47,6 +54,9 @@ namespace Core
             CE_WARN("Invalid image source: %s.", imagePath.c_str());
             return;
         }
+
+        config.MinFilter = texConfig.MinFilter;
+        config.MagFilter = texConfig.MagFilter;
 
         glGenTextures(1, &id);
         Bind();
@@ -70,4 +80,29 @@ namespace Core
         Bind();
     }
 
+    void Texture::UpdateWithConfig(TextureConfiguration &config)
+    {
+        if (id != 0)
+            DestroyGLTexture();
+
+        this->config.MinFilter = config.MinFilter;
+        this->config.MagFilter = config.MagFilter;
+
+        glGenTextures(1, &id);
+        Bind();
+
+        if (image != nullptr)
+        {
+            std::string texName = image->GetPath();
+            DestroyImageIfExistent();
+            image = new Image(texName);
+            TextureLoadUtils(image->GetWidth(), image->GetHeight(), image->GetData(), image->GetChannels(), config);
+            image->FreeData();
+        }
+        else
+        {
+            CeU8 data[4] = {255, 255, 255, 255};
+            TextureLoadUtils(1, 1, data, 4, {});
+        }
+    }
 }

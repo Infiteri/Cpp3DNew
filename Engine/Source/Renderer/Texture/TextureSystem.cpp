@@ -131,4 +131,13 @@ namespace Core
         textures[name]->count++;
         return textures[name]->texture;
     }
+
+    Texture *TextureSystem::Get(TextureConfiguration &config)
+    {
+        if (textures.find(config.FilePath) == textures.end())
+            Load(config.FilePath, config);
+
+        textures[config.FilePath]->count++;
+        return textures[config.FilePath]->texture;
+    }
 }

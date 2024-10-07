@@ -44,6 +44,9 @@ namespace Core
         ActorList children;
         Actor *parent = nullptr;
 
+        friend class SceneSerializer;
+        friend class ComponentSerializer;
+
     public:
         Actor();
         ~Actor();
@@ -69,6 +72,8 @@ namespace Core
         inline ActorList GetChildren() { return children; };
         inline Actor *GetParent() { return parent; };
         inline bool IsOwned() { return parent != nullptr; };
+        inline bool SameUUID(const UUID &uuid) { return id == uuid; };
+        inline bool SameUUID(Actor *a) { return id == a->id; };
 
         void AddChild(Actor *actor);
         Actor *SpawnChild();
@@ -83,7 +88,7 @@ namespace Core
         /// @return Actor * or nullptr.
         Actor *FindChildInHierarchyByUUID(const UUID &uuid);
 
-        void RemoveActorByUUID(const UUID& uuid);
+        void RemoveActorByUUID(const UUID &uuid);
         // --------------------------------
 
         // ---------- COMPONENTS ----------

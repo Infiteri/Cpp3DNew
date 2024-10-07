@@ -37,5 +37,6 @@
 #include "Scene/Scene.h"
 #include "Scene/World.h"
 #include "Scene/Components/Components.h"
+#include "Scene/Serializer/SceneSerializer.h"
 
 #include "Resources/Image.h"

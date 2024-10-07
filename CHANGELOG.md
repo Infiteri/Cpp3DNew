@@ -107,3 +107,18 @@
 - Fixed ImGui Image framebuffer issue (lost my mind (can go into details tho))
 - Editor actor children get rendered
 - Moving actors in the hierarchy and parenting to others is now possible
+
+# 1.0.3 - 07.10.2024
+
+- Update BuildVendor.bat
+- Fixed mouse bug when moving the camera
+- Added YAMl
+- Core Serializer structure
+- Started Scene serializer
+- Added Component serializer
+- Tied Component Serializer with Scene Serializer
+- Some Renderer specific changes
+- Fixed Serializer bugs
+- Some code clean-up
+- Fixed bugs related to textures and meshes
+- Other stuff

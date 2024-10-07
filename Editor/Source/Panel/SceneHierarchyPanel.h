@@ -18,7 +18,6 @@ namespace Core
 
         void RenderActor(Actor *a, Actor *parent, bool parentNodeOpen);
         void RenderActorComponents(Actor *a);
-
     };
 
 }

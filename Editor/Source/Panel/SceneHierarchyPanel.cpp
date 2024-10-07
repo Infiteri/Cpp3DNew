@@ -32,6 +32,14 @@ namespace Core
             return;
         }
 
+        if (ImGui::BeginPopupContextWindow(0, 1))
+        {
+            if (ImGui::MenuItem("Create Actor"))
+                scene->SpawnActor();
+
+            ImGui::EndPopup();
+        }
+
         actorIndex = 0;
         for (auto actor : scene->GetActors())
         {
@@ -42,6 +50,10 @@ namespace Core
         ImGui::End();
 
         ImGui::Begin("Proprieties");
+
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && ImGui::IsWindowHovered())
+        {
+        }
 
         if (Input::GetKey(Keys::Escape))
             selectionContext = nullptr;
@@ -60,8 +72,8 @@ namespace Core
         // Flags setup
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_AllowItemOverlap;
         if (selectionContext != nullptr)
-            if (selectionContext->GetUUID() == a->GetUUID())
-                flags |= ImGuiTreeNodeFlags_Selected;
+            if (selectionContext->SameUUID(a))
+                flags |= ImGuiTreeNodeFlags_Selected | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
         bool pop = false;
 
@@ -190,6 +202,17 @@ namespace Core
         }
 
         CE_UTIL_ADD_RENDER("Mesh Component", MeshComponent, RenderMeshUI);
+
+        if (ImGui::Button("Add Component"))
+            ImGui::OpenPopup("ComponentPopup");
+
+        if (ImGui::BeginPopupContextItem("ComponentPopup"))
+        {
+            if (ImGui::MenuItem("Mesh"))
+                selectionContext->AddComponent<MeshComponent>();
+
+            ImGui::EndPopup();
+        }
     }
 
     void RenderMeshUI(MeshComponent *mesh, Actor *a)
@@ -243,6 +266,57 @@ namespace Core
 
             ImGui::TreePop();
         }
-    }
 
+        if (ImGui::TreeNode("Geometry"))
+        {
+            auto g = mesh->mesh->GetGeometry();
+
+            switch (g->GetType())
+            {
+            case Geometry::Box:
+                auto b = (BoxGeometry *)g;
+
+                float data[3] = {b->Width, b->Height, b->Depth};
+                if (ImGui::DragFloat3("Size", data, 0.05f, 0.0f))
+                    mesh->mesh->SetGeometry(new BoxGeometry(data[0], data[1], data[2]));
+                break;
+            }
+
+            {
+                const int Count = 2;
+                const char *Type[Count] = {"None", "Box"};
+                const char *Current = Type[g->GetType()];
+
+                if (ImGui::BeginCombo("Type", Current))
+                {
+                    for (int ci = 0; ci < Count; ci++)
+                    {
+                        bool isSelected = (Current == Type[ci]);
+                        if (ImGui::Selectable(Type[ci], isSelected))
+                        {
+                            Current = Type[ci];
+
+                            switch ((Geometry::Types)ci)
+                            {
+                            case Geometry::Box:
+                                mesh->mesh->SetGeometry(new BoxGeometry(1, 1, 1));
+                                break;
+
+                            default:
+                                mesh->mesh->SetGeometry(new Geometry());
+                                break;
+                            }
+                        }
+
+                        if (isSelected)
+                            ImGui::SetItemDefaultFocus();
+                    }
+
+                    ImGui::EndCombo();
+                }
+            }
+
+            ImGui::TreePop();
+        }
+    }
 }

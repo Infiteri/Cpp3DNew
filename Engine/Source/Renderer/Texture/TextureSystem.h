@@ -22,6 +22,7 @@ namespace Core
 
         static void Load(const std::string &name, const TextureConfiguration &ref = {});
         static Texture *Get(const std::string &name);
+        static Texture * Get(TextureConfiguration& config);
     };
 
 }

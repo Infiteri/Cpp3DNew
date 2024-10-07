@@ -54,7 +54,7 @@ namespace Core
     Mesh::Mesh()
     {
         vertex = nullptr;
-        geometry = new BoxGeometry(1, 1, 1);
+        geometry = new Geometry();
 
         MakeMaterialDefault();
 
@@ -98,7 +98,6 @@ namespace Core
 
         _ReleaseMaterial();
         material = MaterialSystem::GetDefault();
-        isMaterialUnique = false;
     }
 
     void Mesh::MakeMaterialUnique()
@@ -108,6 +107,15 @@ namespace Core
 
         material = new Material();
         material->SetType(Material::Config);
-        isMaterialUnique = true;
+    }
+
+    void Mesh::MakeMaterialUnique(Material::Configuration &config)
+    {
+        if (material)
+            _ReleaseMaterial();
+
+        material = new Material();
+        material->SetType(Material::Config);
+        material->Create(&config);
     }
 }
