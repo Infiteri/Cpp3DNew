@@ -83,7 +83,7 @@
 - Added Transform (along side shader transform and complexities that come along (future world/local matrices for parenting/ownership between actors))
 - Added temporary position/rotation transform control in scene hierarchy panel
 
-# 1.0.0 - 24.09.2024
+# 0.1.0 - 24.09.2024
 
 - Started Parenting
 - Added parenting related functions to actors
@@ -91,7 +91,7 @@
 - Added child searching functions
 - Changed some structural application concepts
 
-# 1.0.1 - 01.10.2024
+# 0.1.1 - 01.10.2024
 
 - Added Transform GUI
 - Added Mesh GUI
@@ -101,14 +101,14 @@
 - Added Fonts to GUI
 - Other stuff
 
-# 1.0.2 - 04.10.2024
+# 0.1.2 - 04.10.2024
 
 - Started single file shader
 - Fixed ImGui Image framebuffer issue (lost my mind (can go into details tho))
 - Editor actor children get rendered
 - Moving actors in the hierarchy and parenting to others is now possible
 
-# 1.0.3 - 07.10.2024
+# 0.1.3 - 07.10.2024
 
 - Update BuildVendor.bat
 - Fixed mouse bug when moving the camera
@@ -122,3 +122,4 @@
 - Some code clean-up
 - Fixed bugs related to textures and meshes
 - Other stuff
+- Fixed mistake in the CHANGELOG.md file
