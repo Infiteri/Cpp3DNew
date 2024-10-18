@@ -123,3 +123,17 @@
 - Fixed bugs related to textures and meshes
 - Other stuff
 - Fixed mistake in the CHANGELOG.md file
+
+# 0.1.4 - 18.10.2024
+
+- Started CubeMapTexture
+- Started Sky
+- Skys now have different modes
+- Shader sky mode is added
+- Test sky shader
+- Added CeData
+- Fixed issues
+- Data Set components added
+- Data sets get now serialized, deserialized and edited in the editor
+- Sky shader refactor
+- Other

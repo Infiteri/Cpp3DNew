@@ -21,4 +21,22 @@ namespace Core
     void MeshComponent::From(MeshComponent *c)
     {
     }
+
+    DataSetComponent::DataSetComponent()
+    {
+    }
+
+    DataSetComponent::~DataSetComponent()
+    {
+    }
+
+    void DataSetComponent::From(DataSetComponent *c)
+    {
+        for (auto d : c->Set.GetSet())
+        {
+            CeData *c = new CeData();
+            c->From(d);
+            Set.Add(c);
+        }
+    }
 }

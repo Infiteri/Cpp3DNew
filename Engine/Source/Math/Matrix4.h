@@ -38,6 +38,7 @@ namespace Core
         static Matrix4 Perspective(float fov, float aspect, float near, float far);
         static Matrix4 Translate(float x, float y, float z);
         static Matrix4 Translate(Vector3 *vec);
+        static Matrix4 Translate(const Vector3 &vec);
 
         static Matrix4 Multiply(Matrix4 *a, Matrix4 *b);
         static Matrix4 Invert(Matrix4 *a);

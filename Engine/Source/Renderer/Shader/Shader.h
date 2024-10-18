@@ -40,6 +40,14 @@ namespace Core
 
         void Int(int i, const char *name);
 
+        void Vec2(Vector2 *v, const char *name);
+        void Vec2(const Vector2 &v, const char *name);
+        void Vec2(float x, float y, const char *name);
+
+        void Vec3(Vector3 *v, const char *name);
+        void Vec3(const Vector3 &v, const char *name);
+        void Vec3(float x, float y, float z, const char *name);
+
         void Vec4(const Color &color, const char *name);
 
         void Mat4(const Matrix4 &matrix, const char *name);

@@ -105,6 +105,11 @@ namespace Core
         return Translate(vec->x, vec->y, vec->z);
     }
 
+    Matrix4 Matrix4::Translate(const Vector3 &vec)
+    {
+        return Translate(vec.x, vec.y, vec.z);
+    }
+
     Matrix4 Matrix4::Multiply(Matrix4 *a, Matrix4 *b)
     {
         Matrix4 m;

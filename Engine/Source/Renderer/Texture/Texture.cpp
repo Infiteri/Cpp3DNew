@@ -1,10 +1,10 @@
 #include "Texture.h"
 #include "Core/Logger.h"
+#include "TextureSystem.h"
 #include <glad/glad.h>
 
 namespace Core
 {
-    static CeU32 GGen = 0;
     void Texture::DestroyImageIfExistent()
     {
         if (!image)
@@ -23,14 +23,14 @@ namespace Core
     {
         id = 0;
         image = nullptr;
-        generation = GGen;
-        GGen++;
+        generation = TextureSystem::GetNewTextureGeneration();
 
         Load();
     }
 
     Texture::~Texture()
     {
+        TextureSystem::DecrementTextureGeneration();
         Destroy();
     }
 

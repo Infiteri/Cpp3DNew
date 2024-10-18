@@ -1,8 +1,18 @@
 #include "BaseTexture.h"
+#include "Renderer/Texture/TextureSystem.h"
 #include <glad/glad.h>
 
 namespace Core
 {
+    void BaseTexture::GenGeneration()
+    {
+        if (!hasGeneration)
+        {
+            generation = TextureSystem::GetNewTextureGeneration();
+            hasGeneration = true;
+        }
+    }
+
     CeU32 BaseTexture::FilterIntToGLType(CeU32 filter)
     {
         switch (filter)

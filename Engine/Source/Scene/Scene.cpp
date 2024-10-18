@@ -7,6 +7,7 @@ namespace Core
 {
     Scene::Scene()
     {
+        environemnt.Setup();
     }
 
     Scene::~Scene()

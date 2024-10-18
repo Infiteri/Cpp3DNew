@@ -71,9 +71,9 @@ namespace Core
 
                 if (actor["Transform"])
                 {
-                    SerializerUtils::Vector3ToYAML(actor["Transform"]["Position"], &a->GetTransform()->Position);
-                    SerializerUtils::Vector3ToYAML(actor["Transform"]["Rotation"], &a->GetTransform()->Rotation);
-                    SerializerUtils::Vector3ToYAML(actor["Transform"]["Scale"], &a->GetTransform()->Scale);
+                    SerializerUtils::YAMLToVector3(actor["Transform"]["Position"], &a->GetTransform()->Position);
+                    SerializerUtils::YAMLToVector3(actor["Transform"]["Rotation"], &a->GetTransform()->Rotation);
+                    SerializerUtils::YAMLToVector3(actor["Transform"]["Scale"], &a->GetTransform()->Scale);
                 }
 
                 ComponentSerializer componentSerializer(a);
@@ -120,9 +120,9 @@ namespace Core
         {
             out << YAML::Key << "Transform";
             out << YAML::Value << YAML::BeginMap;
-            SerializerUtils::YAMLToVector3(out, "Position", &a->GetTransform()->Position);
-            SerializerUtils::YAMLToVector3(out, "Rotation", &a->GetTransform()->Rotation);
-            SerializerUtils::YAMLToVector3(out, "Scale", &a->GetTransform()->Scale);
+            SerializerUtils::Vector3ToYAML(out, "Position", &a->GetTransform()->Position);
+            SerializerUtils::Vector3ToYAML(out, "Rotation", &a->GetTransform()->Rotation);
+            SerializerUtils::Vector3ToYAML(out, "Scale", &a->GetTransform()->Scale);
             out << YAML::Value << YAML::EndMap;
         }
 

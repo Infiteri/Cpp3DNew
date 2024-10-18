@@ -2,6 +2,7 @@
 
 #include "Base.h"
 #include "Renderer/Object/Mesh.h"
+#include "Core/Data/CeDataSet.h"
 
 namespace Core
 {
@@ -34,6 +35,17 @@ namespace Core
         void Render();
 
         void From(MeshComponent *c);
+    };
+
+    class CE_API DataSetComponent : public Component
+    {
+    public:
+        CeDataSet Set;
+
+        DataSetComponent();
+        ~DataSetComponent();
+
+        void From(DataSetComponent *c);
     };
 
 }

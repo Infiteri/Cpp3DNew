@@ -17,6 +17,7 @@ namespace Core
         struct ComponentCount
         {
             int MeshCount;
+            int DataSetCount;
         };
         ComponentCount count;
 
@@ -27,6 +28,9 @@ namespace Core
 
         void SerializeMeshComponent(MeshComponent *c, int index, YAML::Emitter &out);
         void DeserializeMeshComponent(YAML::Node node);
+
+        void SerializeDataSetComponent(DataSetComponent *c, int index, YAML::Emitter &out);
+        void DeserializeDataSetComponent(YAML::Node node);
 
     public:
         ComponentSerializer(Actor *target);

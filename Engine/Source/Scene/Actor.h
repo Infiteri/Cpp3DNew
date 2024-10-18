@@ -123,7 +123,11 @@ namespace Core
         {
             std::vector<T *> v;
             for (Component *c : components)
-                v.push_back((T *)c);
+            {
+                T *typedComponent = dynamic_cast<T *>(c);
+                if (typedComponent)
+                    v.push_back(typedComponent);
+            }
 
             return v;
         };

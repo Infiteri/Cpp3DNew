@@ -2,6 +2,8 @@
 
 #include "Base.h"
 #include "Actor.h"
+#include "SceneEnvironment.h"
+
 #include <vector>
 #include <unordered_map>
 #include <string>
@@ -12,6 +14,7 @@ namespace Core
     {
     private:
         ActorList actors;
+        SceneEnvironment environemnt;
         std::string name;
 
     public:
@@ -46,5 +49,7 @@ namespace Core
         void RemoveActorByUUID(const UUID &uid);
 
         void MoveChildInHierarchy(const UUID &uid, int newIndex);
+
+        inline SceneEnvironment *GetEnvironment() { return &environemnt; };
     };
 }

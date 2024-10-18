@@ -49,10 +49,12 @@ namespace Core
 
         ImGui::End();
 
+        EditorUtils::SetSetIDTo0();
+
         ImGui::Begin("Proprieties");
 
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && ImGui::IsWindowHovered())
-        {
+        { // todo
         }
 
         if (Input::GetKey(Keys::Escape))
@@ -182,6 +184,7 @@ namespace Core
     }
 
     void RenderMeshUI(MeshComponent *mesh, Actor *a);
+    void RenderDataSetUI(DataSetComponent *mesh, Actor *a);
 
     void SceneHierarchyPanel::RenderActorComponents(Actor *a)
     {
@@ -189,8 +192,9 @@ namespace Core
             return;
 
         {
-            std::string name = EditorUtils::ImGuiStringEdit("Name", a->GetName());
-            a->SetName(name);
+            auto name = EditorUtils::ImGuiStringEdit("Name", a->GetName());
+            if (name.Changed)
+                a->SetName(name.Content);
         }
 
         ImGui::Dummy({0, 10});
@@ -202,6 +206,7 @@ namespace Core
         }
 
         CE_UTIL_ADD_RENDER("Mesh Component", MeshComponent, RenderMeshUI);
+        CE_UTIL_ADD_RENDER("Data Set Component", DataSetComponent, RenderDataSetUI);
 
         if (ImGui::Button("Add Component"))
             ImGui::OpenPopup("ComponentPopup");
@@ -210,6 +215,9 @@ namespace Core
         {
             if (ImGui::MenuItem("Mesh"))
                 selectionContext->AddComponent<MeshComponent>();
+
+            if (ImGui::MenuItem("Data Set"))
+                selectionContext->AddComponent<DataSetComponent>();
 
             ImGui::EndPopup();
         }
@@ -317,6 +325,16 @@ namespace Core
             }
 
             ImGui::TreePop();
+        }
+    }
+
+    void RenderDataSetUI(DataSetComponent *c, Actor *a)
+    {
+        EditorUtils::DrawDataSetUI(&c->Set);
+
+        if (ImGui::Button("Add"))
+        {
+            c->Set.Add(new CeData(new Vector2(), CeData::DataVec2, "Vector 2"));
         }
     }
 }

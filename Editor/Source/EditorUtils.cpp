@@ -3,8 +3,28 @@
 
 namespace Core
 {
+    static CeU32 SetID = 0;
+
     namespace EditorUtils
     {
+        void ImGuiVec2Edit(const char *l, Vector2 *v)
+        {
+            float d[2] = {v->x, v->y};
+            if (ImGui::DragFloat2(l, d, 0.01f))
+            {
+                v->Set(d[0], d[1]);
+            }
+        }
+
+        void ImGuiVec3Edit(const char *l, Vector3 *v)
+        {
+            float d[3] = {v->x, v->y, v->z};
+            if (ImGui::DragFloat3(l, d, 0.01f))
+            {
+                v->Set(d[0], d[1], d[2]);
+            }
+        }
+
         void ImGuiVector3StyledEdit(const char *label, Vector3 *vec, float defaultValue)
         {
             ImGui::PushID(label);
@@ -74,14 +94,16 @@ namespace Core
             ImGuiVector3StyledEdit("Scale", &transform->Scale, 1.0f);
         }
 
-        std::string ImGuiStringEdit(const char *label, const std::string &str)
+        StringEdit ImGuiStringEdit(const char *label, const std::string &str)
         {
+            StringEdit edit;
             const int size = 256;
-            static char buffer[size];
+            char buffer[size];
             CeMemory::Zero(&buffer, size);
             CeMemory::Copy(&buffer, str.c_str(), str.size() <= size ? str.size() : size);
-            ImGui::InputText(label, buffer, size);
-            return buffer;
+            edit.Changed = ImGui::InputText(label, buffer, size);
+            edit.Content = buffer;
+            return edit;
         }
 
         void ImGuiColorEdit(const char *label, Color *color)
@@ -190,5 +212,92 @@ namespace Core
                 ImGui::EndCombo();
             }
         }
+    }
+
+    bool EditorUtils::DrawDataSetUI(CeDataSet *dSet)
+    {
+        for (auto set : dSet->GetSet())
+        {
+            if (ImGui::TreeNodeEx((void *)(CeU64)(CeU32)SetID, 0, set->GetName().c_str()))
+            {
+                static char Name[256];
+                CeMemory::Zero(&Name, 256);
+
+                CeMemory::Copy(&Name, set->GetName().c_str(), 256);
+
+                if (ImGui::InputText("Name", Name, 256))
+                {
+                    set->SetName(Name);
+                }
+
+                // -- DATA TYPE SELECTION --
+                const int maxSelections = 5;
+                const char *selections[maxSelections] = {"None", "Vec2", "Vec3", "Color", "Float"};
+                const char *current = selections[(int)set->GetType()];
+
+                if (ImGui::BeginCombo("Data Type", current))
+                {
+                    for (int i = 0; i < maxSelections; i++)
+                    {
+                        bool isSelected = (current == selections[i]);
+
+                        if (ImGui::Selectable(selections[i], isSelected))
+                        {
+                            current = selections[i];
+                            set->ClearDataBasedOnCurrentType();
+                            set->SetType((CeData::DataType)i);
+                            set->SetupDefaultValuesBaseOnCurrentType();
+                        }
+
+                        if (isSelected)
+                            ImGui::SetItemDefaultFocus();
+                    }
+
+                    ImGui::EndCombo();
+                }
+                // -------------------------
+
+                // -- EDIT VALUES ----------
+                switch (set->GetType())
+                {
+                case CeData::DataVec2:
+                    EditorUtils::ImGuiVec2Edit("Value", set->As<Vector2>());
+                    break;
+
+                case CeData::DataVec3:
+                    EditorUtils::ImGuiVec3Edit("Value", set->As<Vector3>());
+                    break;
+
+                case CeData::DataFloat:
+                {
+                    CeData::FloatContainer *Cont = set->As<CeData::FloatContainer>();
+                    ImGui::DragFloat("Value", &Cont->Value, 0.1f);
+                    break;
+                }
+
+                case CeData::DataColor:
+                    EditorUtils::ImGuiColorEdit("Value", (Color *)set->As<Color>());
+                    break;
+                }
+                // -------------------------
+
+                if (ImGui::Button("Remove"))
+                {
+                    dSet->Remove(set->GetName());
+                    ImGui::TreePop();
+                    return true;
+                }
+
+                ImGui::TreePop();
+            }
+
+            SetID++;
+            return false;
+        }
+    }
+
+    void EditorUtils::SetSetIDTo0()
+    {
+        SetID = 0;
     }
 }

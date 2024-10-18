@@ -4,6 +4,7 @@
 
 namespace Core
 {
+    static CeU32 generation = 0;
 
     struct TextureReference
     {
@@ -139,5 +140,17 @@ namespace Core
 
         textures[config.FilePath]->count++;
         return textures[config.FilePath]->texture;
+    }
+
+    CeU32 TextureSystem::GetNewTextureGeneration()
+    {
+        CeU32 gen = generation;
+        generation++;
+        return gen;
+    }
+
+    void TextureSystem::DecrementTextureGeneration()
+    {
+        generation--;
     }
 }

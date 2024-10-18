@@ -136,6 +136,42 @@ namespace Core
         glUniform1i(GetUniLoc(name), i);
     }
 
+    void Shader::Vec2(Vector2 *v, const char *name)
+    {
+        Vec2(v->x, v->y, name);
+    }
+
+    void Shader::Vec2(const Vector2 &v, const char *name)
+    {
+        Vec2(v.x, v.y, name);
+    }
+
+    void Shader::Vec2(float x, float y, const char *name)
+    {
+        if (!valid)
+            return;
+        Use();
+        glUniform2f(GetUniLoc(name), x, y);
+    }
+
+    void Shader::Vec3(Vector3 *v, const char *name)
+    {
+        Vec3(v->x, v->y, v->z, name);
+    }
+
+    void Shader::Vec3(const Vector3 &v, const char *name)
+    {
+        Vec3(v.x, v.y, v.z, name);
+    }
+
+    void Shader::Vec3(float x, float y, float z, const char *name)
+    {
+        if (!valid)
+            return;
+        Use();
+        glUniform3f(GetUniLoc(name), x, y, z);
+    }
+
     void Shader::Vec4(const Color &color, const char *name)
     {
         if (!valid)

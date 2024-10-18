@@ -27,6 +27,8 @@ namespace Core
     protected:
         CeU32 id;
         CeU32 generation;
+        bool hasGeneration = false;
+        void GenGeneration();
 
         CeU32 FilterIntToGLType(CeU32 filter);
         CeU32 FilterToGLType(TextureFilter filter);

@@ -7,6 +7,9 @@
 #include "Texture/TextureSystem.h"
 #include "Material/MaterialSystem.h"
 
+#include "Sky/Sky.h"
+
+#include "Scene/World.h"
 #include "Camera/CameraSystem.h"
 
 #include <glad/glad.h>
@@ -66,8 +69,7 @@ namespace Core
 
         state.Screen.Begin();
 
-        glClearColor(0.4, 0.1, 0.1, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(255, 255, 255, 255);
     }
 
     void Renderer::Render()
@@ -75,13 +77,33 @@ namespace Core
         if (!state.initializedContext)
             return;
 
-        state.objectShader->Use();
+        //? sky system
+        auto sky = World::GetActiveScene()->GetEnvironment()->SkyInst;
+        if (sky != nullptr)
+        {
+            switch (sky->GetMode())
+            {
+            case Sky::ColorMode:
+                glClearColor(sky->GetColor().r / 255, sky->GetColor().b / 255, sky->GetColor().b / 255, sky->GetColor().a / 255);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                break;
 
-        auto activeCamera = CameraSystem::GetPerspectiveActive();
-        activeCamera->UpdateView();
+            default:
+                glDepthMask(false);
+                sky->Render();
+                glDepthMask(true);
+                break;
+            }
+        }
 
-        state.objectShader->Mat4(activeCamera->GetProjection(), "uProjection");
-        state.objectShader->Mat4(activeCamera->GetViewInverted(), "uView");
+        // Camera
+        {
+            auto activeCamera = CameraSystem::GetPerspectiveActive();
+            activeCamera->UpdateView();
+            state.objectShader->Use();
+            state.objectShader->Mat4(activeCamera->GetProjection(), "uProjection");
+            state.objectShader->Mat4(activeCamera->GetViewInverted(), "uView");
+        }
     }
 
     void Renderer::EndFrame()
@@ -143,6 +165,11 @@ namespace Core
 
     void Renderer::Shutdown()
     {
+        ShaderSystem::Shutdown();
+        CameraSystem::Shutdown();
+        TextureSystem::Shutdown();
+        MaterialSystem::Shutdown();
+
         delete state.Screen.Array;
         delete state.Screen.Buffer;
     }

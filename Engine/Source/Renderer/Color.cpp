@@ -3,6 +3,7 @@ namespace Core
 {
     Color::Color(float r, float g, float b, float a)
     {
+        Set(r, g, b, a);
     }
 
     Color::~Color()
