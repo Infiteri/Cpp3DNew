@@ -4,6 +4,8 @@
 #include "Panel/PanelSystem.h"
 #include "EditorCamera.h"
 
+#include <ImGuizmo.h>
+
 namespace Core
 {
     struct DockspaceSettings
@@ -23,6 +25,7 @@ namespace Core
         DockspaceSettings Dockspace;
         ImVec2 LastFrameViewport;
         EditorCamera Camera;
+        ImGuizmo::OPERATION GuizmoOperation;
     };
 
     class EditorLayer : public Layer
@@ -41,9 +44,17 @@ namespace Core
 
         void PreparePanelInfo();
 
+        void DrawGizmo(PerspectiveCamera *camera, float *data, float *deltaMatrix);
+        void MapInputToGuizmoOperation(Keys k, ImGuizmo::OPERATION op);
+
+        // -- SCENE RELATED --
+        void OpenScene(const std::string &name);
+        // -------------------
+
         // -- DOCKSPACE --
         void BeginDockspace();
         void RenderSceneViewport();
+        void HandleDragDrop();
         void EndDockspace();
         // ---------------
     };

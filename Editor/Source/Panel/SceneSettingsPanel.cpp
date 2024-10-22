@@ -5,6 +5,11 @@
 
 namespace Core
 {
+    static float intensity = 0.5;
+    static float blurRadius = 0.5;
+    static float blurStrength = 0.5;
+    static int samples = 1;
+
     SceneSettingsPanel::SceneSettingsPanel()
     {
     }
@@ -54,7 +59,17 @@ namespace Core
                     break;
 
                 case Sky::CubeMapMode:
-                    // TODO: When cubeMap files exist, do this
+                    if (ImGui::Button("Load"))
+                    {
+                        std::string path = Platform::OpenFileDialog("Cubemap.ce_cubemap \0*.ce_cubemap\0");
+                        if (!path.empty())
+                            sky->SetModeToCubeMap(path);
+                    }
+
+                    if (ImGui::Button("ReLoad"))
+                    {
+                        sky->SetModeToCubeMap(sky->GetCubemapPath());
+                    }
                     break;
 
                 case Sky::ShaderMode:
@@ -76,6 +91,16 @@ namespace Core
             EditorUtils::DrawDataSetUI(&sky->GetShaderDataSet());
             ImGui::TreePop();
         }
+
+        ImGui::DragFloat("Intensity", &intensity, 0.005f);
+        ImGui::DragFloat("Blur Radius", &blurRadius, 0.005f);
+        ImGui::DragFloat("Blur Strength", &blurStrength, 0.005f);
+        ImGui::DragInt("Samples", &samples);
+
+        Renderer::TEMP_GetShaderFromPost(0)->Float(intensity, "intensity");
+        Renderer::TEMP_GetShaderFromPost(0)->Float(blurRadius, "blurRadius");
+        Renderer::TEMP_GetShaderFromPost(0)->Float(blurStrength, "blurStrength");
+        Renderer::TEMP_GetShaderFromPost(0)->Int(samples, "samples");
 
         ImGui::End();
     }

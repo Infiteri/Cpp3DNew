@@ -28,11 +28,14 @@ namespace Core
         CeU32 id;
         CeU32 generation;
         bool hasGeneration = false;
+        bool INTERNAL_REQUIRE_GENERATION = true;
         void GenGeneration();
 
         CeU32 FilterIntToGLType(CeU32 filter);
         CeU32 FilterToGLType(TextureFilter filter);
         void TextureLoadUtils(int w, int h, CeU8 *data, CeU32 channel, TextureConfiguration config);
+
+        friend class ContentBrowserPanel; // Note: for editor
 
     public:
         BaseTexture();

@@ -229,6 +229,46 @@ namespace Core
         {
             auto mat = mesh->mesh->GetMaterial();
 
+            // Type editing
+            {
+                const int maxSelections = 3;
+                const char *selections[maxSelections] = {"Default", "Config", "File"};
+                const char *current = selections[(int)mat->GetType()];
+
+                if (ImGui::BeginCombo("Type", current))
+                {
+                    for (int i = 0; i < maxSelections; i++)
+                    {
+                        bool isSelected = (current == selections[i]);
+
+                        if (ImGui::Selectable(selections[i], isSelected))
+                        {
+                            current = selections[i];
+
+                            switch ((Material::MaterialTypes)i)
+                            {
+                            case Material::Default:
+                                mesh->mesh->MakeMaterialDefault();
+                                break;
+
+                            case Material::Config:
+                                mesh->mesh->MakeMaterialUnique();
+                                break;
+
+                            case Material::File:
+                                mesh->mesh->MakeMaterialFromFile(); // Note, until user decides to load a config file
+                                break;
+                            }
+                        }
+
+                        if (isSelected)
+                            ImGui::SetItemDefaultFocus();
+                    }
+
+                    ImGui::EndCombo();
+                }
+            }
+
             // UI Editing;
             {
                 switch (mat->GetType())
@@ -243,31 +283,25 @@ namespace Core
                     }
                     break;
 
+                case Material::File:
+                    if (ImGui::Button("Load"))
+                    {
+                        std::string path = Platform::OpenFileDialog("Material.ce_material \0*.ce_material\0");
+                        if (!path.empty())
+                            mesh->mesh->MakeMaterialFromFile(path);
+                    }
+
+                    if (ImGui::Button("ReLoad"))
+                    {
+                        if (!mat->GetFilePath().empty())
+                            mesh->mesh->MakeMaterialFromFile(mat->GetFilePath());
+                    }
+
+                    break;
+
                 case Material::Default:
                 default:
                     ImGui::Text("Material is default.");
-                    break;
-                }
-            }
-
-            // UI Button
-            {
-
-                switch (mat->GetType())
-                {
-                case Material::Config:
-                    if (ImGui::Button("Make Default"))
-                    {
-                        mesh->mesh->MakeMaterialDefault();
-                    }
-                    break;
-
-                case Material::Default:
-                default:
-                    if (ImGui::Button("Make Unique"))
-                    {
-                        mesh->mesh->MakeMaterialUnique();
-                    }
                     break;
                 }
             }

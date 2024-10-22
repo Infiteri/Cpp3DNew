@@ -24,15 +24,19 @@ namespace Core
         out << YAML::Key << "Scene";
         out << YAML::Value << scene->GetName().c_str();
 
-        out << YAML::Key << "Actors";
-        out << YAML::Value << YAML::BeginSeq;
+        auto actors = scene->GetActors();
+        if (actors.size() > 0)
+        {
+            out << YAML::Key << "Actors";
+            out << YAML::Value << YAML::BeginSeq;
 
-        // Serialize each actor
-        for (Actor *a : scene->GetActors())
-            SerializeActor(a, out);
+            // Serialize each actor
+            for (Actor *a : actors)
+                SerializeActor(a, out);
 
-        out << YAML::EndSeq;
-        out << YAML::EndMap;
+            out << YAML::EndSeq;
+            out << YAML::EndMap;
+        }
 
         std::ofstream fout(filepath);
         fout << out.c_str();

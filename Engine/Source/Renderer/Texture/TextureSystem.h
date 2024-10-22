@@ -26,6 +26,7 @@ namespace Core
 
         static CeU32 GetNewTextureGeneration();
         static void DecrementTextureGeneration();
+        static void StartNewSceneGeneration();
     };
 
 }

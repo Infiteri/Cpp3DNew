@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "Core/Engine.h"
 #include "Core/Logger.h"
 #include "Platform/Platform.h"
 
@@ -54,12 +55,15 @@ namespace Core
         CameraSystem::Init();
         TextureSystem::Init();
         MaterialSystem::Init(); // Post texture system as the material relies on the default texture. :)
-        state.objectShader = ShaderSystem::GetFromEngineResource("Object");
+        ShaderSystem::Load("EngineResources/Shaders/Object");
+        state.postProcessor.Add("EngineResources/Shaders/GrayScale.glsl", true);
 
         CameraSystem::CreatePerspective("Main Camera");
         CameraSystem::Activate("Main Camera");
 
         state.Screen.Setup();
+
+        glEnable(GL_MULTISAMPLE);
     }
 
     void Renderer::BeginFrame()
@@ -69,7 +73,9 @@ namespace Core
 
         state.Screen.Begin();
 
+        // TODO: WTF?
         glClearColor(255, 255, 255, 255);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     void Renderer::Render()
@@ -100,9 +106,10 @@ namespace Core
         {
             auto activeCamera = CameraSystem::GetPerspectiveActive();
             activeCamera->UpdateView();
-            state.objectShader->Use();
-            state.objectShader->Mat4(activeCamera->GetProjection(), "uProjection");
-            state.objectShader->Mat4(activeCamera->GetViewInverted(), "uView");
+            Shader *objShader = ShaderSystem::GetFromEngineResource("Object");
+            objShader->Use();
+            objShader->Mat4(activeCamera->GetProjection(), "uProjection");
+            objShader->Mat4(activeCamera->GetViewInverted(), "uView");
         }
     }
 
@@ -126,10 +133,21 @@ namespace Core
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, renderPass->id);
         ShaderSystem::GetFromEngineResource("Screen")->Int(0, "uScreenTexture");
-
         state.Screen.Array->Bind();
         state.Screen.Array->GetVertexBuffer()->Bind();
         state.Screen.Array->GetVertexBuffer()->Draw();
+
+        // -- Post process --
+        for (auto shader : state.postProcessor.GetEnabledShaders())
+        {
+            shader->Use();
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, post->GetRenderPass(0)->id);
+            state.Screen.Array->Bind();
+            state.Screen.Array->GetVertexBuffer()->Bind();
+            state.Screen.Array->GetVertexBuffer()->Draw();
+        }
+        // ------------------
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glBindTexture(GL_TEXTURE_2D, post->GetRenderPass(0)->id);
@@ -161,6 +179,11 @@ namespace Core
     CeU32 Renderer::GetPassID(int index)
     {
         return state.Screen.PostBuffer->GetRenderPass(index)->id;
+    }
+
+    Shader *Renderer::TEMP_GetShaderFromPost(int i)
+    {
+        return state.postProcessor.shaders[i].shd;
     }
 
     void Renderer::Shutdown()

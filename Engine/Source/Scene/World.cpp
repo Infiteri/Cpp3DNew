@@ -1,5 +1,6 @@
 #include "World.h"
 #include "Core/Logger.h"
+#include "Serializer/SceneSerializer.h"
 
 #include <unordered_map>
 #include <string>
@@ -21,7 +22,19 @@ namespace Core
     Scene *World::CreateScene(const std::string &name)
     {
         Scene *scene = new Scene();
+        SceneSerializer ser(scene);
         scene->SetName(name);
+        ser.Deserialize(name);
+        scenes[name] = scene;
+        return scene;
+    }
+
+    Scene *World::CreateScene(const std::string &name, const std::string &filepath)
+    {
+        Scene *scene = new Scene();
+        scene->SetName(name);
+        SceneSerializer s(scene);
+        s.Deserialize(filepath);
         scenes[name] = scene;
         return scene;
     }
@@ -71,6 +84,11 @@ namespace Core
         scene->Stop();
         delete scene;
         scenes.erase(name);
+    }
+
+    bool World::Exists(const std::string &name)
+    {
+        return scenes.find(name) != scenes.end();
     }
 
     void World::StartActiveScene()

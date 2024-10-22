@@ -19,18 +19,17 @@ namespace Core
         id = 0;
     }
 
-    Texture::Texture()
+    Texture::Texture(bool autoload)
     {
         id = 0;
         image = nullptr;
-        generation = TextureSystem::GetNewTextureGeneration();
 
-        Load();
+        if (autoload)
+            Load();
     }
 
     Texture::~Texture()
     {
-        TextureSystem::DecrementTextureGeneration();
         Destroy();
     }
 
@@ -43,7 +42,7 @@ namespace Core
         TextureLoadUtils(1, 1, data, GL_RGBA, {});
     }
 
-    void Texture::Load(const std::string &imagePath, TextureConfiguration texConfig)
+    void Texture::Load(const std::string &imagePath, const TextureConfiguration &texConfig)
     {
         DestroyGLTexture();
         DestroyImageIfExistent();
@@ -76,6 +75,7 @@ namespace Core
 
     void Texture::Use()
     {
+        GenGeneration(); // note: the scene sets the global generation id to zero at the beginning of each render call
         glActiveTexture(GL_TEXTURE0 + generation);
         Bind();
     }

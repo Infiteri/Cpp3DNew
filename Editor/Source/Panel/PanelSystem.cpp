@@ -2,6 +2,7 @@
 
 #include "SceneHierarchyPanel.h"
 #include "SceneSettingsPanel.h"
+#include "ContentBrowserPanel.h"
 
 namespace Core
 {
@@ -9,6 +10,7 @@ namespace Core
     {
         panels.push_back(new SceneHierarchyPanel());
         panels.push_back(new SceneSettingsPanel());
+        panels.push_back(new ContentBrowserPanel());
     }
 
     PanelSystem::~PanelSystem()

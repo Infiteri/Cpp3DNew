@@ -153,4 +153,9 @@ namespace Core
     {
         generation--;
     }
+
+    void TextureSystem::StartNewSceneGeneration()
+    {
+        generation = 0;
+    }
 }

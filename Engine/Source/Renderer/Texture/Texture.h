@@ -17,7 +17,9 @@ namespace Core
         void DestroyGLTexture();
 
     public:
-        Texture();
+        /// @brief Basic texture constructor.
+        /// @param autoload Weather or not to autoload the texture, if you know what you are doing, making this false is better.
+        Texture(bool autoload = true);
         ~Texture();
 
         /// @brief Will load a white texture. (A.K.A default)
@@ -26,12 +28,12 @@ namespace Core
         /// @brief Will load from an image.
         /// @param imagePath The image path.
         /// @param texConfig The configuration to use.
-        void Load(const std::string &imagePath, TextureConfiguration texConfig);
+        void Load(const std::string &imagePath, const TextureConfiguration &texConfig);
         void Destroy();
         void Bind();
         void Use();
 
-        void UpdateWithConfig(TextureConfiguration& config);
+        void UpdateWithConfig(TextureConfiguration &config);
 
         inline TextureConfiguration &GetConfig() { return config; };
         inline bool HasImage() { return image != nullptr; };

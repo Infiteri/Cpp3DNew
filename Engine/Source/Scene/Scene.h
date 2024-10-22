@@ -17,6 +17,8 @@ namespace Core
         SceneEnvironment environemnt;
         std::string name;
 
+        friend class TextureSystem;
+
     public:
         Scene();
         ~Scene();

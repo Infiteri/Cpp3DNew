@@ -18,7 +18,7 @@ namespace Core
             Config,
 
             /// @brief From file, TODO: Implement
-            // File
+            File
         };
 
         struct Configuration
@@ -33,6 +33,7 @@ namespace Core
     private:
         Configuration state; // Note: Configuration is just a state.
         MaterialTypes type = Default;
+        std::string filePath; // Filled if existing
 
         struct TexturePair
         {
@@ -51,12 +52,14 @@ namespace Core
 
         void Create();
         void Create(Configuration *config);
+        void Create(const std::string &configPath);
         void MakeDefault();
 
         inline Configuration &GetState() { return state; };
         inline MaterialTypes GetType() { return type; };
 
         inline Texture *GetColorTexture() { return colorTexture.texture; };
+        inline std::string GetFilePath() { return filePath; };
 
         /// @brief Do not call if you dont know what you doing (ultra bad btw)
         /// @param t The new type
@@ -76,6 +79,6 @@ namespace Core
 
         /// @brief Will set the color of the material.
         /// @param color The color to use.
-        void SetColor(const Color& color);
+        void SetColor(const Color &color);
     };
 }

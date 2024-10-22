@@ -1,6 +1,7 @@
 #include "ComponentSerializer.h"
 #include "Scene/Components/Components.h"
 #include "Core/Serializer/CeSerializerUtils.h"
+#include "Resources/Loaders/MaterialLoader.h"
 
 #define CE_COMP_SIZE(type) count.type##Count = a->GetComponents<type##Component>().size();
 
@@ -74,17 +75,15 @@ namespace Core
             switch (mat->GetType())
             {
             case Material::Config:
-                Color c = mat->GetState().Color;
-                CE_SERIALIZE_FIELD("Name", mat->GetState().Name);
-                SerializerUtils::ColorToYAML(out, "Color", &c);
-                CE_SERIALIZE_FIELD("TextureName", mat->GetColorTexture()->GetImagePath().c_str());
-                CE_SERIALIZE_FIELD("TextureMin", (int)mat->GetColorTexture()->GetConfig().MinFilter);
-                CE_SERIALIZE_FIELD("TextureMag", (int)mat->GetColorTexture()->GetConfig().MagFilter);
-                break;
+            {
+                MaterialLoader loader;
+                loader.SerializeNonSpecific(out, mat);
+            }
+            break;
 
-                // TODO: Fill
-                // case Material::File:
-                //     break;
+            case Material::File:
+                CE_SERIALIZE_FIELD("FilePath", mat->GetFilePath().c_str());
+                break;
             }
         }
 
@@ -119,14 +118,16 @@ namespace Core
                 break;
 
             case Material::Config:
+            {
                 Material::Configuration config;
-                config.Name = mc["Name"].as<std::string>();
-                SerializerUtils::YAMLToColor(mc["Color"], &config.Color);
-                // TODO: Texture
-                config.TextureConfig.FilePath = mc["TextureName"].as<std::string>();
-                config.TextureConfig.MinFilter = (TextureFilter)mc["TextureMin"].as<int>();
-                config.TextureConfig.MagFilter = (TextureFilter)mc["TextureMag"].as<int>();
+                MaterialLoader l;
+                l.DeserializeNonSpecific(mc, &config);
                 c->mesh->MakeMaterialUnique(config);
+            }
+            break;
+
+            case Material::File:
+                c->mesh->MakeMaterialFromFile(mc["FilePath"].as<std::string>());
                 break;
             }
         }

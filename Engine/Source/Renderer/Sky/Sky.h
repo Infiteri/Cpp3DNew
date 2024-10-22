@@ -26,6 +26,7 @@ namespace Core
         Mode mode;
 
         CubeMapTexture *cubeTexture = nullptr;
+        std::string cubeMapPath;
 
         VertexArray *array = nullptr;
         Color color;
@@ -48,10 +49,12 @@ namespace Core
         void SetMode(Mode newMode);
         void SetModeToColor(const Color &c);
         void SetModeToCubeMap(CubeMapTexture::Configuration &config);
+        void SetModeToCubeMap(const std::string &configPath);
         void SetModeToShader(const std::string &shader);
 
         inline Color &GetColor() { return color; };
         inline std::string GetShaderName() { return shaderName; };
+        inline std::string GetCubemapPath() { return cubeMapPath; };
         void SetColor(const Color &color);
 
         void From(Sky *other);

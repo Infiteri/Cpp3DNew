@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "Core/Logger.h"
+#include "Renderer/Texture/TextureSystem.h"
 
 #include <algorithm>
 
@@ -24,6 +25,8 @@ namespace Core
 
     void Scene::Render()
     {
+        TextureSystem::StartNewSceneGeneration();
+
         for (auto actor : actors)
         {
             actor->Render();
@@ -57,6 +60,7 @@ namespace Core
         if (actor->GetState() != Actor::Started)
             actor->Start();
 
+        actor->scene = this;
         actors.push_back(actor);
     }
 

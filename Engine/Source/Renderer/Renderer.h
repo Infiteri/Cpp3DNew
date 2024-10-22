@@ -5,6 +5,7 @@
 #include "Buffer/FrameBuffer.h"
 #include "Buffer/VertexArray.h"
 #include "Shader/Shader.h"
+#include "PostProcessor.h"
 
 #include "Camera/PerspectiveCamera.h"
 
@@ -25,15 +26,14 @@ namespace Core
         {
             GPUScreen Screen;
             Viewport ScreenViewport;
-            Shader *objectShader;
-            Shader *gray;
+            PostProcessor postProcessor;
 
             bool initializedContext = false;
         };
 
     public:
-        Renderer(){};
-        ~Renderer(){};
+        Renderer() {};
+        ~Renderer() {};
 
         static void InitializeRenderingContext();
 
@@ -42,11 +42,10 @@ namespace Core
         static void Render();
         static void EndFrame();
         static void Shutdown();
-
         static void RenderScreenImage();
-
         static void Viewport(int width, int height);
-
         static CeU32 GetPassID(int index);
+
+        static Shader* TEMP_GetShaderFromPost(int i = 0);
     };
 }

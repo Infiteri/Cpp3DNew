@@ -40,3 +40,4 @@
 #include "Scene/Serializer/SceneSerializer.h"
 
 #include "Resources/Image.h"
+#include "Resources/Loaders/CubeMapLoader.h"

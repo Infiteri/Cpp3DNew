@@ -2,6 +2,7 @@
 
 #include "Base.h"
 #include <string>
+#include <vector>
 
 namespace Core
 {
@@ -23,6 +24,12 @@ namespace Core
             Yellow,
         };
 
+        struct DirectoryEntry
+        {
+            std::string Name;
+            bool IsFolder = false;
+        };
+
         static void SetConsoleColor(PlatformLogColor Color);
         static void LogMessage(const char *Message);
 
@@ -36,6 +43,12 @@ namespace Core
         // --------------- FILE DIALOGS ------------------
         static std::string OpenFileDialog(const char *filter);
         static std::string SaveFileDialog(const char *filter);
+        // ------------------------------------------------
+
+        // --------------- DIRECTORY ENTRY ----------------
+        static std::vector<std::string> GetFilePathsInDirectory(const std::string &directoryPath);
+        static std::vector<std::string> GetFolderPathsInDirectory(const std::string &directoryPath);
+        static std::vector<DirectoryEntry> GetDirectoryEntries(const std::string &directoryPath);
         // ------------------------------------------------
     };
 

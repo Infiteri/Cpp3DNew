@@ -16,26 +16,9 @@ void main() {
 in vec2 vUVs;
 
 uniform sampler2D uScreenTexture;
-bool uHalfColor;  // If true, halve the color
-bool uGrayScale;  // If true, convert to grayscale
-
 out vec4 oColor;
 
 void main() {
     vec4 color = texture(uScreenTexture, vUVs);
-
-    uHalfColor = false;
-    uGrayScale = false;
-
-    // Apply color halving if uHalfColor is true
-    if(uHalfColor) {
-        color *= 0.5;
-    }
-
-    // Apply grayscale conversion if uGrayScale is true
-    if(uGrayScale) {
-        color = vec4(vec3(1.0 - texture2D(uScreenTexture, vUVs)), 1.0);
-    }
-
     oColor = color;
 }

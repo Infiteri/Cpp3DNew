@@ -43,13 +43,11 @@ namespace Core
 
     CubeMapTexture::CubeMapTexture()
     {
-        GenGeneration();
         Load();
     }
 
     CubeMapTexture::CubeMapTexture(Configuration &config)
     {
-        GenGeneration();
         Load(config);
     }
 
@@ -60,7 +58,6 @@ namespace Core
 
     void CubeMapTexture::Load()
     {
-        GenGeneration();
         glGenTextures(1, &id);
         Bind();
 
@@ -77,7 +74,6 @@ namespace Core
 
     void CubeMapTexture::Load(Configuration &config)
     {
-        GenGeneration();
         glGenTextures(1, &id);
         Bind();
 
@@ -101,6 +97,7 @@ namespace Core
 
     void CubeMapTexture::Use()
     {
+        GenGeneration();
         glActiveTexture(GL_TEXTURE0 + generation);
         Bind();
     }
@@ -112,10 +109,5 @@ namespace Core
                 delete img;
 
         glDeleteTextures(1, &id);
-        if (generation != 0)
-        {
-            generation = 0;
-            TextureSystem::DecrementTextureGeneration();
-        }
     }
 }

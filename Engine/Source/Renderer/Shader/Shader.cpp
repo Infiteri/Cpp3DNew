@@ -105,16 +105,19 @@ namespace Core
 
     Shader::Shader(const ShaderConstructor &constructor)
     {
+        name = constructor.VertexSource;
         Compile(constructor.VertexSource, constructor.FragmentSource);
     }
 
     Shader::Shader(const std::string &shaderSource)
     {
+        name = shaderSource;
         Compile(shaderSource);
     }
 
     Shader::Shader(const std::string &vertexSource, const std::string &fragmentSource)
     {
+        name = vertexSource;
         Compile(vertexSource, fragmentSource);
     }
 
@@ -197,5 +200,14 @@ namespace Core
 
         Use();
         glUniformMatrix4fv(GetUniLoc(name), 1, false, matrix);
+    }
+
+    void Shader::Float(float x, const char *name)
+    {
+        if (!valid)
+            return;
+
+        Use();
+        glUniform1f(GetUniLoc(name), x);
     }
 }

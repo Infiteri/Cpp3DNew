@@ -118,4 +118,23 @@ namespace Core
         material->SetType(Material::Config);
         material->Create(&config);
     }
+
+    void Mesh::MakeMaterialFromFile()
+    {
+        if (material)
+            _ReleaseMaterial();
+
+        material = new Material();
+        material->MakeDefault();
+        material->SetType(Material::File);
+    }
+
+    void Mesh::MakeMaterialFromFile(const std::string &name)
+    {
+        if (material)
+            _ReleaseMaterial();
+
+        material = new Material();
+        material->Create(name);
+    }
 }

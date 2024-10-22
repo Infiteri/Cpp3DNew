@@ -137,3 +137,17 @@
 - Data sets get now serialized, deserialized and edited in the editor
 - Sky shader refactor
 - Other
+
+# 0.1.5 - 22.10.2024
+
+- Fixed Sky rendering issues
+- Cubemap config files exist
+- Material config files exist
+- Editor changes to fit engine changes
+- Other changes
+- Scripts Fixed
+- Started Content Browser Panel
+- Platform API code added
+- Scene changing from drag-drop
+- Some postprocessing stuff
+- Some fun with shaders (temporary)

@@ -7,10 +7,8 @@ namespace Core
 {
     class PanelSystem
     {
-    private:
-        std::vector<Panel*> panels;
-
     public:
+        std::vector<Panel*> panels;
         /// @brief Will add default panels
         PanelSystem();
         ~PanelSystem();

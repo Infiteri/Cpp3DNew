@@ -24,6 +24,7 @@ namespace Core
         /// @param name The name of the scene.
         /// @return Pointer to a newly created scene.
         static Scene *CreateScene(const std::string &name);
+        static Scene *CreateScene(const std::string &name, const std::string& filepath);
 
         /// @brief Will activate a scene with this name. ActiveScene will be set to nullptr if there is no scene with the given name.
         /// @param name The name of the scene.
@@ -43,7 +44,9 @@ namespace Core
 
         /// @brief Will delete a scene, nothing happens if scene with this name doesn't exist.
         /// @param name The name of the scene.
-        static void DeleteScene(const std::string& name);
+        static void DeleteScene(const std::string &name);
+
+        static bool Exists(const std::string &name);
         // --------------------------
 
         // -- Scene activation ------

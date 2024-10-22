@@ -2,6 +2,8 @@
 #include "Renderer/Shader/ShaderSystem.h"
 #include "Renderer/Texture/TextureSystem.h"
 
+#include "Resources/Loaders/MaterialLoader.h"
+
 #include "Core/Logger.h"
 
 namespace Core
@@ -50,14 +52,29 @@ namespace Core
 
     void Material::Create()
     {
+        filePath = "";
         MakeDefault();
     }
 
     void Material::Create(Configuration *config)
     {
+        filePath = "";
         this->state.From(config);
         SetType(Config);
+        config->TextureConfig.INTERNAL_IGNORE = config->TextureConfig.FilePath.empty();
         SetColorTexture(config->TextureConfig);
+    }
+
+    void Material::Create(const std::string &configPath)
+    {
+        filePath = configPath;
+        SetType(File);
+        Configuration c;
+        MaterialLoader l;
+        l.Deserialize(configPath, &c);
+        this->state.From(&c);
+        c.TextureConfig.INTERNAL_IGNORE = c.TextureConfig.FilePath.empty();
+        SetColorTexture(c.TextureConfig);
     }
 
     void Material::MakeDefault()

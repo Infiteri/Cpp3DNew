@@ -8,7 +8,7 @@
 
 namespace Core
 {
-    class Shader
+    class CE_API Shader
     {
     public:
         struct ShaderConstructor
@@ -20,6 +20,7 @@ namespace Core
     private:
         CeU32 id;
         bool valid = false;
+        std::string name; // any of them, even if its 2 sources, // TODO: Better system for 2 shader sources
 
         void Compile(const std::string &vertexSource, const std::string &fragmentSource);
         void Compile(const std::string &shaderSource);
@@ -37,6 +38,7 @@ namespace Core
 
         inline CeU32 GetID() { return id; };
         inline bool GetValid() { return valid; };
+        inline std::string GetName() { return name; };
 
         void Int(int i, const char *name);
 
@@ -53,5 +55,7 @@ namespace Core
         void Mat4(const Matrix4 &matrix, const char *name);
         void Mat4(Matrix4 *matrix, const char *name);
         void Mat4(const float *matrix, const char *name);
+
+        void Float(float x, const char *name);
     };
 }

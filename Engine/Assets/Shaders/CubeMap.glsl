@@ -26,5 +26,5 @@ uniform samplerCube uSkybox;
 uniform vec4 uTint;
 
 void main() {
-    FragColor = uTint * texture(uSkybox, vUVs);
+    FragColor = texture(uSkybox, vUVs);
 }

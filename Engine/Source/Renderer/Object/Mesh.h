@@ -35,6 +35,8 @@ namespace Core
         void MakeMaterialDefault();
         void MakeMaterialUnique();
         void MakeMaterialUnique(Material::Configuration &config);
+        void MakeMaterialFromFile();
+        void MakeMaterialFromFile(const std::string &name);
         // void SetMaterial(const std::string& name);
     };
 }

@@ -1,12 +1,11 @@
 #include "EditorLayer.h"
+#include "Panel/SceneHierarchyPanel.h"
+#include "Core/Utils/StringUtils.h"
 
 #include <imgui.h>
 
 namespace Core
 {
-    static float speed = 1.0f;
-    static float rotationSpeed = 1.0f;
-
     static Scene *scene;
 
     void EditorLayer::OnAttach()
@@ -17,31 +16,14 @@ namespace Core
         ImGuiLayer::SetFont("EngineResources/Font/Open_Sans/static/OpenSans-Bold.ttf", 12.0f);
 
         // TODO:This type of scene creation sucks
-        scene = World::CreateScene("Scene");
-        World::ActivateScene("Scene");
+        scene = World::CreateScene("EngineResources/Scene.ce_scene");
+        World::ActivateScene("EngineResources/Scene.ce_scene");
 
-#if 0
-
-        auto testActor = scene->SpawnActor();
-        auto mesh = testActor->AddComponent<MeshComponent>();
-
-        auto testActor2 = testActor->SpawnChild();
-        testActor2->SetName("Child");
-        auto mesh2 = testActor2->AddComponent<MeshComponent>();
-
-        auto testActor3 = testActor2->SpawnChild();
-        testActor3->SetName("Child 2");
-        auto mesh3 = testActor3->AddComponent<MeshComponent>();
-
-        auto testActor4 = scene->SpawnActor();
-        testActor4->SetName("Testingar");
-        testActor4->AddComponent<MeshComponent>();
-
-        testActor2->GetTransform()->Position = {6, 1, 0};
-        testActor2->GetTransform()->Rotation = {0, 90 * CE_DEG_TO_RAD, 0};
-        testActor3->GetTransform()->Position = {5, 0, 0};
-        testActor4->GetTransform()->Position = {-5, 0, 0};
-#endif
+        // todo: save scene file
+        CubeMapTexture::Configuration temp;
+        CubeMapLoader l;
+        l.Deserialize("EngineResources/Cubemaps/CoolBox.ce_cubemap", &temp);
+        World::GetActiveScene()->GetEnvironment()->SkyInst->SetModeToCubeMap(temp);
     }
 
     void EditorLayer::OnImGuiRender()
@@ -72,6 +54,10 @@ namespace Core
     void EditorLayer::OnUpdate()
     {
         World::UpdateActiveScene(); // TODO: Add this to the engine somehow please thank you :)
+
+        MapInputToGuizmoOperation(Keys::R, ImGuizmo::ROTATE);
+        MapInputToGuizmoOperation(Keys::T, ImGuizmo::TRANSLATE);
+        MapInputToGuizmoOperation(Keys::S, ImGuizmo::SCALE);
 
         if (state.Camera.updateWithMouse)
         {
@@ -155,11 +141,120 @@ namespace Core
         // End update renderer viewport
         ImGui::Image((void *)(CeU64)(CeU32)(Renderer::GetPassID(0)), viewportSize, ImVec2{0, 1}, ImVec2{1, 0});
 
+        //? Will handle all kinds of drag-n-drop from ImGui
+        HandleDragDrop();
+
+        //? Some gizmo things
+        // TODO: Fix Rotation (somehow)
+        {
+            auto panel = (SceneHierarchyPanel *)state.Panels.panels[0];
+            Actor *actorContext = panel->selectionContext;
+            PerspectiveCamera *camera = CameraSystem::GetPerspectiveActive();
+            if (actorContext != nullptr && camera != nullptr)
+            {
+                auto tc = actorContext->GetTransform();
+                auto delta = actorContext->GetParent() ? Matrix4::Invert(actorContext->GetParent()->GetTransformMatrix()).data : NULL;
+                auto data = actorContext->GetTransformMatrix().data;
+
+                DrawGizmo(camera, data, delta);
+
+                if (ImGuizmo::IsUsing())
+                {
+                    Matrix4 dater;
+                    if (actorContext->GetParent() != nullptr)
+                    {
+                        Matrix4 dataMatrix = Matrix4();
+                        dataMatrix.From(actorContext->GetLocalMatrix());
+
+                        Matrix4 deltaMatrix = Matrix4();
+                        if (delta)
+                            deltaMatrix.From(delta);
+                        else
+                            deltaMatrix = Matrix4::Identity();
+
+                        dater = Matrix4::Multiply(dataMatrix, deltaMatrix);
+                    }
+                    else
+                    {
+                        dater.From(data);
+                    }
+
+                    float matrixTranslation[3], matrixRotation[3], matrixScale[3];
+                    ImGuizmo::DecomposeMatrixToComponents(dater.data, matrixTranslation, matrixRotation, matrixScale);
+                    ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, dater.data);
+
+                    // todo: fix
+                    if (state.GuizmoOperation == ImGuizmo::TRANSLATE)
+                    {
+                        matrixTranslation[0] = dater.data[12];
+                        matrixTranslation[1] = dater.data[13];
+                        matrixTranslation[2] = dater.data[14];
+                        tc->Position.Set(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]);
+                    }
+                    else if (state.GuizmoOperation == ImGuizmo::ROTATE)
+                    {
+                        tc->Rotation.Set(Math::DegToRad(matrixRotation[0]), Math::DegToRad(matrixRotation[1]), Math::DegToRad(matrixRotation[2]));
+                    }
+                    else if (state.GuizmoOperation == ImGuizmo::SCALE)
+                    {
+                        matrixScale[0] = dater.data[0];
+                        matrixScale[1] = dater.data[5];
+                        matrixScale[2] = dater.data[10];
+                        tc->Scale.Set(matrixScale[0], matrixScale[1], matrixScale[2]);
+                    }
+                }
+            }
+        }
         ImGui::End();
+    }
+
+    void EditorLayer::HandleDragDrop()
+    {
+        if (ImGui::BeginDragDropTarget())
+        {
+            const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CE_CONTENT_PANEL");
+
+            if (payload)
+            {
+                const char *name = (const char *)payload->Data;
+                std::string extension = StringUtils::GetExtension(name);
+
+                if (extension == "ce_scene")
+                    OpenScene(name);
+            }
+
+            ImGui::EndDragDropTarget();
+        }
     }
 
     void EditorLayer::EndDockspace()
     {
         ImGui::End();
+    }
+
+    void EditorLayer::DrawGizmo(PerspectiveCamera *camera, float *data, float *deltaMatrix)
+    {
+        if (camera != nullptr && data != nullptr)
+        {
+            ImGuizmo::SetOrthographic(false);
+            ImGuizmo::SetDrawlist();
+            ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+
+            ImGuizmo::Manipulate(camera->GetViewInverted().data, camera->GetProjection().data, state.GuizmoOperation, ImGuizmo::WORLD, data, deltaMatrix);
+        }
+    }
+
+    void EditorLayer::MapInputToGuizmoOperation(Keys k, ImGuizmo::OPERATION op)
+    {
+        if (Input::GetKey(k))
+            state.GuizmoOperation = op;
+    }
+
+    void EditorLayer::OpenScene(const std::string &name)
+    {
+        if (!World::Exists(name))
+            World::CreateScene(name);
+
+        World::ActivateScene(name);
     }
 }

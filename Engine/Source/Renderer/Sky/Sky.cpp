@@ -2,6 +2,7 @@
 #include "Renderer/Camera/CameraSystem.h"
 #include "Renderer/Shader/ShaderSystem.h"
 #include "Math/Matrix4.h"
+#include "Resources/Loaders/CubeMapLoader.h"
 #include <vector>
 
 namespace Core
@@ -89,8 +90,7 @@ namespace Core
     {
         color = {255, 255, 255, 255};
         shader = nullptr;
-        SetMode(ColorMode);
-
+        mode = ColorMode;
         // Generate vertex array
         array = new VertexArray();
         array->GenVertexBuffer(cubeVertices, sizeof(cubeVertices));
@@ -122,6 +122,8 @@ namespace Core
             if (camera && cubeTexture && cubeMapShader && cubeMapShader->GetValid())
             {
                 cubeMapShader->Use();
+                camera->UpdateProjection();
+                camera->UpdateView();
                 cubeMapShader->Mat4(camera->GetProjection(), "uProjection");
                 cubeMapShader->Mat4(camera->GetViewInverted(), "uView"); // todo: inverted?
                 cubeMapShader->Mat4(Matrix4::Translate(camera->GetPosition()), "uModel");
@@ -204,6 +206,15 @@ namespace Core
         DestroyFromMode();
         SetMode(CubeMapMode);
         cubeTexture = new CubeMapTexture(config);
+    }
+
+    void Sky::SetModeToCubeMap(const std::string &configPath)
+    {
+        CubeMapTexture::Configuration c;
+        CubeMapLoader l;
+        cubeMapPath = configPath;
+        l.Deserialize(configPath, &c);
+        SetModeToCubeMap(c);
     }
 
     void Sky::SetModeToShader(const std::string &shaderFile)

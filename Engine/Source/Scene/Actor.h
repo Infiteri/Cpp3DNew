@@ -10,6 +10,8 @@
 
 namespace Core
 {
+    class Scene;
+
     typedef std::vector<Actor *> ActorList;
 
     class CE_API Actor
@@ -43,7 +45,9 @@ namespace Core
         // children
         ActorList children;
         Actor *parent = nullptr;
+        Scene *scene;
 
+        friend class Scene;
         friend class SceneSerializer;
         friend class ComponentSerializer;
 
@@ -67,6 +71,7 @@ namespace Core
 
         inline Transform *GetTransform() { return &transform; };
         inline Matrix4 GetTransformMatrix() { return worldMatrix; };
+        inline Matrix4 GetLocalMatrix() { return localMatrix; };
 
         // --------- PARENTING ------------
         inline ActorList GetChildren() { return children; };

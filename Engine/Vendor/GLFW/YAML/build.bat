@@ -1,1 +1,0 @@
-g++ -g -shared -Iinclude src/*.cpp src/contrib/*.cpp -o yaml.dll

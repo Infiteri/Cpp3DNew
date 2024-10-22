@@ -6,7 +6,10 @@ namespace Core
 {
     void BaseTexture::GenGeneration()
     {
-        if (!hasGeneration)
+        if (!INTERNAL_REQUIRE_GENERATION)
+            return;
+
+        // if (!hasGeneration)
         {
             generation = TextureSystem::GetNewTextureGeneration();
             hasGeneration = true;
