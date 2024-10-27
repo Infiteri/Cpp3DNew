@@ -2,12 +2,16 @@
 #include "Logger.h"
 #include "Input.h"
 
+#include "Platform/Platform.h"
+
 #include "Layer/LayerStack.h"
 #include "Layer/ImGuiLayer.h"
+#include "Instrumentation.h"
 
 #include "Renderer/Renderer.h"
 
 #include "Scene/World.h"
+#include "Script/ScriptEngine.h"
 
 #include <string>
 #include <iostream>
@@ -18,6 +22,7 @@
 namespace Core
 {
     static Engine::State state;
+    Platform::DynamicLibrary lib;
 
     void Engine::PreInit()
     {
@@ -28,7 +33,6 @@ namespace Core
         CE_CORE_INFO("VERSION: %s", CE_VERSION);
 
         Input::Init();
-        LayerStack::Init();
 
         // TODO: From configuration or project
         Window::Information WindowInformation;
@@ -39,10 +43,20 @@ namespace Core
         Renderer::InitializeRenderingContext();
         Renderer::Init();
         Renderer::Viewport(state.Window->GetInfo()->Width, state.Window->GetInfo()->Height);
-
         World::Init();
-
+        ScriptEngine::Init();
         ImGuiLayer::Init(); // NOTE: Requires window
+
+        LayerStack::Init();
+
+        lib = Platform::CreateLibrary("GameCode.dll");
+        typedef void (*TestPFN)();
+
+        if (Platform::LoadFunction(&lib, "Test"))
+        {
+            auto t = (TestPFN)(lib.Functions["Test"]->PFN);
+            t();
+        }
     }
 
     void Engine::Init()
@@ -53,6 +67,8 @@ namespace Core
 
     void Engine::Update()
     {
+        CE_PROFILE_FUNCTION();
+
         state.Window->Update();
         LayerStack::Update();
 
@@ -63,6 +79,8 @@ namespace Core
 
     void Engine::Render()
     {
+        CE_PROFILE_FUNCTION();
+
         Renderer::BeginFrame();
         Renderer::Render();
         World::RenderActiveScene();
@@ -89,6 +107,7 @@ namespace Core
         Renderer::Shutdown();
         World::Shutdown();
         Logger::Shutdown();
+        ScriptEngine::Shutdown();
     }
 
     bool Engine::ShouldRun()

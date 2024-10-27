@@ -14,10 +14,13 @@ namespace Core
     class ComponentSerializer : public CeSerializer
     {
     private:
+        // ADD WHEN NEW COMPONENTS
         struct ComponentCount
         {
             int MeshCount;
             int DataSetCount;
+            int ScriptCount;
+            int CameraCount;
         };
         ComponentCount count;
 
@@ -26,11 +29,19 @@ namespace Core
         void FillComponentCountData();
         void SerializeComponentCount(YAML::Emitter &out);
 
+        // ADD WHEN NEW COMPONENTS
+
         void SerializeMeshComponent(MeshComponent *c, int index, YAML::Emitter &out);
         void DeserializeMeshComponent(YAML::Node node);
 
         void SerializeDataSetComponent(DataSetComponent *c, int index, YAML::Emitter &out);
         void DeserializeDataSetComponent(YAML::Node node);
+
+        void SerializeScriptComponent(ScriptComponent *c, int index, YAML::Emitter &out);
+        void DeserializeScriptComponent(YAML::Node node);
+
+        void SerializeCameraComponent(CameraComponent *c, int index, YAML::Emitter &out);
+        void DeserializeCameraComponent(YAML::Node node);
 
     public:
         ComponentSerializer(Actor *target);

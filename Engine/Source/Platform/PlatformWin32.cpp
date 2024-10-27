@@ -3,6 +3,7 @@
 #if CE_PLATFORM == CE_WIN32_PLATFORM_VALUE
 #include <windows.h>
 #include "Core/Engine.h"
+#include "Core/Logger.h"
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
@@ -208,6 +209,60 @@ namespace Core
         return paths;
     }
 
+    Platform::DynamicLibrary Platform::CreateLibrary(const std::string &name)
+    {
+        DynamicLibrary lib;
+        lib.Name = name;
+        lib.Valid = false;
+        lib.Internal = nullptr;
+
+        if (name.empty())
+        {
+            CE_CORE_ERROR("Platform::CreateLibrary: Name is empty.");
+            return lib;
+        }
+
+        HMODULE mod = LoadLibrary(name.c_str());
+        if (mod == NULL)
+        {
+            CE_CORE_ERROR("Platform::CreateLibrary: Unable to load library '%s'.", name.c_str());
+            return lib;
+        }
+
+        lib.Valid = true;
+        lib.Internal = mod;
+
+        return lib;
+    }
+
+    void Platform::DestroyLibrary(DynamicLibrary *lib)
+    {
+        if (!lib || !lib->Valid || lib->Name.empty())
+            return;
+
+        for (auto it = lib->Functions.begin(); it != lib->Functions.end(); it++)
+            delete it->second;
+
+        lib->Functions.clear();
+        FreeLibrary((HMODULE)lib->Internal);
+    }
+
+    bool Platform::LoadFunction(DynamicLibrary *lib, const std::string &name)
+    {
+        if (!lib || !lib->Valid)
+            return false;
+
+        FARPROC f_addr = GetProcAddress((HMODULE)lib->Internal, name.c_str());
+        if (!f_addr)
+            return false;
+
+        DynamicLibraryFunction *f = new DynamicLibraryFunction;
+        f->PFN = (void *)f_addr;
+        f->Name = name;
+        lib->Functions[name] = f;
+
+        return true;
+    }
 }
 
 #endif

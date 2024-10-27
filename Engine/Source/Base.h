@@ -1,7 +1,7 @@
 #pragma once
 
 /// @brief Version (MAJOR.MINOR.SUBTLE - DD/MM/YYYY)
-#define CE_VERSION "0.1.5 - 22.10.2024"
+#define CE_VERSION "0.1.6 - 27.10.2024"
 
 /// @brief Value for the unknown OS
 #define CE_UNKNOWN_PLATFORM_VALUE 0
@@ -39,3 +39,14 @@ typedef signed int CeI32;
 typedef signed long long CeI64;
 
 #define CE_BUILD_RELEASE 0
+
+#ifdef _MSVC_VER_
+#undef CE_FUNCTION_SIGNATURE
+#define CE_FUNCTION_SIGNATURE __FUNCSIG__
+#else
+#undef CE_FUNCTION_SIGNATURE
+#define CE_FUNCTION_SIGNATURE __PRETTY_FUNCTION__
+#endif
+
+#define CE_DEFINE_SCRIPT_EXPORT(className) \
+    extern "C" __declspec(dllexport) ActorScript *className##Create() { return new className(); }

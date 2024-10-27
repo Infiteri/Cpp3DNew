@@ -151,3 +151,14 @@
 - Scene changing from drag-drop
 - Some postprocessing stuff
 - Some fun with shaders (temporary)
+
+# 0.1.6 - 27.10.2024
+
+- Timer and Instrumentation (buggy TODO)
+- Some postprocessing shaders
+- Started platform library concept
+- Added Scene Runtime to the editor
+- Goofy ahh bug fixe :skull:
+- Added Camera Component
+- Bug fixes
+- Other

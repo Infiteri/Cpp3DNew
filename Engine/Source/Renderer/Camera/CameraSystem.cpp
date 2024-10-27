@@ -17,9 +17,6 @@ namespace Core
         for (auto c : cameras)
             delete c.second;
         cameras.clear();
-
-        if (active)
-            delete active;
     }
 
     PerspectiveCamera *CameraSystem::CreatePerspective(const std::string &name, float fov, float aspect, float near, float far)
@@ -61,6 +58,8 @@ namespace Core
     void CameraSystem::Activate(Camera *camera)
     {
         active = camera;
+        active->UpdateProjection();
+        active->UpdateView();
     }
 
     Camera *CameraSystem::GetActive()

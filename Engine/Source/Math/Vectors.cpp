@@ -59,6 +59,11 @@ namespace Core
         Set(v->x, v->y, v->z);
     }
 
+    void Vector3::Set(const Vector3 &v)
+    {
+        Set(v.x, v.y, v.z);
+    }
+
     bool Vector3::NotZero() const
     {
         return (x != 0.0f || y != 0.0f || z != 0.0f);

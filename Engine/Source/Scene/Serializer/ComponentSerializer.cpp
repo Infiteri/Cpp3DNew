@@ -12,6 +12,10 @@
             Serialize##type##Component(list[i], i, out); \
     }
 
+#define CE_DESERIALIZE_COMPONENT(name, fun)                 \
+    for (int i = 0; i < GetNodeCount(name, actorNode); i++) \
+    fun(actorNode[std::string(name) + std::string(" ") + std::to_string(i)])
+
 namespace Core
 {
     static int GetNodeCount(const std::string &name, YAML::Node node) // Ensures node exists and then returns it as "<int>", useful for when components get added but not serialized yet
@@ -34,31 +38,43 @@ namespace Core
 
     void ComponentSerializer::Serialize(YAML::Emitter &out)
     {
+        // ADD WHEN NEW COMPONENTS
         SerializeComponentCount(out);
+
         CE_SERIALIZE_COMP_CALLBACK(Mesh);
         CE_SERIALIZE_COMP_CALLBACK(DataSet);
+        CE_SERIALIZE_COMP_CALLBACK(Script);
+        CE_SERIALIZE_COMP_CALLBACK(Camera);
     }
 
     void ComponentSerializer::Deserialize(YAML::Node actorNode)
     {
-        for (int i = 0; i < GetNodeCount("MeshComponent", actorNode); i++)
-            DeserializeMeshComponent(actorNode["MeshComponent " + std::to_string(i)]);
+        // ADD WHEN NEW COMPONENTS
 
-        for (int i = 0; i < GetNodeCount("DataSetComponent", actorNode); i++)
-            DeserializeDataSetComponent(actorNode["DataSetComponent " + std::to_string(i)]);
+        CE_DESERIALIZE_COMPONENT("MeshComponent", DeserializeMeshComponent);
+        CE_DESERIALIZE_COMPONENT("DataSetComponent", DeserializeDataSetComponent);
+        CE_DESERIALIZE_COMPONENT("ScriptComponent", DeserializeScriptComponent);
+        CE_DESERIALIZE_COMPONENT("CameraComponent", DeserializeCameraComponent);
     }
 
     void ComponentSerializer::FillComponentCountData()
     {
+        // ADD WHEN NEW COMPONENTS
         CE_COMP_SIZE(Mesh);
         CE_COMP_SIZE(DataSet);
+        CE_COMP_SIZE(Script);
+        CE_COMP_SIZE(Camera);
     }
 
     void ComponentSerializer::SerializeComponentCount(YAML::Emitter &out)
     {
+        // ADD WHEN NEW COMPONENTS
         FillComponentCountData();
+
         CE_SERIALIZE_FIELD("MeshComponentCount", count.MeshCount);
         CE_SERIALIZE_FIELD("DataSetComponentCount", count.DataSetCount);
+        CE_SERIALIZE_FIELD("ScriptComponentCount", count.ScriptCount);
+        CE_SERIALIZE_FIELD("CameraComponentCount", count.CameraCount);
     }
 
     void ComponentSerializer::SerializeMeshComponent(MeshComponent *c, int index, YAML::Emitter &out)
@@ -245,5 +261,40 @@ namespace Core
             break;
             }
         }
+    }
+
+    void ComponentSerializer::SerializeScriptComponent(ScriptComponent *c, int index, YAML::Emitter &out)
+    {
+        out << YAML::Key << "ScriptComponent " + std::to_string(index);
+        out << YAML::BeginMap;
+        CE_SERIALIZE_FIELD("ClassName", c->ClassName.c_str());
+        out << YAML::EndMap;
+    }
+
+    void ComponentSerializer::DeserializeScriptComponent(YAML::Node node)
+    {
+        auto c = a->AddComponent<ScriptComponent>();
+        c->ClassName = node["ClassName"].as<std::string>();
+    }
+
+    void ComponentSerializer::SerializeCameraComponent(CameraComponent *c, int index, YAML::Emitter &out)
+    {
+        out << YAML::Key << "CameraComponent " + std::to_string(index);
+        out << YAML::BeginMap;
+        CE_SERIALIZE_FIELD("FOV", c->FOV);
+        CE_SERIALIZE_FIELD("Near", c->Near);
+        CE_SERIALIZE_FIELD("Far", c->Far);
+        CE_SERIALIZE_FIELD("IsPrimary", c->IsPrimary);
+        out << YAML::EndMap;
+    }
+
+    void ComponentSerializer::DeserializeCameraComponent(YAML::Node node)
+    {
+        auto c = a->AddComponent<CameraComponent>();
+        c->FOV = node["FOV"].as<float>();
+        c->Near = node["Near"].as<float>();
+        c->Far = node["Far"].as<float>();
+        c->IsPrimary = node["IsPrimary"].as<bool>();
+        c->UpdateCameraState();
     }
 }

@@ -34,6 +34,9 @@ namespace Core
 
         Geometry() { type = None; };
         virtual ~Geometry() {};
+
+        template <typename T>
+        T *As() { return (T *)this; };
     };
 
     class CE_API BoxGeometry : public Geometry
@@ -46,5 +49,4 @@ namespace Core
         BoxGeometry(float width = 1, float height = 1, float depth = 1);
         ~BoxGeometry();
     };
-
 }

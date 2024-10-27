@@ -80,6 +80,7 @@ namespace Core
 
         void Set(float x, float y, float z);
         void Set(Vector3 *v);
+        void Set(const Vector3 &v);
 
         void operator+=(const Vector3 &o)
         {

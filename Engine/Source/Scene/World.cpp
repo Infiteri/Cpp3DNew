@@ -7,8 +7,17 @@
 
 namespace Core
 {
+
     static std::unordered_map<std::string, Scene *> scenes;
     static Scene *activeScene;
+
+    void World::EDITOR_CopyToActive(Scene *scene)
+    {
+        if (activeScene)
+            delete activeScene;
+
+        activeScene = Scene::From(scene);
+    }
 
     void World::Init()
     {

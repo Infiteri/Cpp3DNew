@@ -1,5 +1,7 @@
 #include "Components.h"
 #include "Scene/Actor.h"
+#include "Core/Logger.h"
+#include "Core/Engine.h"
 
 namespace Core
 {
@@ -20,6 +22,35 @@ namespace Core
 
     void MeshComponent::From(MeshComponent *c)
     {
+        switch (c->mesh->GetMaterial()->GetType())
+        {
+        case Material::Default:
+        default:
+            mesh->MakeMaterialDefault();
+            break;
+
+        case Material::Config:
+            mesh->MakeMaterialUnique(c->mesh->GetMaterial()->GetState());
+            break;
+
+        case Material::File:
+            mesh->MakeMaterialFromFile(c->mesh->GetMaterial()->GetFilePath());
+            break;
+        }
+
+        auto geometry = c->mesh->GetGeometry();
+        switch (geometry->GetType())
+        {
+        case Geometry::None:
+        default:
+            mesh->SetGeometry(new Geometry());
+            break;
+
+        case Geometry::Box:
+            auto *cast = geometry->As<BoxGeometry>();
+            mesh->SetGeometry(new BoxGeometry(cast->Width, cast->Height, cast->Depth));
+            break;
+        }
     }
 
     DataSetComponent::DataSetComponent()
@@ -38,5 +69,53 @@ namespace Core
             c->From(d);
             Set.Add(c);
         }
+    }
+
+    ScriptComponent::ScriptComponent()
+    {
+    }
+
+    ScriptComponent::~ScriptComponent()
+    {
+    }
+
+    void ScriptComponent::From(ScriptComponent *c)
+    {
+        ClassName = c->ClassName;
+    }
+
+    CameraComponent::CameraComponent()
+    {
+        Camera = new PerspectiveCamera();
+    }
+
+    CameraComponent::~CameraComponent()
+    {
+        delete Camera;
+    }
+
+    void CameraComponent::Render()
+    {
+        Camera->SetMatrixMode(Camera::InputMatrix);
+        Camera->GetPosition().Set(Owner->GetTransform()->Position);
+        Camera->GetRotation().Set(Owner->GetTransform()->Rotation);
+        Camera->SetViewMatrix(Owner->GetTransformMatrix());
+    }
+
+    void CameraComponent::UpdateCameraState()
+    {
+        Camera->SetFOV(FOV);
+        Camera->SetNear(Near);
+        Camera->SetFar(Far);
+        Camera->SetAspect(Engine::GetWindow()->GetWidth() / Engine::GetWindow()->GetHeight());
+        Camera->UpdateProjection();
+    }
+
+    void CameraComponent::From(CameraComponent *c)
+    {
+        FOV = c->FOV;
+        Near = c->Near;
+        Far = c->Far;
+        IsPrimary = c->IsPrimary;
     }
 }

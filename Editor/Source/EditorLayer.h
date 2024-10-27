@@ -18,6 +18,18 @@ namespace Core
         ImVec2 ViewportRightBottom;
     };
 
+    struct Textures
+    {
+        Texture *PlayButton;
+        Texture *StopButton;
+    };
+
+    enum CurrentSceneState
+    {
+        SceneStatePlay,
+        SceneStateStop,
+    };
+
     struct EditorState
     {
         PanelInformation PanelInfo;
@@ -26,6 +38,11 @@ namespace Core
         ImVec2 LastFrameViewport;
         EditorCamera Camera;
         ImGuizmo::OPERATION GuizmoOperation;
+
+        Textures TextureSet;
+        CurrentSceneState StateScene;
+
+        Scene *EditorScene = nullptr;
     };
 
     class EditorLayer : public Layer
@@ -41,6 +58,21 @@ namespace Core
         void OnImGuiRender();
         void OnUpdate();
         // -------------------
+
+        // --- UI FUNCTION ---
+        void UI_TopBar();
+        // -------------------
+
+        // -- SCENE FUNCTION --
+        void StartSceneRuntime();
+        void StopSceneRuntime();
+
+        /// @param mode Play - play camera, Stop - editor camera
+        void ActivateCamera(CurrentSceneState mode);
+
+        void UpdateRuntime();
+        void UpdateEditor();
+        // --------------------
 
         void PreparePanelInfo();
 

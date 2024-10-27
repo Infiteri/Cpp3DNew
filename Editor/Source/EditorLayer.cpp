@@ -10,10 +10,10 @@ namespace Core
 
     void EditorLayer::OnAttach()
     {
+        ImGuiLayer::SetFont("EngineResources/Font/Open_Sans/static/OpenSans-Bold.ttf", 12.0f);
+
         state.Camera.camera = CameraSystem::CreatePerspective("EditorCamera", 120.0f);
         CameraSystem::Activate("EditorCamera");
-
-        ImGuiLayer::SetFont("EngineResources/Font/Open_Sans/static/OpenSans-Bold.ttf", 12.0f);
 
         // TODO:This type of scene creation sucks
         scene = World::CreateScene("EngineResources/Scene.ce_scene");
@@ -21,9 +21,22 @@ namespace Core
 
         // todo: save scene file
         CubeMapTexture::Configuration temp;
-        CubeMapLoader l;
-        l.Deserialize("EngineResources/Cubemaps/CoolBox.ce_cubemap", &temp);
-        World::GetActiveScene()->GetEnvironment()->SkyInst->SetModeToCubeMap(temp);
+        // CubeMapLoader l;
+        // l.Deserialize("EngineResources/Cubemaps/CoolBox.ce_cubemap", &temp);
+        World::GetActiveScene()->GetEnvironment()->SkyInst->SetModeToColor({0, 125, 255, 255});
+
+        // Load textures
+        state.TextureSet.PlayButton = new Texture(false);
+        state.TextureSet.PlayButton->INTERNAL_REQUIRE_GENERATION = false;
+        state.TextureSet.PlayButton->Load("EngineResources/Images/Icons/PlayButton.png", {});
+
+        state.TextureSet.StopButton = new Texture(false);
+        state.TextureSet.StopButton->INTERNAL_REQUIRE_GENERATION = false;
+        state.TextureSet.StopButton->Load("EngineResources/Images/Icons/StopButton.png", {});
+
+        state.StateScene = SceneStateStop;
+
+        StopSceneRuntime();
     }
 
     void EditorLayer::OnImGuiRender()
@@ -33,6 +46,10 @@ namespace Core
         state.Panels.RenderImGui(&state.PanelInfo);
         RenderSceneViewport();
 
+        // Render UI
+        UI_TopBar();
+
+        // NOTE: temporary
         ImGui::Begin("Debug");
         if (ImGui::Button("Save"))
         {
@@ -46,6 +63,8 @@ namespace Core
             serializer.Deserialize("EngineResources/Scene.ce_scene");
         }
 
+        ImGui::Text("FPS: %.3f", 1.0f / Engine::GetDeltaTime());
+
         ImGui::End();
 
         EndDockspace();
@@ -53,8 +72,113 @@ namespace Core
 
     void EditorLayer::OnUpdate()
     {
-        World::UpdateActiveScene(); // TODO: Add this to the engine somehow please thank you :)
+        switch (state.StateScene)
+        {
+        case SceneStatePlay:
+            UpdateRuntime();
+            break;
 
+        case SceneStateStop:
+            UpdateEditor();
+            break;
+        }
+    }
+
+    void EditorLayer::UI_TopBar()
+    {
+        ImGui::Begin("Top navbar", NULL, ImGuiWindowFlags_NoDecoration);
+
+        float size = 12;
+
+        switch (state.StateScene)
+        {
+        case SceneStatePlay:
+            if (ImGui::ImageButton((void *)(CeU64)(CeU32)state.TextureSet.StopButton->GetID(), {size, size}))
+            {
+                StopSceneRuntime();
+            }
+            break;
+
+        case SceneStateStop:
+            if (ImGui::ImageButton((void *)(CeU64)(CeU32)state.TextureSet.PlayButton->GetID(), {size, size}))
+            {
+                StartSceneRuntime();
+            }
+            break;
+        }
+
+        ImGui::End();
+    }
+
+    void EditorLayer::StartSceneRuntime()
+    {
+        state.StateScene = SceneStatePlay; // TODO: Copy scene
+
+        World::StopActiveScene(); // Test
+        state.EditorScene = Scene::From(World::GetActiveScene());
+        World::StartActiveScene();
+        // ActivateCamera(); NOTE: Should be done by scene start
+        Renderer::Viewport();
+    }
+
+    void EditorLayer::StopSceneRuntime()
+    {
+        state.StateScene = SceneStateStop; // TODO: Copy scene
+
+        if (!state.EditorScene)
+            return;
+
+        auto panel = (SceneHierarchyPanel *)state.Panels.panels[0];
+        UUID id = 0;
+        if (panel->selectionContext)
+            id = panel->selectionContext->GetUUID();
+
+        panel->selectionContext = nullptr;
+
+        World::StopActiveScene(); // Stop last scene
+
+        World::EDITOR_CopyToActive(state.EditorScene);
+        delete state.EditorScene;
+        state.EditorScene = nullptr;
+
+        ActivateCamera(SceneStateStop);
+        Renderer::Viewport();
+
+        if (id != 0)
+        {
+            panel->selectionContext = World::GetActiveScene()->GetActorByUUID(id);
+        }
+    }
+
+    void EditorLayer::ActivateCamera(CurrentSceneState mode)
+    {
+        switch (mode)
+        {
+        case SceneStatePlay:
+        {
+            CameraComponent *c = World::GetActiveScene()->GetPrimaryCameraComponent();
+            if (!c)
+                c = World::GetActiveScene()->GetFirstCameraComponent();
+
+            CameraSystem::Activate(c->Camera);
+        }
+        break;
+
+        case SceneStateStop:
+        {
+            CameraSystem::Activate("EditorCamera");
+        }
+        break;
+        }
+    }
+
+    void EditorLayer::UpdateRuntime()
+    {
+        World::UpdateActiveScene(); // TODO: Add this to the engine somehow please thank you :)
+    }
+
+    void EditorLayer::UpdateEditor()
+    {
         MapInputToGuizmoOperation(Keys::R, ImGuizmo::ROTATE);
         MapInputToGuizmoOperation(Keys::T, ImGuizmo::TRANSLATE);
         MapInputToGuizmoOperation(Keys::S, ImGuizmo::SCALE);
@@ -125,7 +249,9 @@ namespace Core
 
     void EditorLayer::RenderSceneViewport()
     {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
         ImGui::Begin("Viewport");
+        ImGui::PopStyleVar();
 
         // Update renderer viewport
         ImVec2 viewportSize = ImGui::GetContentRegionAvail();
@@ -180,26 +306,27 @@ namespace Core
                     }
 
                     float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-                    ImGuizmo::DecomposeMatrixToComponents(dater.data, matrixTranslation, matrixRotation, matrixScale);
-                    ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, dater.data);
+                    ImGuizmo::DecomposeMatrixToComponents(dater, matrixTranslation, matrixRotation, matrixScale);
+                    // ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, dater);
 
                     // todo: fix
                     if (state.GuizmoOperation == ImGuizmo::TRANSLATE)
                     {
-                        matrixTranslation[0] = dater.data[12];
-                        matrixTranslation[1] = dater.data[13];
-                        matrixTranslation[2] = dater.data[14];
+                        matrixTranslation[0] = dater[12];
+                        matrixTranslation[1] = dater[13];
+                        matrixTranslation[2] = dater[14];
                         tc->Position.Set(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]);
                     }
                     else if (state.GuizmoOperation == ImGuizmo::ROTATE)
                     {
+                        CE_TRACE("%f %f %f", matrixRotation[0], matrixRotation[1], matrixRotation[2]);
                         tc->Rotation.Set(Math::DegToRad(matrixRotation[0]), Math::DegToRad(matrixRotation[1]), Math::DegToRad(matrixRotation[2]));
                     }
                     else if (state.GuizmoOperation == ImGuizmo::SCALE)
                     {
-                        matrixScale[0] = dater.data[0];
-                        matrixScale[1] = dater.data[5];
-                        matrixScale[2] = dater.data[10];
+                        matrixScale[0] = dater[0];
+                        matrixScale[1] = dater[5];
+                        matrixScale[2] = dater[10];
                         tc->Scale.Set(matrixScale[0], matrixScale[1], matrixScale[2]);
                     }
                 }

@@ -10,6 +10,10 @@
         EditorUtils::DrawComponentBaseUI(name, Component##type, index##type, a, cb); \
     }
 
+#define CE_ADD_COMPONENT(type)  \
+    if (ImGui::MenuItem(#type)) \
+    selectionContext->AddComponent<type##Component>()
+
 namespace Core
 {
     SceneHierarchyPanel::SceneHierarchyPanel()
@@ -109,8 +113,6 @@ namespace Core
                 UUID *uid = (UUID *)payload->Data;
                 UUID rawUUID = UUID(uid->Get());
 
-                CE_CORE_TRACE("%uul to %ull", a->GetUUID().Get(), uid->Get());
-
                 // NOTE: Actor is target, data is name of the actor to move
                 auto moveActor = World::GetActiveScene()->GetActorInHierarchy(rawUUID);
                 if (moveActor)
@@ -183,8 +185,10 @@ namespace Core
             ImGui::TreePop();
     }
 
-    void RenderMeshUI(MeshComponent *mesh, Actor *a);
-    void RenderDataSetUI(DataSetComponent *mesh, Actor *a);
+    void RenderMeshUI(MeshComponent *c, Actor *a);
+    void RenderDataSetUI(DataSetComponent *c, Actor *a);
+    void RenderScriptUI(ScriptComponent *c, Actor *a);
+    void RenderCameraUI(CameraComponent *c, Actor *a);
 
     void SceneHierarchyPanel::RenderActorComponents(Actor *a)
     {
@@ -207,17 +211,18 @@ namespace Core
 
         CE_UTIL_ADD_RENDER("Mesh Component", MeshComponent, RenderMeshUI);
         CE_UTIL_ADD_RENDER("Data Set Component", DataSetComponent, RenderDataSetUI);
+        CE_UTIL_ADD_RENDER("Script Component", ScriptComponent, RenderScriptUI);
+        CE_UTIL_ADD_RENDER("Camera Component", CameraComponent, RenderCameraUI);
 
         if (ImGui::Button("Add Component"))
             ImGui::OpenPopup("ComponentPopup");
 
         if (ImGui::BeginPopupContextItem("ComponentPopup"))
         {
-            if (ImGui::MenuItem("Mesh"))
-                selectionContext->AddComponent<MeshComponent>();
-
-            if (ImGui::MenuItem("Data Set"))
-                selectionContext->AddComponent<DataSetComponent>();
+            CE_ADD_COMPONENT(Mesh);
+            CE_ADD_COMPONENT(DataSet);
+            CE_ADD_COMPONENT(Script);
+            CE_ADD_COMPONENT(Camera);
 
             ImGui::EndPopup();
         }
@@ -321,6 +326,9 @@ namespace Core
                 float data[3] = {b->Width, b->Height, b->Depth};
                 if (ImGui::DragFloat3("Size", data, 0.05f, 0.0f))
                     mesh->mesh->SetGeometry(new BoxGeometry(data[0], data[1], data[2]));
+
+                // NOTE: If the geometry changes, the address changes as well, faults if this isn't done
+                g = mesh->mesh->GetGeometry();
                 break;
             }
 
@@ -369,6 +377,27 @@ namespace Core
         if (ImGui::Button("Add"))
         {
             c->Set.Add(new CeData(new Vector2(), CeData::DataVec2, "Vector 2"));
+        }
+    }
+
+    void RenderScriptUI(ScriptComponent *c, Actor *a)
+    {
+        auto scriptChange = EditorUtils::ImGuiStringEdit("Class Name", c->ClassName);
+        if (scriptChange.Changed)
+            c->ClassName = scriptChange.Content;
+    }
+
+    void RenderCameraUI(CameraComponent *c, Actor *a)
+    {
+        ImGui::DragFloat("FOV", &c->FOV, 0.05f, 0.0f, 360.0f);
+        ImGui::DragFloat("Near", &c->Near, 0.05f, 0.01f);
+        ImGui::DragFloat("Far", &c->Far, 0.05f, 0.01f);
+
+        bool primary = c->IsPrimary;
+        if (ImGui::Checkbox("Is Primary", &primary))
+        {
+            World::GetActiveScene()->SetPrimaryCameraToNone(); // Automatically tick off every single camera to be non primary
+            c->IsPrimary = primary;
         }
     }
 }

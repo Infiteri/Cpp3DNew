@@ -12,5 +12,6 @@ namespace Core
         Sky *SkyInst;
 
         void Setup();
+        void From(SceneEnvironment* env);
     };
 }

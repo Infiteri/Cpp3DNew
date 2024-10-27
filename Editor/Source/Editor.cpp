@@ -21,5 +21,4 @@ namespace Core
     {
         return new Editor();
     }
-
 }

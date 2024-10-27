@@ -33,7 +33,6 @@ namespace Core
         }
 
         delete reference->material;
-        delete reference;
     };
 
     /// @brief Will also decrement count
@@ -110,9 +109,12 @@ namespace Core
 
     void MaterialSystem::Release(const std::string &name)
     {
+        if (name.empty())
+            return;
+
         if (references.find(name)->second == nullptr)
             return;
 
-        _ReleaseMaterialNoLogging(references[name]);
+        _CheckAndDeleteMaterialReference(references[name]);
     }
 }

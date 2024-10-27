@@ -35,7 +35,9 @@ namespace Core
         CeU32 FilterToGLType(TextureFilter filter);
         void TextureLoadUtils(int w, int h, CeU8 *data, CeU32 channel, TextureConfiguration config);
 
-        friend class ContentBrowserPanel; // Note: for editor
+        // Note: for editor
+        friend class ContentBrowserPanel;
+        friend class EditorLayer;
 
     public:
         BaseTexture();

@@ -46,8 +46,16 @@ namespace Core
 
         shader->Use();
         shader->Vec4(state.Color, "uColor");
-        colorTexture.texture->Use();
-        shader->Int(colorTexture.texture->GetGeneration(), "uColorTexture");
+
+        if (colorTexture.texture)
+        {
+            colorTexture.texture->Use();
+            shader->Int(colorTexture.texture->GetGeneration(), "uColorTexture");
+        }
+        else
+        {
+            CE_CORE_WARN("Wht>");
+        }
     }
 
     void Material::Create()
@@ -89,6 +97,7 @@ namespace Core
         if (colorTexture.texture)
             ReleaseTexture(&colorTexture);
 
+        colorTexture.isDefault = true;
         colorTexture.texture = TextureSystem::GetDefault();
     }
 
@@ -97,17 +106,22 @@ namespace Core
         if (colorTexture.texture)
             ReleaseTexture(&colorTexture);
 
+        colorTexture.isDefault = false;
         colorTexture.texture = TextureSystem::Get(name); // TODO: use configuration
     }
 
     void Material::SetColorTexture(TextureConfiguration &configuration)
     {
         if (configuration.INTERNAL_IGNORE)
+        {
+            SetColorTexture();
             return;
+        }
 
         if (colorTexture.texture)
             ReleaseTexture(&colorTexture);
 
+        colorTexture.isDefault = false;
         colorTexture.texture = TextureSystem::Get(configuration); // TODO: use configuration
     }
 

@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Base.h"
+
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace Core
@@ -12,6 +14,20 @@ namespace Core
     public:
         Platform() {}
         ~Platform() {}
+
+        struct DynamicLibraryFunction
+        {
+            std::string Name;
+            void *PFN;
+        };
+
+        struct DynamicLibrary
+        {
+            std::string Name;
+            bool Valid = false;
+            void *Internal;
+            std::unordered_map<std::string, DynamicLibraryFunction *> Functions;
+        };
 
         enum PlatformLogColor
         {
@@ -49,6 +65,24 @@ namespace Core
         static std::vector<std::string> GetFilePathsInDirectory(const std::string &directoryPath);
         static std::vector<std::string> GetFolderPathsInDirectory(const std::string &directoryPath);
         static std::vector<DirectoryEntry> GetDirectoryEntries(const std::string &directoryPath);
+        // ------------------------------------------------
+
+        // --------------- LIBRARY ------------------------
+        static DynamicLibrary CreateLibrary(const std::string &name);
+        static void DestroyLibrary(DynamicLibrary *lib);
+        static bool LoadFunction(DynamicLibrary *lib, const std::string &name);
+
+        template <typename T>
+        static T GetFunction(DynamicLibrary *lib, const std::string &name)
+        {
+            if (!lib->Valid)
+                return NULL;
+
+            if (lib->Functions.find(name) == lib->Functions.end())
+                LoadFunction(lib, name);
+
+            return (T)lib->Functions[name]->PFN;
+        };
         // ------------------------------------------------
     };
 

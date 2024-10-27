@@ -10,6 +10,9 @@ namespace Core
     static float blurStrength = 0.5;
     static int samples = 1;
 
+    static float falloff = 1.0;
+    static float vignetteAmount = 1.0;
+
     SceneSettingsPanel::SceneSettingsPanel()
     {
     }
@@ -92,15 +95,26 @@ namespace Core
             ImGui::TreePop();
         }
 
-        ImGui::DragFloat("Intensity", &intensity, 0.005f);
-        ImGui::DragFloat("Blur Radius", &blurRadius, 0.005f);
-        ImGui::DragFloat("Blur Strength", &blurStrength, 0.005f);
-        ImGui::DragInt("Samples", &samples);
+        // Radiant blur
+        {
+            ImGui::DragFloat("Intensity", &intensity, 0.005f);
+            ImGui::DragFloat("Blur Radius", &blurRadius, 0.005f);
+            ImGui::DragFloat("Blur Strength", &blurStrength, 0.005f);
+            ImGui::DragInt("Samples", &samples);
 
-        Renderer::TEMP_GetShaderFromPost(0)->Float(intensity, "intensity");
-        Renderer::TEMP_GetShaderFromPost(0)->Float(blurRadius, "blurRadius");
-        Renderer::TEMP_GetShaderFromPost(0)->Float(blurStrength, "blurStrength");
-        Renderer::TEMP_GetShaderFromPost(0)->Int(samples, "samples");
+            Renderer::TEMP_GetShaderFromPost(0)->Float(intensity, "uIntensity");
+            Renderer::TEMP_GetShaderFromPost(0)->Float(blurRadius, "uBlurRadius");
+            Renderer::TEMP_GetShaderFromPost(0)->Float(blurStrength, "uBlurStrength");
+            Renderer::TEMP_GetShaderFromPost(0)->Int(samples, "uSamples");
+        }
+
+        {
+            ImGui::DragFloat("Falloff", &falloff, 0.005f);
+            ImGui::DragFloat("Vignette Amount", &vignetteAmount, 0.005f);
+
+            Renderer::TEMP_GetShaderFromPost(1)->Float(falloff, "uFalloff");
+            Renderer::TEMP_GetShaderFromPost(1)->Float(vignetteAmount, "uAmount");
+        }
 
         ImGui::End();
     }

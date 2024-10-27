@@ -3,6 +3,7 @@
 #include "Base.h"
 #include "Renderer/Object/Mesh.h"
 #include "Core/Data/CeDataSet.h"
+#include "Renderer/Camera/PerspectiveCamera.h"
 
 namespace Core
 {
@@ -48,4 +49,40 @@ namespace Core
         void From(DataSetComponent *c);
     };
 
+    class CE_API ScriptComponent : public Component
+    {
+    public:
+        std::string ClassName;
+
+        ScriptComponent();
+        ~ScriptComponent();
+
+        void From(ScriptComponent *c);
+    };
+
+    class CE_API CameraComponent : public Component
+    {
+    private:
+        PerspectiveCamera *Camera;
+
+        friend class Scene;
+
+        // Note: For editor
+        friend class EditorLayer;
+
+    public:
+        float FOV = 90.0f;
+        float Far = 1000.0f;
+        float Near = 0.01f;
+        bool IsPrimary = true;
+
+        CameraComponent();
+        ~CameraComponent();
+
+        void Render();
+
+        void UpdateCameraState();
+
+        void From(CameraComponent *c);
+    };
 }

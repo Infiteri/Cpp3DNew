@@ -1,6 +1,12 @@
 #include "Actor.h"
+#include "Core/Logger.h"
 #include "Renderer/Object/Mesh.h"
 #include "Renderer/Shader/ShaderSystem.h"
+
+#define CE_COPY_COMPONENT(type)                          \
+    auto type##COMPONENT = other->GetComponents<type>(); \
+    for (auto c : type##COMPONENT)                       \
+    outActor->AddComponent<type>()->From(c)
 
 namespace Core
 {
@@ -14,30 +20,39 @@ namespace Core
 
     Actor::~Actor()
     {
+        for (auto child : children)
+            delete child;
+
+        for (auto component : components)
+            delete component;
+
+        children.clear();
+        components.clear();
     }
 
     Actor *Actor::From(Actor *other)
     {
-
         if (!other)
             return nullptr;
 
         Actor *outActor = new Actor();
         outActor->SetName(other->GetName());
         outActor->parent = other->GetParent();
+        outActor->id = other->id;
 
         auto transform = other->GetTransform();
-        auto mesh = other->GetComponent<MeshComponent>();
 
         outActor->GetTransform()->From(transform);
 
-        if (mesh)
-            outActor->AddComponent<MeshComponent>()->From(mesh);
+        CE_COPY_COMPONENT(MeshComponent);
+        CE_COPY_COMPONENT(DataSetComponent);
+        CE_COPY_COMPONENT(ScriptComponent);
+        CE_COPY_COMPONENT(CameraComponent);
 
         for (Actor *a : other->GetChildren())
             outActor->AddChild(Actor::From(a));
 
-        return other;
+        return outActor;
     }
 
     void Actor::_CalculateMatrices()
@@ -68,10 +83,8 @@ namespace Core
 
     void Actor::Render()
     {
-        if ((state != Started) && (state != Running))
+        if (state == Stopped)
             return;
-
-        state = Running;
 
         //? what
         _CalculateMatrices();
@@ -92,7 +105,7 @@ namespace Core
 
     void Actor::Update()
     {
-        if (state != Started)
+        if (state != Started && (state != Running))
             return;
 
         state = Running;

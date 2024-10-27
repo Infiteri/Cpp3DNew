@@ -1,4 +1,4 @@
-Scene: Scene
+Scene: EngineResources/Scene.ce_scene
 Actors:
   - Actor: Filed
     Name: Actor
@@ -9,6 +9,9 @@ Actors:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshComponentCount: 1
+    DataSetComponentCount: 0
+    ScriptComponentCount: 0
+    CameraComponentCount: 0
     MeshComponent 0:
       Type: 1
       Name: ""
@@ -20,3 +23,20 @@ Actors:
       Width: 1
       Height: 1
       Depth: 1
+  - Actor: Filed
+    Name: Actor
+    UUID: 1275278976166057676
+    ParentUUID: 0
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponentCount: 0
+    DataSetComponentCount: 0
+    ScriptComponentCount: 0
+    CameraComponentCount: 1
+    CameraComponent 0:
+      FOV: 90
+      Near: 0.005
+      Far: 1000
+      IsPrimary: true

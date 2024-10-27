@@ -19,9 +19,16 @@ namespace Core
     public:
         enum State
         {
+            // CAN RENDER
             Initialized,
+
+            // CAN RENDER && UPDATE
             Started,
+
+            // CAN RENDER && UPDATE
             Running,
+
+            // CAN RENDER
             Stopped
         };
 

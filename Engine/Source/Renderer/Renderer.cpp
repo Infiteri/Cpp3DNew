@@ -56,10 +56,9 @@ namespace Core
         TextureSystem::Init();
         MaterialSystem::Init(); // Post texture system as the material relies on the default texture. :)
         ShaderSystem::Load("EngineResources/Shaders/Object");
-        state.postProcessor.Add("EngineResources/Shaders/GrayScale.glsl", true);
-
-        CameraSystem::CreatePerspective("Main Camera");
-        CameraSystem::Activate("Main Camera");
+        state.postProcessor.Add("EngineResources/Shaders/Post/RadiantBlur.glsl", false); // TODO: Some architecture
+        state.postProcessor.Add("EngineResources/Shaders/Post/Vignette.glsl", false);    // TODO: Some architecture
+        state.postProcessor.Add("EngineResources/Shaders/Post/Toy.glsl", false);         // TODO: Some architecture
 
         state.Screen.Setup();
 
@@ -105,11 +104,15 @@ namespace Core
         // Camera
         {
             auto activeCamera = CameraSystem::GetPerspectiveActive();
-            activeCamera->UpdateView();
-            Shader *objShader = ShaderSystem::GetFromEngineResource("Object");
-            objShader->Use();
-            objShader->Mat4(activeCamera->GetProjection(), "uProjection");
-            objShader->Mat4(activeCamera->GetViewInverted(), "uView");
+            if (activeCamera)
+            {
+                Shader *objShader = ShaderSystem::GetFromEngineResource("Object");
+
+                activeCamera->UpdateView();
+                objShader->Use();
+                objShader->Mat4(activeCamera->GetProjection(), "uProjection");
+                objShader->Mat4(activeCamera->GetViewInverted(), "uView");
+            }
         }
     }
 
@@ -174,6 +177,11 @@ namespace Core
 
         if (state.Screen.PostBuffer)
             state.Screen.PostBuffer->Resize(width, height);
+    }
+
+    void Renderer::Viewport()
+    {
+        Viewport(state.ScreenViewport.Width, state.ScreenViewport.Height);
     }
 
     CeU32 Renderer::GetPassID(int index)

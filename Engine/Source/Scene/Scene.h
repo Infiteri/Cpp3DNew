@@ -19,9 +19,23 @@ namespace Core
 
         friend class TextureSystem;
 
+        enum State
+        {
+            Initialized,
+            Started,
+            Running,
+            Stopped,
+        };
+
+        State state;
+
+        void LoadRuntimeComponent(Actor *a);
+
     public:
         Scene();
         ~Scene();
+
+        static Scene *From(Scene *scene);
 
         void SetName(const std::string &name) { this->name = name; };
         inline std::string GetName() { return name; };
@@ -53,5 +67,13 @@ namespace Core
         void MoveChildInHierarchy(const UUID &uid, int newIndex);
 
         inline SceneEnvironment *GetEnvironment() { return &environemnt; };
+
+        // -- Scene camera functions --
+        void SetPrimaryCameraToNone();
+        void ActivateSceneCamera();
+        CameraComponent *GetPrimaryCameraComponent();
+        CameraComponent *GetFirstCameraComponent();
+
+        // ----------------------------
     };
 }

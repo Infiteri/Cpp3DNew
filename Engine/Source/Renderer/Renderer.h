@@ -44,6 +44,7 @@ namespace Core
         static void Shutdown();
         static void RenderScreenImage();
         static void Viewport(int width, int height);
+        static void Viewport();
         static CeU32 GetPassID(int index);
 
         static Shader* TEMP_GetShaderFromPost(int i = 0);

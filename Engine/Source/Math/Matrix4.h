@@ -16,6 +16,12 @@ namespace Core
             From(Matrix4::Multiply(*this, m));
         }
 
+        operator const float *() { return data; };
+        float &operator[](int index)
+        {
+            return data[index];
+        };
+
         Matrix4 operator*(const Matrix4 &m)
         {
             Matrix4 a;

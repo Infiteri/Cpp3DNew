@@ -41,3 +41,5 @@
 
 #include "Resources/Image.h"
 #include "Resources/Loaders/CubeMapLoader.h"
+
+#include "Script/ActorScript.h"
