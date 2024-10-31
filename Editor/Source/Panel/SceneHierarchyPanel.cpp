@@ -189,6 +189,7 @@ namespace Core
     void RenderDataSetUI(DataSetComponent *c, Actor *a);
     void RenderScriptUI(ScriptComponent *c, Actor *a);
     void RenderCameraUI(CameraComponent *c, Actor *a);
+    void RenderPointLightUI(PointLightComponent *c, Actor *a);
 
     void SceneHierarchyPanel::RenderActorComponents(Actor *a)
     {
@@ -213,6 +214,7 @@ namespace Core
         CE_UTIL_ADD_RENDER("Data Set Component", DataSetComponent, RenderDataSetUI);
         CE_UTIL_ADD_RENDER("Script Component", ScriptComponent, RenderScriptUI);
         CE_UTIL_ADD_RENDER("Camera Component", CameraComponent, RenderCameraUI);
+        CE_UTIL_ADD_RENDER("Point Light Component", PointLightComponent, RenderPointLightUI);
 
         if (ImGui::Button("Add Component"))
             ImGui::OpenPopup("ComponentPopup");
@@ -223,6 +225,7 @@ namespace Core
             CE_ADD_COMPONENT(DataSet);
             CE_ADD_COMPONENT(Script);
             CE_ADD_COMPONENT(Camera);
+            CE_ADD_COMPONENT(PointLight);
 
             ImGui::EndPopup();
         }
@@ -399,5 +402,17 @@ namespace Core
             World::GetActiveScene()->SetPrimaryCameraToNone(); // Automatically tick off every single camera to be non primary
             c->IsPrimary = primary;
         }
+    }
+
+    void RenderPointLightUI(PointLightComponent *c, Actor *a)
+    {
+        EditorUtils::ImGuiVec3Edit("Specular", &c->Light->Specular);
+        EditorUtils::ImGuiColorEdit("Color", &c->Light->Color);
+
+        ImGui::DragFloat("Constant", &c->Light->Constant, 0.05f, 0.0f);
+        ImGui::DragFloat("Quadratic", &c->Light->Quadratic, 0.05f, 0.0f);
+        ImGui::DragFloat("Linear", &c->Light->Linear, 0.05f, 0.0f);
+        ImGui::DragFloat("Radius", &c->Light->Radius, 0.05f, 0.0f);
+        ImGui::DragFloat("Intensity", &c->Light->Intensity, 0.05f, 0.0f);
     }
 }

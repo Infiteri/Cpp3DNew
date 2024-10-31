@@ -95,25 +95,15 @@ namespace Core
             ImGui::TreePop();
         }
 
-        // Radiant blur
+        if (ImGui::TreeNode("Directional Light"))
         {
-            ImGui::DragFloat("Intensity", &intensity, 0.005f);
-            ImGui::DragFloat("Blur Radius", &blurRadius, 0.005f);
-            ImGui::DragFloat("Blur Strength", &blurStrength, 0.005f);
-            ImGui::DragInt("Samples", &samples);
+            DirectionalLight *light = &World::GetActiveScene()->GetEnvironment()->DirectionalLight;
 
-            Renderer::TEMP_GetShaderFromPost(0)->Float(intensity, "uIntensity");
-            Renderer::TEMP_GetShaderFromPost(0)->Float(blurRadius, "uBlurRadius");
-            Renderer::TEMP_GetShaderFromPost(0)->Float(blurStrength, "uBlurStrength");
-            Renderer::TEMP_GetShaderFromPost(0)->Int(samples, "uSamples");
-        }
+            EditorUtils::ImGuiVec3Edit("Direction", &light->Direction);
+            EditorUtils::ImGuiColorEdit("Color", &light->Color);
+            ImGui::DragFloat("Intensity", &light->Intensity, 0.05f, 0.0f);
 
-        {
-            ImGui::DragFloat("Falloff", &falloff, 0.005f);
-            ImGui::DragFloat("Vignette Amount", &vignetteAmount, 0.005f);
-
-            Renderer::TEMP_GetShaderFromPost(1)->Float(falloff, "uFalloff");
-            Renderer::TEMP_GetShaderFromPost(1)->Float(vignetteAmount, "uAmount");
+            ImGui::TreePop();
         }
 
         ImGui::End();

@@ -3,6 +3,8 @@
 
 #include "Renderer/Texture/TextureSystem.h"
 #include "Renderer/Camera/CameraSystem.h"
+#include "Renderer/Shader/ShaderSystem.h"
+#include "Renderer/Light/LightID.h"
 #include "Components/Components.h"
 
 #include "Script/ScriptEngine.h"
@@ -72,10 +74,20 @@ namespace Core
         state = Running;
         TextureSystem::StartNewSceneGeneration();
 
+        environemnt.DirectionalLight.Render();
+
         for (auto actor : actors)
         {
             actor->Render();
         }
+
+        auto objectShader = ShaderSystem::GetFromEngineResource("Object");
+        if (objectShader)
+        {
+            objectShader->Int(LightID::GetPointLight(), "uPointLightCount");
+        }
+
+        LightID::Begin();
     }
 
     void Scene::Update()
@@ -92,6 +104,7 @@ namespace Core
     void Scene::Stop()
     {
         state = Stopped;
+
         for (auto actor : actors)
         {
             actor->Stop();

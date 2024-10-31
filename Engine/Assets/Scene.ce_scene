@@ -15,7 +15,7 @@ Actors:
     MeshComponent 0:
       Type: 1
       Name: ""
-      Color: [255, 0, 0, 255]
+      Color: [255, 255, 255, 255]
       TextureName: D:\Ion\Cpp3DNew\Bin\EngineResources\Images\crate.png
       TextureMin: 1
       TextureMag: 1

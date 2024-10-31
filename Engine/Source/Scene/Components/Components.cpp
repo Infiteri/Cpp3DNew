@@ -118,4 +118,33 @@ namespace Core
         Far = c->Far;
         IsPrimary = c->IsPrimary;
     }
+
+    PointLightComponent::PointLightComponent()
+    {
+        Light = new PointLight();
+    }
+
+    PointLightComponent::~PointLightComponent()
+    {
+        delete Light;
+    }
+
+    void PointLightComponent::Render()
+    {
+        Light->Position = Owner->GetTransform()->Position;
+        Light->Render();
+    }
+
+    void PointLightComponent::From(PointLightComponent *c)
+    {
+        Light->Position = c->Light->Position;
+        Light->Specular = c->Light->Specular;
+        Light->Color = c->Light->Color;
+
+        Light->Intensity = c->Light->Intensity;
+        Light->Radius = c->Light->Radius;
+        Light->Quadratic = c->Light->Quadratic;
+        Light->Linear = c->Light->Linear;
+        Light->Constant = c->Light->Constant;
+    }
 }

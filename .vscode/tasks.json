@@ -52,7 +52,7 @@
     {
       "type": "shell",
       "command": "${workspaceFolder}/Scripts/CopyAssets.bat",
-      "label": "Copy Assets",
+      "label": "AA Copy Assets",
       "problemMatcher": [],
       "group": {
         "kind": "run"

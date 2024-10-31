@@ -162,3 +162,11 @@
 - Added Camera Component
 - Bug fixes
 - Other
+
+# 0.1.7 - 31.10.2024
+
+- Fixed Sky issue with color
+- Light system setup
+- Started lights
+- Added Directional Light
+- Added Point Light

@@ -3,6 +3,8 @@
 #include "Core/Logger.h"
 #include "Platform/Platform.h"
 
+#include "Light/PointLight.h"
+
 #include "Object/Mesh.h"
 #include "Shader/ShaderSystem.h"
 #include "Texture/TextureSystem.h"
@@ -12,6 +14,8 @@
 
 #include "Scene/World.h"
 #include "Camera/CameraSystem.h"
+
+#include "Light/LightID.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -59,7 +63,6 @@ namespace Core
         state.postProcessor.Add("EngineResources/Shaders/Post/RadiantBlur.glsl", false); // TODO: Some architecture
         state.postProcessor.Add("EngineResources/Shaders/Post/Vignette.glsl", false);    // TODO: Some architecture
         state.postProcessor.Add("EngineResources/Shaders/Post/Toy.glsl", false);         // TODO: Some architecture
-
         state.Screen.Setup();
 
         glEnable(GL_MULTISAMPLE);
@@ -71,6 +74,9 @@ namespace Core
             return;
 
         state.Screen.Begin();
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         // TODO: WTF?
         glClearColor(255, 255, 255, 255);
@@ -89,7 +95,7 @@ namespace Core
             switch (sky->GetMode())
             {
             case Sky::ColorMode:
-                glClearColor(sky->GetColor().r / 255, sky->GetColor().b / 255, sky->GetColor().b / 255, sky->GetColor().a / 255);
+                glClearColor(sky->GetColor().r / 255, sky->GetColor().g / 255, sky->GetColor().b / 255, sky->GetColor().a / 255);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 break;
 
@@ -104,12 +110,13 @@ namespace Core
         // Camera
         {
             auto activeCamera = CameraSystem::GetPerspectiveActive();
-            if (activeCamera)
+            Shader *objShader = ShaderSystem::GetFromEngineResource("Object");
+            if (activeCamera && objShader)
             {
-                Shader *objShader = ShaderSystem::GetFromEngineResource("Object");
+                objShader->Use();
 
                 activeCamera->UpdateView();
-                objShader->Use();
+                objShader->Vec3(activeCamera->GetPosition(), "uCameraPosition");
                 objShader->Mat4(activeCamera->GetProjection(), "uProjection");
                 objShader->Mat4(activeCamera->GetViewInverted(), "uView");
             }

@@ -44,10 +44,12 @@ namespace Core
 
         outActor->GetTransform()->From(transform);
 
+        // ADD WHEN NEW COMPONENTS
         CE_COPY_COMPONENT(MeshComponent);
         CE_COPY_COMPONENT(DataSetComponent);
         CE_COPY_COMPONENT(ScriptComponent);
         CE_COPY_COMPONENT(CameraComponent);
+        CE_COPY_COMPONENT(PointLightComponent);
 
         for (Actor *a : other->GetChildren())
             outActor->AddChild(Actor::From(a));

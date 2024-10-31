@@ -4,6 +4,7 @@
 #include "Renderer/Object/Mesh.h"
 #include "Core/Data/CeDataSet.h"
 #include "Renderer/Camera/PerspectiveCamera.h"
+#include "Renderer/Light/PointLight.h"
 
 namespace Core
 {
@@ -84,5 +85,18 @@ namespace Core
         void UpdateCameraState();
 
         void From(CameraComponent *c);
+    };
+
+    class CE_API PointLightComponent : public Component
+    {
+    public:
+        PointLight *Light;
+
+        PointLightComponent();
+        ~PointLightComponent();
+
+        void Render();
+
+        void From(PointLightComponent* c);
     };
 }

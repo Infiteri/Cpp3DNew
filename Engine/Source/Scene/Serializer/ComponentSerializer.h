@@ -21,6 +21,7 @@ namespace Core
             int DataSetCount;
             int ScriptCount;
             int CameraCount;
+            int PointLightCount;
         };
         ComponentCount count;
 
@@ -42,6 +43,9 @@ namespace Core
 
         void SerializeCameraComponent(CameraComponent *c, int index, YAML::Emitter &out);
         void DeserializeCameraComponent(YAML::Node node);
+
+        void SerializePointLightComponent(PointLightComponent *c, int index, YAML::Emitter &out);
+        void DeserializePointLightComponent(YAML::Node node);
 
     public:
         ComponentSerializer(Actor *target);

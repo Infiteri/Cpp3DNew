@@ -45,6 +45,7 @@ namespace Core
         CE_SERIALIZE_COMP_CALLBACK(DataSet);
         CE_SERIALIZE_COMP_CALLBACK(Script);
         CE_SERIALIZE_COMP_CALLBACK(Camera);
+        CE_SERIALIZE_COMP_CALLBACK(PointLight);
     }
 
     void ComponentSerializer::Deserialize(YAML::Node actorNode)
@@ -55,6 +56,7 @@ namespace Core
         CE_DESERIALIZE_COMPONENT("DataSetComponent", DeserializeDataSetComponent);
         CE_DESERIALIZE_COMPONENT("ScriptComponent", DeserializeScriptComponent);
         CE_DESERIALIZE_COMPONENT("CameraComponent", DeserializeCameraComponent);
+        CE_DESERIALIZE_COMPONENT("PointLightComponent", DeserializePointLightComponent);
     }
 
     void ComponentSerializer::FillComponentCountData()
@@ -64,6 +66,7 @@ namespace Core
         CE_COMP_SIZE(DataSet);
         CE_COMP_SIZE(Script);
         CE_COMP_SIZE(Camera);
+        CE_COMP_SIZE(PointLight);
     }
 
     void ComponentSerializer::SerializeComponentCount(YAML::Emitter &out)
@@ -75,6 +78,7 @@ namespace Core
         CE_SERIALIZE_FIELD("DataSetComponentCount", count.DataSetCount);
         CE_SERIALIZE_FIELD("ScriptComponentCount", count.ScriptCount);
         CE_SERIALIZE_FIELD("CameraComponentCount", count.CameraCount);
+        CE_SERIALIZE_FIELD("PointLightComponentCount", count.PointLightCount);
     }
 
     void ComponentSerializer::SerializeMeshComponent(MeshComponent *c, int index, YAML::Emitter &out)
@@ -296,5 +300,34 @@ namespace Core
         c->Far = node["Far"].as<float>();
         c->IsPrimary = node["IsPrimary"].as<bool>();
         c->UpdateCameraState();
+    }
+
+    void ComponentSerializer::SerializePointLightComponent(PointLightComponent *c, int index, YAML::Emitter &out)
+    {
+        out << YAML::Key << "PointLightComponent " + std::to_string(index);
+        out << YAML::BeginMap;
+        SerializerUtils::Vector3ToYAML(out, "Position", &c->Light->Position);
+        SerializerUtils::Vector3ToYAML(out, "Specular", &c->Light->Specular);
+        SerializerUtils::ColorToYAML(out, "Color", &c->Light->Color);
+        CE_SERIALIZE_FIELD("Constant", c->Light->Constant);
+        CE_SERIALIZE_FIELD("Linear", c->Light->Linear);
+        CE_SERIALIZE_FIELD("Quadratic", c->Light->Quadratic);
+        CE_SERIALIZE_FIELD("Radius", c->Light->Radius);
+        CE_SERIALIZE_FIELD("Intensity", c->Light->Intensity);
+        out << YAML::EndMap;
+    }
+
+    void ComponentSerializer::DeserializePointLightComponent(YAML::Node node)
+    {
+        auto c = a->AddComponent<PointLightComponent>();
+
+        SerializerUtils::YAMLToVector3(node["Position"], &c->Light->Position);
+        SerializerUtils::YAMLToVector3(node["Specular"], &c->Light->Specular);
+        SerializerUtils::YAMLToColor(node["Color"], &c->Light->Color);
+        c->Light->Constant = node["Constant"].as<float>();
+        c->Light->Linear = node["Linear"].as<float>();
+        c->Light->Quadratic = node["Quadratic"].as<float>();
+        c->Light->Radius = node["Radius"].as<float>();
+        c->Light->Intensity = node["Intensity"].as<float>();
     }
 }

@@ -13,6 +13,9 @@ namespace Core
             return;
 
         SkyInst->From(env->SkyInst);
-    }
 
+        DirectionalLight.Color = env->DirectionalLight.Color;
+        DirectionalLight.Direction = env->DirectionalLight.Direction;
+        DirectionalLight.Intensity = env->DirectionalLight.Intensity;
+    }
 }

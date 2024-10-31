@@ -84,14 +84,19 @@ namespace Core
                 componentSerializer.Deserialize(actor);
 
                 //? add to the right target
-                if (actor["ParentUUID"].as<CeU64>() == 0)
+                if (actor["ParentUUID"])
                 {
-                    scene->AddActor(a);
+                    if (actor["ParentUUID"].as<CeU64>() == 0)
+                        scene->AddActor(a);
+                    else
+                    {
+                        auto parent = scene->GetActorInHierarchy(actor["ParentUUID"].as<CeU64>());
+                        parent->AddChild(a);
+                    }
                 }
                 else
                 {
-                    auto parent = scene->GetActorInHierarchy(actor["ParentUUID"].as<CeU64>());
-                    parent->AddChild(a);
+                    scene->AddActor(a);
                 }
 
                 if (actor["UUID"])

@@ -100,7 +100,8 @@ namespace Core
             return 0;
 
         Use();
-        return glGetUniformLocation(id, n);
+        auto ret = glGetUniformLocation(id, n);
+        return ret;
     }
 
     Shader::Shader(const ShaderConstructor &constructor)
