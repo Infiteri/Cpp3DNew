@@ -12,6 +12,7 @@
 
 #include "Scene/World.h"
 #include "Script/ScriptEngine.h"
+#include "Physics/PhysicsEngine.h"
 
 #include <string>
 #include <iostream>
@@ -45,6 +46,7 @@ namespace Core
         Renderer::Viewport(state.Window->GetInfo()->Width, state.Window->GetInfo()->Height);
         World::Init();
         ScriptEngine::Init();
+        PhysicsEngine::Init();
         ImGuiLayer::Init(); // NOTE: Requires window
 
         LayerStack::Init();

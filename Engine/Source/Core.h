@@ -43,3 +43,6 @@
 #include "Resources/Loaders/CubeMapLoader.h"
 
 #include "Script/ActorScript.h"
+
+#include "Physics/PhysicsEngine.h"
+#include "Physics/Objects/Spring.h"

@@ -190,6 +190,7 @@ namespace Core
     void RenderScriptUI(ScriptComponent *c, Actor *a);
     void RenderCameraUI(CameraComponent *c, Actor *a);
     void RenderPointLightUI(PointLightComponent *c, Actor *a);
+    void RenderRigidBodyUI(RigidBodyComponent *c, Actor *a);
 
     void SceneHierarchyPanel::RenderActorComponents(Actor *a)
     {
@@ -215,6 +216,7 @@ namespace Core
         CE_UTIL_ADD_RENDER("Script Component", ScriptComponent, RenderScriptUI);
         CE_UTIL_ADD_RENDER("Camera Component", CameraComponent, RenderCameraUI);
         CE_UTIL_ADD_RENDER("Point Light Component", PointLightComponent, RenderPointLightUI);
+        CE_UTIL_ADD_RENDER("Rigid Body Component", RigidBodyComponent, RenderRigidBodyUI);
 
         if (ImGui::Button("Add Component"))
             ImGui::OpenPopup("ComponentPopup");
@@ -226,6 +228,7 @@ namespace Core
             CE_ADD_COMPONENT(Script);
             CE_ADD_COMPONENT(Camera);
             CE_ADD_COMPONENT(PointLight);
+            CE_ADD_COMPONENT(RigidBody);
 
             ImGui::EndPopup();
         }
@@ -414,5 +417,11 @@ namespace Core
         ImGui::DragFloat("Linear", &c->Light->Linear, 0.05f, 0.0f);
         ImGui::DragFloat("Radius", &c->Light->Radius, 0.05f, 0.0f);
         ImGui::DragFloat("Intensity", &c->Light->Intensity, 0.05f, 0.0f);
+    }
+
+    void RenderRigidBodyUI(RigidBodyComponent *c, Actor *a)
+    {
+        ImGui::DragFloat("Damp", &c->Config.LinearDamp, 0.05f, 0.0f, 1.0f);
+        ImGui::DragFloat("Mass", &c->Config.Mass, 0.05f, 0.0f);
     }
 }

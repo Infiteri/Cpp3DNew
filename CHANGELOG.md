@@ -170,3 +170,15 @@
 - Started lights
 - Added Directional Light
 - Added Point Light
+
+# 0.1.8 - 03.11.2024 
+
+- Started Physics
+- Math changes
+- Fixed most of gizmo rotation bugs
+- Basic Physics code
+- Bodies were added
+- Added Rigid Body components
+- Added physics math
+- Added Quaternions
+- Other

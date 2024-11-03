@@ -147,4 +147,17 @@ namespace Core
         Light->Linear = c->Light->Linear;
         Light->Constant = c->Light->Constant;
     }
+
+    RigidBodyComponent::RigidBodyComponent()
+    {
+    }
+
+    RigidBodyComponent::~RigidBodyComponent()
+    {
+    }
+
+    void RigidBodyComponent::From(RigidBodyComponent *c)
+    {
+        Config.From(&c->Config);
+    }
 }

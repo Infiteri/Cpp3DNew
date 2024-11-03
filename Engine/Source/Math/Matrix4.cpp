@@ -3,6 +3,206 @@
 
 namespace Core
 {
+    PhysMatrix4x3::PhysMatrix4x3()
+    {
+        for (int i = 0; i < 12; i++)
+            data[i] = 0;
+
+        _11 = _22 = _33 = 1.0f;
+    }
+
+    PhysMatrix4x3::PhysMatrix4x3(const PhysMatrix4x3 &other)
+    {
+        From(other);
+    }
+
+    PhysMatrix4x3::PhysMatrix4x3(float data11, float data12, float data13, float data14,
+                                 float data21, float data22, float data23, float data24,
+                                 float data31, float data32, float data33, float data34)
+    {
+        _11 = data11;
+        _12 = data12;
+        _13 = data13;
+        _14 = data14;
+
+        _21 = data21;
+        _22 = data22;
+        _23 = data23;
+        _24 = data24;
+
+        _31 = data31;
+        _32 = data32;
+        _33 = data33;
+        _34 = data34;
+    }
+
+    PhysMatrix4x3::~PhysMatrix4x3()
+    {
+    }
+
+    void PhysMatrix4x3::From(const PhysMatrix4x3 &mat)
+    {
+        for (int i = 0; i < 12; i++)
+            data[i] = mat.data[i];
+    }
+
+    void PhysMatrix4x3::From(float *data)
+    {
+        for (int i = 0; i < 12; i++)
+            data[i] = data[i];
+    }
+
+    void PhysMatrix4x3::From(PhysMatrix4x3 *mat)
+    {
+        for (int i = 0; i < 12; i++)
+            data[i] = mat->data[i];
+    }
+
+    float PhysMatrix4x3::GetDeterment()
+    {
+        return data[8] * data[5] * data[2] +
+               data[4] * data[9] * data[2] +
+               data[8] * data[1] * data[6] -
+               data[0] * data[9] * data[6] -
+               data[4] * data[1] * data[10] +
+               data[0] * data[5] * data[10];
+    }
+
+    void PhysMatrix4x3::SetInverse(const PhysMatrix4x3 &m)
+    {
+        // Make sure the determinant is non-zero.
+        float det = GetDeterment();
+        if (det == 0)
+            return;
+        det = 1.0f / det;
+
+        data[0] = (-m.data[9] * m.data[6] + m.data[5] * m.data[10]) * det;
+        data[4] = (m.data[8] * m.data[6] - m.data[4] * m.data[10]) * det;
+        data[8] = (-m.data[8] * m.data[5] + m.data[4] * m.data[9] * m.data[15]) * det;
+        data[1] = (m.data[9] * m.data[2] - m.data[1] * m.data[10]) * det;
+        data[5] = (-m.data[8] * m.data[2] + m.data[0] * m.data[10]) * det;
+        data[9] = (m.data[8] * m.data[1] - m.data[0] * m.data[9] * m.data[15]) * det;
+        data[2] = (-m.data[5] * m.data[2] + m.data[1] * m.data[6] * m.data[15]) * det;
+        data[6] = (+m.data[4] * m.data[2] - m.data[0] * m.data[6] * m.data[15]) * det;
+        data[10] = (-m.data[4] * m.data[1] + m.data[0] * m.data[5] * m.data[15]) * det;
+        data[3] = (m.data[9] * m.data[6] * m.data[3] - m.data[5] * m.data[10] * m.data[3] - m.data[9] * m.data[2] * m.data[7] + m.data[1] * m.data[10] * m.data[7] + m.data[5] * m.data[2] * m.data[11] - m.data[1] * m.data[6] * m.data[11]) * det;
+        data[7] = (-m.data[8] * m.data[6] * m.data[3] + m.data[4] * m.data[10] * m.data[3] + m.data[8] * m.data[2] * m.data[7] - m.data[0] * m.data[10] * m.data[7] - m.data[4] * m.data[2] * m.data[11] + m.data[0] * m.data[6] * m.data[11]) * det;
+        data[11] = (m.data[8] * m.data[5] * m.data[3] - m.data[4] * m.data[9] * m.data[3] - m.data[8] * m.data[1] * m.data[7] + m.data[0] * m.data[9] * m.data[7] + m.data[4] * m.data[1] * m.data[11] - m.data[0] * m.data[5] * m.data[11]) * det;
+    }
+
+    void PhysMatrix4x3::Invert()
+    {
+        SetInverse(*this);
+    }
+
+    PhysMatrix4x3 PhysMatrix4x3::Inverted()
+    {
+        PhysMatrix4x3 r;
+        r.SetInverse(*this);
+        return r;
+    }
+
+    PhysMatrix3::PhysMatrix3()
+    {
+        for (int i = 0; i < 9; i++)
+            data[i] = 0;
+        _11 = _22 = _33 = 1;
+    }
+
+    PhysMatrix3::PhysMatrix3(const PhysMatrix3 &m)
+    {
+        From(m);
+    }
+
+    PhysMatrix3::PhysMatrix3(float data11, float data12, float data13,
+                             float data21, float data22, float data23,
+                             float data31, float data32, float data33)
+    {
+        _11 = data11;
+        _12 = data12;
+        _13 = data13;
+
+        _21 = data21;
+        _22 = data21;
+        _23 = data23;
+
+        _31 = data31;
+        _32 = data32;
+        _33 = data33;
+    }
+
+    PhysMatrix3::~PhysMatrix3() {}
+
+    void PhysMatrix3::From(const PhysMatrix3 &mat)
+    {
+        for (int i = 0; i < 9; i++)
+            data[i] = mat.data[i];
+    }
+
+    void PhysMatrix3::From(PhysMatrix3 *mat)
+    {
+        for (int i = 0; i < 9; i++)
+            data[i] = mat->data[i];
+    }
+
+    void PhysMatrix3::SetTranspose(const PhysMatrix3 &m)
+    {
+        data[0] = m.data[0];
+        data[1] = m.data[3];
+        data[2] = m.data[6];
+        data[3] = m.data[1];
+        data[4] = m.data[4];
+        data[5] = m.data[7];
+        data[6] = m.data[2];
+        data[7] = m.data[5];
+        data[8] = m.data[8];
+    }
+
+    void PhysMatrix3::Transpose()
+    {
+        SetTranspose(*this);
+    }
+
+    void PhysMatrix3::SetInverse(const PhysMatrix3 &m)
+    {
+        float t4 = m.data[0] * m.data[4];
+        float t6 = m.data[0] * m.data[5];
+        float t8 = m.data[1] * m.data[3];
+        float t10 = m.data[2] * m.data[3];
+        float t12 = m.data[1] * m.data[6];
+        float t14 = m.data[2] * m.data[6];
+        float t16 = (t4 * m.data[8] - t6 * m.data[7] - t8 * m.data[8] +
+                     t10 * m.data[7] + t12 * m.data[5] - t14 * m.data[4]);
+
+        if (t16 == 0.0f)
+            return;
+
+        float t17 = 1 / t16;
+        data[0] = (m.data[4] * m.data[8] - m.data[5] * m.data[7]) * t17;
+        data[1] = -(m.data[1] * m.data[8] - m.data[2] * m.data[7]) * t17;
+        data[2] = (m.data[1] * m.data[5] - m.data[2] * m.data[4]) * t17;
+        data[3] = -(m.data[3] * m.data[8] - m.data[5] * m.data[6]) * t17;
+        data[4] = (m.data[0] * m.data[8] - t14) * t17;
+        data[5] = -(t6 - t10) * t17;
+        data[6] = (m.data[3] * m.data[7] - m.data[4] * m.data[6]) * t17;
+        data[7] = -(m.data[0] * m.data[7] - t12) * t17;
+        data[8] = (t4 - t8) * t17;
+    }
+
+    PhysMatrix3 PhysMatrix3::Inverted()
+    {
+        PhysMatrix3 result;
+        result.SetInverse(*this);
+        return result;
+        return result;
+    }
+
+    void PhysMatrix3::From(float *data)
+    {
+        for (int i = 0; i < 9; i++)
+            data[i] = data[i];
+    }
+
     Matrix4::Matrix4()
     {
         for (int i = 0; i < 16; i++)
@@ -62,6 +262,57 @@ namespace Core
             data[i + 4] = col.y;
             data[i + 8] = col.z;
         }
+    }
+
+    Vector3 Matrix4::GetEulerAnglesZYX() const
+    {
+        Vector3 eulerAngles;
+
+        // Normalize matrix to remove scale effects
+        Vector3 scale;
+        scale.x = sqrt(data[0] * data[0] + data[1] * data[1] + data[2] * data[2]);
+        scale.y = sqrt(data[4] * data[4] + data[5] * data[5] + data[6] * data[6]);
+        scale.z = sqrt(data[8] * data[8] + data[9] * data[9] + data[10] * data[10]);
+
+        // Normalize rotation components
+        float m00 = data[0] / scale.x;
+        float m01 = data[1] / scale.x;
+        float m02 = data[2] / scale.x;
+        float m10 = data[4] / scale.y;
+        float m11 = data[5] / scale.y;
+        float m12 = data[6] / scale.y;
+        float m20 = data[8] / scale.z;
+        float m21 = data[9] / scale.z;
+        float m22 = data[10] / scale.z;
+
+        // Assuming the matrix is a rotation matrix with ZYX order
+        if (m02 < 1)
+        {
+            if (m02 > -1)
+            {
+                eulerAngles.y = asin(-m02);      // Rotation around Y
+                eulerAngles.x = atan2(m12, m22); // Rotation around X
+                eulerAngles.z = atan2(m01, m00); // Rotation around Z
+            }
+            else
+            {
+                // m02 == -1 -> Gimbal lock
+                eulerAngles.y = CE_PI / 2;
+                eulerAngles.x = atan2(-m10, m11);
+                eulerAngles.z = 0;
+            }
+        }
+        else
+        {
+            // m02 == 1 -> Gimbal lock
+            eulerAngles.y = -CE_PI / 2;
+            eulerAngles.x = atan2(-m10, m11);
+            eulerAngles.z = 0;
+        }
+
+        eulerAngles.y = -eulerAngles.y;
+
+        return eulerAngles;
     }
 
     Matrix4 Matrix4::Perspective(float fov, float aspect, float near, float far)

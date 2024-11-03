@@ -6,6 +6,8 @@
 #include "Renderer/Camera/PerspectiveCamera.h"
 #include "Renderer/Light/PointLight.h"
 
+#include "Physics/Body/RigidBody.h"
+
 namespace Core
 {
     class CE_API Component
@@ -64,14 +66,13 @@ namespace Core
     class CE_API CameraComponent : public Component
     {
     private:
-        PerspectiveCamera *Camera;
-
         friend class Scene;
 
         // Note: For editor
         friend class EditorLayer;
 
     public:
+        PerspectiveCamera *Camera;
         float FOV = 90.0f;
         float Far = 1000.0f;
         float Near = 0.01f;
@@ -97,6 +98,18 @@ namespace Core
 
         void Render();
 
-        void From(PointLightComponent* c);
+        void From(PointLightComponent *c);
+    };
+
+    class CE_API RigidBodyComponent : public Component
+    {
+    public:
+        RigidBodyConfiguration Config;
+        RigidBody *BodyInstance;
+
+        RigidBodyComponent();
+        ~RigidBodyComponent();
+
+        void From(RigidBodyComponent *c);
     };
 }

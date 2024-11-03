@@ -76,6 +76,10 @@ namespace Core
         void Update();
         void Stop();
 
+        /// @brief Will return the world matrix of the object.
+        /// @return A new transform object.
+        Transform GetWorldTransform();
+
         inline Transform *GetTransform() { return &transform; };
         inline Matrix4 GetTransformMatrix() { return worldMatrix; };
         inline Matrix4 GetLocalMatrix() { return localMatrix; };

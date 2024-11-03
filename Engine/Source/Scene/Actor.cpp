@@ -50,6 +50,7 @@ namespace Core
         CE_COPY_COMPONENT(ScriptComponent);
         CE_COPY_COMPONENT(CameraComponent);
         CE_COPY_COMPONENT(PointLightComponent);
+        CE_COPY_COMPONENT(RigidBodyComponent);
 
         for (Actor *a : other->GetChildren())
             outActor->AddChild(Actor::From(a));
@@ -139,6 +140,17 @@ namespace Core
         {
             a->Stop();
         }
+    }
+
+    Transform Actor::GetWorldTransform()
+    {
+        Transform t;
+
+        t.Position = {worldMatrix[12], worldMatrix[13], worldMatrix[14]};
+        t.Rotation = worldMatrix.GetEulerAnglesZYX();
+        t.Scale = {worldMatrix[0], worldMatrix[5], worldMatrix[10]};
+
+        return t;
     }
 
     void Actor::AddChild(Actor *actor)

@@ -2,10 +2,26 @@
 
 void TestScript::OnStart()
 {
-    CE_TRACE("Test actor");
 }
 
 void TestScript::OnUpdate()
 {
-    Owner->GetTransform()->Position.x++;
+    auto rc = Owner->GetComponent<RigidBodyComponent>();
+    if (!rc)
+        return;
+
+    if (Input::GetKey(Keys::A))
+        rc->BodyInstance->AddForce({-1, 0, 0});
+
+    if (Input::GetKey(Keys::D))
+        rc->BodyInstance->AddForce({1, 0, 0});
+
+    if (Input::GetKey(Keys::Q))
+        rc->BodyInstance->AddTorque({10, 0, 0});
+
+    if (Input::GetKey(Keys::R))
+        rc->BodyInstance->AddTorque({-10, 0, 0});
+
+    if (Input::GetKey(Keys::U))
+        rc->BodyInstance->AddForceAtPoint({5, 0, 0}, {0.5, 0, 0});
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Base.h"
-#include "Math.h"
+#include <math.h>
 
 namespace Core
 {
@@ -58,7 +58,7 @@ namespace Core
 
         void Normalize()
         {
-            float length = Core::Math::Sqrt(x * x + y * y);
+            float length = sqrtf(x * x + y * y);
             if (length > 0.0f)
             {
                 x /= length;
@@ -89,6 +89,55 @@ namespace Core
             z += o.z;
         }
 
+        void operator*=(const Vector3 &o)
+        {
+            x *= o.x;
+            y *= o.y;
+            z *= o.z;
+        }
+
+        void operator-=(const Vector3 &o)
+        {
+            x -= o.x;
+            y -= o.y;
+            z -= o.z;
+        }
+
+        void operator/=(const Vector3 &o)
+        {
+            x /= o.x;
+            y /= o.y;
+            z /= o.z;
+        }
+
+        void operator+=(float scalar)
+        {
+            x += scalar;
+            y += scalar;
+            z += scalar;
+        }
+
+        void operator*=(float scalar)
+        {
+            x *= scalar;
+            y *= scalar;
+            z *= scalar;
+        }
+
+        void operator-=(float scalar)
+        {
+            x -= scalar;
+            y -= scalar;
+            z -= scalar;
+        }
+
+        void operator/=(float scalar)
+        {
+            x /= scalar;
+            y /= scalar;
+            z /= scalar;
+        }
+
         Vector3 operator+(const Vector3 &o) const
         {
             return {x + o.x, y + o.y, z + o.z};
@@ -109,6 +158,13 @@ namespace Core
             return {x / scalar, y / scalar, z / scalar};
         }
 
+        Vector3 operator%(const Vector3 &vector) const
+        {
+            return Vector3(y * vector.z - z * vector.y,
+                           z * vector.x - x * vector.z,
+                           x * vector.y - y * vector.x);
+        }
+
         bool operator==(const Vector3 &o) const
         {
             return x == o.x && y == o.y && z == o.z;
@@ -121,9 +177,14 @@ namespace Core
 
         bool NotZero() const;
 
+        float Magnitude() const
+        {
+            return sqrtf(x * x + y * y + z * z);
+        }
+
         void Normalize()
         {
-            float length = Core::Math::Sqrt(x * x + y * y + z * z);
+            float length = sqrtf(x * x + y * y + z * z);
             if (length > 0.0f)
             {
                 x /= length;

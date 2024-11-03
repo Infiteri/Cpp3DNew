@@ -65,6 +65,13 @@ namespace Core
 
         ImGui::Text("FPS: %.3f", 1.0f / Engine::GetDeltaTime());
 
+        {
+            auto s = PhysicsEngine::GetTempSpring();
+
+            ImGui::DragFloat("Rest", &s->RestLength, 0.05f);
+            ImGui::DragFloat("Const", &s->SpringConstant, 0.05f);
+        }
+
         ImGui::End();
 
         EndDockspace();
@@ -319,8 +326,9 @@ namespace Core
                     }
                     else if (state.GuizmoOperation == ImGuizmo::ROTATE)
                     {
-                        CE_TRACE("%f %f %f", matrixRotation[0], matrixRotation[1], matrixRotation[2]);
-                        tc->Rotation.Set(Math::DegToRad(matrixRotation[0]), Math::DegToRad(matrixRotation[1]), Math::DegToRad(matrixRotation[2]));
+                        Matrix4 m = dater;
+                        Vector3 r = dater.GetEulerAnglesZYX();
+                        tc->Rotation.Set(r);
                     }
                     else if (state.GuizmoOperation == ImGuizmo::SCALE)
                     {

@@ -47,9 +47,19 @@ namespace Core
             return cosf(x);
         }
 
+        float Abs(float x)
+        {
+            return abs(x);
+        }
+
         float Tan(float x)
         {
             return tanf(x);
+        }
+
+        float Pow(float x, float y)
+        {
+            return powf(x, y);
         }
 
         float Lerp(float min, float max, float t)
@@ -66,5 +76,6 @@ namespace Core
             else
                 return t;
         }
+
     }
 }

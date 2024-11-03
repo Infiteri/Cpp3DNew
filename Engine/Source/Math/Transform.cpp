@@ -9,6 +9,13 @@ namespace Core
         Scale.Set(1, 1, 1);
     }
 
+    Transform::Transform(Transform &t)
+    {
+        Position.Set(&t.Position);
+        Rotation.Set(&t.Rotation);
+        Scale.Set(&t.Scale);
+    }
+
     void Transform::From(Transform *transform)
     {
         Position.Set(&transform->Position);

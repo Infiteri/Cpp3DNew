@@ -9,6 +9,8 @@
 
 #include "Script/ScriptEngine.h"
 
+#include "Physics/PhysicsEngine.h"
+
 #include <algorithm>
 
 namespace Core
@@ -17,6 +19,12 @@ namespace Core
     {
         for (auto script : a->GetComponents<ScriptComponent>())
             ScriptEngine::RegisterScript(a->GetName(), script->ClassName, a);
+
+        for (auto rigidBody : a->GetComponents<RigidBodyComponent>())
+        {
+            rigidBody->Config.Owner = a;
+            rigidBody->BodyInstance = PhysicsEngine::CreateRigid(&rigidBody->Config);
+        }
     }
 
     Scene::Scene()
@@ -86,7 +94,6 @@ namespace Core
         {
             objectShader->Int(LightID::GetPointLight(), "uPointLightCount");
         }
-
         LightID::Begin();
     }
 
@@ -99,6 +106,7 @@ namespace Core
         }
 
         ScriptEngine::UpdateRuntime();
+        PhysicsEngine::UpdateRuntime();
     }
 
     void Scene::Stop()
@@ -111,6 +119,7 @@ namespace Core
         }
 
         ScriptEngine::StopRuntime();
+        PhysicsEngine::StopRuntime();
     }
 
     void Scene::AddActor(Actor *actor)
@@ -237,9 +246,14 @@ namespace Core
             c = GetFirstCameraComponent();
 
         if (!c)
+        {
             CameraSystem::Activate(nullptr);
+        }
         else
+        {
+            c->UpdateCameraState();
             CameraSystem::Activate(c->Camera);
+        }
     }
 
     CameraComponent *Scene::GetPrimaryCameraComponent()

@@ -46,6 +46,7 @@ namespace Core
         CE_SERIALIZE_COMP_CALLBACK(Script);
         CE_SERIALIZE_COMP_CALLBACK(Camera);
         CE_SERIALIZE_COMP_CALLBACK(PointLight);
+        CE_SERIALIZE_COMP_CALLBACK(RigidBody);
     }
 
     void ComponentSerializer::Deserialize(YAML::Node actorNode)
@@ -57,6 +58,7 @@ namespace Core
         CE_DESERIALIZE_COMPONENT("ScriptComponent", DeserializeScriptComponent);
         CE_DESERIALIZE_COMPONENT("CameraComponent", DeserializeCameraComponent);
         CE_DESERIALIZE_COMPONENT("PointLightComponent", DeserializePointLightComponent);
+        CE_DESERIALIZE_COMPONENT("RigidBodyComponent", DeserializeRigidBodyComponent);
     }
 
     void ComponentSerializer::FillComponentCountData()
@@ -67,6 +69,7 @@ namespace Core
         CE_COMP_SIZE(Script);
         CE_COMP_SIZE(Camera);
         CE_COMP_SIZE(PointLight);
+        CE_COMP_SIZE(RigidBody);
     }
 
     void ComponentSerializer::SerializeComponentCount(YAML::Emitter &out)
@@ -79,6 +82,7 @@ namespace Core
         CE_SERIALIZE_FIELD("ScriptComponentCount", count.ScriptCount);
         CE_SERIALIZE_FIELD("CameraComponentCount", count.CameraCount);
         CE_SERIALIZE_FIELD("PointLightComponentCount", count.PointLightCount);
+        CE_SERIALIZE_FIELD("RigidBodyComponentCount", count.RigidBodyCount);
     }
 
     void ComponentSerializer::SerializeMeshComponent(MeshComponent *c, int index, YAML::Emitter &out)
@@ -329,5 +333,24 @@ namespace Core
         c->Light->Quadratic = node["Quadratic"].as<float>();
         c->Light->Radius = node["Radius"].as<float>();
         c->Light->Intensity = node["Intensity"].as<float>();
+    }
+
+    void ComponentSerializer::SerializeRigidBodyComponent(RigidBodyComponent *c, int index, YAML::Emitter &out)
+    {
+        out << YAML::Key << "RigidBodyComponent " + std::to_string(index);
+        out << YAML::BeginMap;
+        CE_SERIALIZE_FIELD("LinearDamp", c->Config.LinearDamp);
+        CE_SERIALIZE_FIELD("AngularDamp", c->Config.AngularDamp);
+        CE_SERIALIZE_FIELD("Mass", c->Config.Mass);
+        out << YAML::EndMap;
+    }
+
+    void ComponentSerializer::DeserializeRigidBodyComponent(YAML::Node node)
+    {
+        auto c = a->AddComponent<RigidBodyComponent>();
+
+        c->Config.LinearDamp = node["LinearDamp"].as<float>();
+        c->Config.AngularDamp = node["AngularDamp"].as<float>();
+        c->Config.Mass = node["Mass"].as<float>();
     }
 }
