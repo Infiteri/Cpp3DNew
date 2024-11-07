@@ -37,8 +37,6 @@ namespace Core
         static void DestroyBodies();
 
         static NumericValues &GetNumericValueSet();
-
-        CE_API static Spring *GetTempSpring();
     };
 
 }

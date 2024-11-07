@@ -219,5 +219,7 @@ namespace Core
 
         static Matrix4 Scale(Vector3 *vec);
         static Matrix4 Scale(float x, float y, float z);
+
+        static Matrix4 Create(float* data);
     };
 }

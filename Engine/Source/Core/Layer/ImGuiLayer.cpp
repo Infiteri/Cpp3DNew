@@ -30,7 +30,40 @@ namespace Core
         ImGui_ImplGlfw_InitForOpenGL(Engine::GetWindow()->GetHandle(), true);
         ImGui_ImplOpenGL3_Init("#version 330 core");
 
-        // TODO: Make CONFIGURABLE and SAVABLE
+        SetThemeDarkDefault();
+    }
+
+    void ImGuiLayer::Shutdown()
+    {
+    }
+
+    void ImGuiLayer::BeginFrame()
+    {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGuizmo::BeginFrame();
+    }
+
+    void ImGuiLayer::EndFrame()
+    {
+        ImGuiIO &io = ImGui::GetIO();
+        io.DisplaySize = ImVec2(Engine::GetWindow()->GetWidth(), Engine::GetWindow()->GetHeight());
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            GLFWwindow *backup = glfwGetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backup);
+        }
+    }
+
+    void ImGuiLayer::SetThemeDarkDefault()
+    {
         auto &colors = ImGui::GetStyle().Colors;
 
         colors[ImGuiCol_WindowBg] = ImVec4{0.13f, 0.14f, 0.16f, 1.0f};
@@ -61,35 +94,6 @@ namespace Core
         colors[ImGuiCol_TitleBg] = ImVec4{0.15f, 0.2f, 0.25f, 1.0f};
         colors[ImGuiCol_TitleBgActive] = ImVec4{0.15f, 0.2f, 0.25f, 1.0f};
         colors[ImGuiCol_TitleBgCollapsed] = ImVec4{0.15f, 0.2f, 0.25f, 1.0f};
-    }
-
-    void ImGuiLayer::Shutdown()
-    {
-    }
-
-    void ImGuiLayer::BeginFrame()
-    {
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        ImGuizmo::BeginFrame();
-    }
-
-    void ImGuiLayer::EndFrame()
-    {
-        ImGuiIO &io = ImGui::GetIO();
-        io.DisplaySize = ImVec2(Engine::GetWindow()->GetWidth(), Engine::GetWindow()->GetHeight());
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
-            GLFWwindow *backup = glfwGetCurrentContext();
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
-            glfwMakeContextCurrent(backup);
-        }
     }
 
     void ImGuiLayer::SetFont(const char *path, float size)

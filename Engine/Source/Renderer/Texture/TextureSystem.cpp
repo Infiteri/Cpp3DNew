@@ -75,6 +75,11 @@ namespace Core
         textures.clear();
     }
 
+    bool TextureSystem::Exist(const std::string &name)
+    {
+        return textures.find(name) != textures.end();
+    }
+
     void TextureSystem::Release(const std::string &name)
     {
         auto ref = textures[name];

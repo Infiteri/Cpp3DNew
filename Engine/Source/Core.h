@@ -12,6 +12,8 @@
 #include "Core/Layer/LayerStack.h"
 #include "Core/Memory/CeMemory.h"
 #include "Core/Layer/ImGuiLayer.h"
+#include "Core/Serializer/CeSerializer.h"
+#include "Core/Utils/StringUtils.h"
 
 #include "Math/Math.h"
 #include "Math/Matrix4.h"

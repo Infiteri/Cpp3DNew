@@ -38,6 +38,7 @@ namespace Core
         // Note: for editor
         friend class ContentBrowserPanel;
         friend class EditorLayer;
+        friend class EditorUtils;
 
     public:
         BaseTexture();

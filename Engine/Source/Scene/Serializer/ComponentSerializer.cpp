@@ -1,6 +1,7 @@
 #include "ComponentSerializer.h"
 #include "Scene/Components/Components.h"
 #include "Core/Serializer/CeSerializerUtils.h"
+#include "Core/Serializer/CeDataSerializer.h"
 #include "Resources/Loaders/MaterialLoader.h"
 
 #define CE_COMP_SIZE(type) count.type##Count = a->GetComponents<type##Component>().size();
@@ -178,97 +179,17 @@ namespace Core
         out << YAML::Key << "DataSetComponent " + std::to_string(index);
         out << YAML::BeginSeq;
 
-        for (auto d : c->Set.GetSet())
-        {
-            out << YAML::BeginMap;
-            out << YAML::Key << "Name" << YAML::Value << d->GetName();
-            out << YAML::Key << "Type" << YAML::Value << (int)d->GetType();
-
-            switch (d->GetType())
-            {
-            case CeData::DataVec2:
-            {
-                Vector2 *v = (Vector2 *)d->GetData();
-                SerializerUtils::Vector2ToYAML(out, "Value", v);
-                break;
-            }
-
-            case CeData::DataVec3:
-            {
-                Vector3 *v = (Vector3 *)d->GetData();
-                SerializerUtils::Vector3ToYAML(out, "Value", v);
-                break;
-            }
-
-            case CeData::DataColor:
-            {
-                Color *v = (Color *)d->GetData();
-                SerializerUtils::ColorToYAML(out, "Value", v);
-
-                break;
-            }
-
-            case CeData::DataFloat:
-            {
-                CeData::FloatContainer *v = (CeData::FloatContainer *)d->GetData();
-                out << YAML::Key << "Value" << v->Value;
-                break;
-            }
-            }
-
-            out << YAML::EndMap;
-        }
+        CeDataSerializer ser(&c->Set);
+        ser.Serialize(out);
 
         out << YAML::EndSeq;
     }
 
     void ComponentSerializer::DeserializeDataSetComponent(YAML::Node node)
     {
-        for (auto nodeData : node)
-        {
-            auto c = a->AddComponent<DataSetComponent>();
-            std::string name = nodeData["Name"].as<std::string>();
-            CeData::DataType type = (CeData::DataType)(nodeData["Type"].as<int>());
-            auto v = nodeData["Value"];
-
-            switch (type)
-            {
-            case CeData::DataVec2:
-            {
-                Vector2 *data = new Vector2();
-                SerializerUtils::YAMLToVector2(v, data);
-                c->Set.Add(data, CeData::DataVec2, name);
-                // todo - optional delete data;
-            }
-            break;
-
-            case CeData::DataVec3:
-            {
-                Vector3 *data = new Vector3();
-                SerializerUtils::YAMLToVector3(v, data);
-                c->Set.Add(data, CeData::DataVec3, name);
-                // todo - optional delete data;
-            }
-            break;
-
-            case CeData::DataFloat:
-            {
-                CeData::FloatContainer *data = new CeData::FloatContainer(v.as<float>());
-                c->Set.Add(data, CeData::DataFloat, name);
-                // todo - optional delete data;
-            }
-            break;
-
-            case CeData::DataColor:
-            {
-                Color *data = new Color();
-                SerializerUtils::YAMLToColor(v, data);
-                c->Set.Add(data, CeData::DataColor, name);
-                // todo - optional delete data;
-            }
-            break;
-            }
-        }
+        auto c = a->AddComponent<DataSetComponent>();
+        CeDataSerializer ser(&c->Set);
+        ser.Deserialize(node);
     }
 
     void ComponentSerializer::SerializeScriptComponent(ScriptComponent *c, int index, YAML::Emitter &out)

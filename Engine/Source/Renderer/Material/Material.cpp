@@ -107,6 +107,10 @@ namespace Core
             ReleaseTexture(&colorTexture);
 
         colorTexture.isDefault = false;
+
+        if (!TextureSystem::Exist(name))
+            TextureSystem::Load(name, colorTexture.texture->GetConfig()); // NOTE: DANGEROUS
+
         colorTexture.texture = TextureSystem::Get(name); // TODO: use configuration
     }
 

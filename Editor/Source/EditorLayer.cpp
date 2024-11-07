@@ -1,6 +1,9 @@
 #include "EditorLayer.h"
+#include "EditorUtils.h"
 #include "Panel/SceneHierarchyPanel.h"
 #include "Core/Utils/StringUtils.h"
+
+#define CE_DEFINE_COLOR_EDITABLE(name, color) state.Settings.Colors.push_back({name, color})
 
 #include <imgui.h>
 
@@ -10,31 +13,22 @@ namespace Core
 
     void EditorLayer::OnAttach()
     {
-        ImGuiLayer::SetFont("EngineResources/Font/Open_Sans/static/OpenSans-Bold.ttf", 12.0f);
-
         state.Camera.camera = CameraSystem::CreatePerspective("EditorCamera", 120.0f);
         CameraSystem::Activate("EditorCamera");
 
-        // TODO:This type of scene creation sucks
+        LoadSettings();
+        UseSettings();
+        RegisterColorsToSettings();
+        ImGuiLayer::SetFont("EngineResources/Font/Open_Sans/static/OpenSans-Bold.ttf", state.Settings.FontSize); // Fonts get set once only :
+
+        // TODO:This type of scene creation sucks. Project soon?
         scene = World::CreateScene("EngineResources/Scene.ce_scene");
         World::ActivateScene("EngineResources/Scene.ce_scene");
-
-        // todo: save scene file
-        CubeMapTexture::Configuration temp;
-        // CubeMapLoader l;
-        // l.Deserialize("EngineResources/Cubemaps/CoolBox.ce_cubemap", &temp);
-        World::GetActiveScene()->GetEnvironment()->SkyInst->SetModeToColor({0, 125, 255, 255});
+        state.ActiveScenePath = scene->GetName();
 
         // Load textures
-        state.TextureSet.PlayButton = new Texture(false);
-        state.TextureSet.PlayButton->INTERNAL_REQUIRE_GENERATION = false;
-        state.TextureSet.PlayButton->Load("EngineResources/Images/Icons/PlayButton.png", {});
-
-        state.TextureSet.StopButton = new Texture(false);
-        state.TextureSet.StopButton->INTERNAL_REQUIRE_GENERATION = false;
-        state.TextureSet.StopButton->Load("EngineResources/Images/Icons/StopButton.png", {});
-
-        state.StateScene = SceneStateStop;
+        state.TextureSet.PlayButton = EditorUtils::LoadTexture("EngineResources/Images/Icons/PlayButton.png");
+        state.TextureSet.StopButton = EditorUtils::LoadTexture("EngineResources/Images/Icons/StopButton.png");
 
         StopSceneRuntime();
     }
@@ -48,6 +42,8 @@ namespace Core
 
         // Render UI
         UI_TopBar();
+        UI_MenuBar();
+        UI_EditorSettings();
 
         // NOTE: temporary
         ImGui::Begin("Debug");
@@ -64,13 +60,6 @@ namespace Core
         }
 
         ImGui::Text("FPS: %.3f", 1.0f / Engine::GetDeltaTime());
-
-        {
-            auto s = PhysicsEngine::GetTempSpring();
-
-            ImGui::DragFloat("Rest", &s->RestLength, 0.05f);
-            ImGui::DragFloat("Const", &s->SpringConstant, 0.05f);
-        }
 
         ImGui::End();
 
@@ -115,6 +104,144 @@ namespace Core
         }
 
         ImGui::End();
+    }
+
+    void EditorLayer::UI_MenuBar()
+    {
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::MenuItem("File"))
+                ImGui::OpenPopup("FileMenu");
+
+            if (ImGui::MenuItem("Editor"))
+                ImGui::OpenPopup("EditorSettings");
+
+            ImGui::SetNextWindowSize({250, 0});
+            if (ImGui::BeginPopup("FileMenu"))
+            {
+                ImGui::SeparatorText("Scene");
+
+                if (ImGui::MenuItem("New"))
+                    NewScene();
+
+                if (ImGui::MenuItem("Open"))
+                    OpenScene();
+
+                if (ImGui::MenuItem("Save"))
+                    SaveScene();
+
+                if (ImGui::MenuItem("Save as"))
+                    SaveSceneAs();
+
+                ImGui::EndPopup();
+            }
+
+            ImGui::SetNextWindowSize({250, 0});
+            if (ImGui::BeginPopup("EditorSettings"))
+            {
+                if (ImGui::MenuItem("Open Editor Settings"))
+                    state.RenderSettings = true;
+
+                ImGui::EndPopup();
+            }
+
+            ImGui::EndMainMenuBar();
+        }
+    }
+
+    void EditorLayer::UI_EditorSettings()
+    {
+        if (!state.RenderSettings)
+            return;
+
+        float margin = 50.0f;
+
+        ImGui::SetNextWindowPos({margin, margin});
+        ImGui::SetNextWindowSize({Engine::GetWindow()->GetWidth() - (margin + 5), Engine::GetWindow()->GetHeight() - (margin + 5)});
+
+        ImGui::Begin("Editor Settings Menu");
+
+        ImGui::DragFloat("Camera FOV", &state.Settings.CameraFOV, 0.05f, 0.0f);
+        ImGui::DragFloat("Font Size", &state.Settings.FontSize, 0.05f, 0.0f);
+
+        ImGui::SeparatorText("Colors");
+
+        for (auto &it : state.Settings.Colors)
+            UI_UTIL_RenderColorChange(it.Name.c_str(), it.Color);
+
+        if (ImGui::Button("Reset"))
+            ImGuiLayer::SetThemeDarkDefault();
+
+        ImGui::Dummy(ImVec2(0, 0));
+        ImVec2 buttonSize = ImVec2(80, ImGui::GetFrameHeightWithSpacing());
+        ImVec2 buttonPos = ImVec2(ImGui::GetWindowSize().x - buttonSize.x - ImGui::GetStyle().FramePadding.x * 2,
+                                  ImGui::GetWindowSize().y - buttonSize.y - ImGui::GetStyle().FramePadding.y * 2);
+
+        ImGui::SetCursorPos(buttonPos);
+
+        if (ImGui::Button("Ok", buttonSize))
+        {
+            state.RenderSettings = false;
+            SaveSettings();
+            UseSettings();
+        }
+
+        ImGui::End();
+    }
+
+    void EditorLayer::UI_UTIL_RenderColorChange(const char *label, int target)
+    {
+        auto &colors = ImGui::GetStyle().Colors;
+
+        float data[4] = {colors[target].x, colors[target].y, colors[target].z, colors[target].w};
+        if (ImGui::ColorEdit4(label, data))
+        {
+            colors[target].x = data[0];
+            colors[target].y = data[1];
+            colors[target].z = data[2];
+            colors[target].w = data[3];
+        }
+    }
+
+    void EditorLayer::SaveSettings()
+    {
+        EditorSettingsSerializer ser(&state.Settings);
+        ser.Serialize();
+    }
+
+    void EditorLayer::LoadSettings()
+    {
+        EditorSettingsSerializer ser(&state.Settings);
+        ser.Deserialize();
+    }
+
+    void EditorLayer::RegisterColorsToSettings()
+    {
+        state.Settings.Colors.clear();
+        CE_DEFINE_COLOR_EDITABLE("Background", ImGuiCol_WindowBg);
+        CE_DEFINE_COLOR_EDITABLE("Header", ImGuiCol_Header);
+        CE_DEFINE_COLOR_EDITABLE("HeaderHovered", ImGuiCol_HeaderHovered);
+        CE_DEFINE_COLOR_EDITABLE("HeaderActive", ImGuiCol_HeaderActive);
+        CE_DEFINE_COLOR_EDITABLE("Button", ImGuiCol_Button);
+        CE_DEFINE_COLOR_EDITABLE("ButtonHovered", ImGuiCol_ButtonHovered);
+        CE_DEFINE_COLOR_EDITABLE("ButtonActive", ImGuiCol_ButtonActive);
+        CE_DEFINE_COLOR_EDITABLE("FrameBg", ImGuiCol_FrameBg);
+        CE_DEFINE_COLOR_EDITABLE("FrameBgHovered", ImGuiCol_FrameBgHovered);
+        CE_DEFINE_COLOR_EDITABLE("FrameBgActive", ImGuiCol_FrameBgActive);
+        CE_DEFINE_COLOR_EDITABLE("Tab", ImGuiCol_Tab);
+        CE_DEFINE_COLOR_EDITABLE("TabHovered", ImGuiCol_TabHovered);
+        CE_DEFINE_COLOR_EDITABLE("TabActive", ImGuiCol_TabActive);
+        CE_DEFINE_COLOR_EDITABLE("TabUnfocused", ImGuiCol_TabUnfocused);
+        CE_DEFINE_COLOR_EDITABLE("TabUnfocusedActive", ImGuiCol_TabUnfocusedActive);
+        CE_DEFINE_COLOR_EDITABLE("TitleBg", ImGuiCol_TitleBg);
+        CE_DEFINE_COLOR_EDITABLE("TitleBgActive", ImGuiCol_TitleBgActive);
+        CE_DEFINE_COLOR_EDITABLE("TitleBgCollapsed", ImGuiCol_TitleBgCollapsed);
+    }
+
+    void EditorLayer::UseSettings()
+    {
+        state.Camera.camera->SetFOV(state.Settings.CameraFOV);
+        state.Camera.camera->UpdateProjection();
     }
 
     void EditorLayer::StartSceneRuntime()
@@ -391,5 +518,46 @@ namespace Core
             World::CreateScene(name);
 
         World::ActivateScene(name);
+    }
+
+    void EditorLayer::OpenScene()
+    {
+        std::string path = Platform::OpenFileDialog("*.ce_scene, \0*.ce_scene\0");
+        if (!path.empty())
+            OpenScene(path);
+    }
+
+    void EditorLayer::NewScene()
+    {
+        // TODO: Saving of current scene if present
+
+        StopSceneRuntime();
+
+        state.ActiveScenePath = "";
+
+        World::CreateScene("TEMPORARY SCENE NAME");
+        World::ActivateScene("TEMPORARY SCENE NAME");
+    }
+
+    void EditorLayer::SaveScene()
+    {
+        if (state.ActiveScenePath.empty())
+        {
+            SaveSceneAs();
+            return;
+        }
+
+        SceneSerializer ser(World::GetActiveScene());
+        ser.Serialize(state.ActiveScenePath);
+    }
+
+    void EditorLayer::SaveSceneAs()
+    {
+        std::string path = Platform::SaveFileDialog("*.ce_scene \0*.ce_scene\0");
+        if (!path.empty())
+        {
+            state.ActiveScenePath = path;
+            SaveScene();
+        }
     }
 }

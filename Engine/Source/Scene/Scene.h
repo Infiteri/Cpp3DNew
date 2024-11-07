@@ -31,13 +31,21 @@ namespace Core
 
         void LoadRuntimeComponent(Actor *a);
 
+        void SetName(const std::string &name) { this->name = name; };
+
+        friend class EditorLayer; // Note: For editor
+        friend class World;
+        friend class SceneSerializer;
+
+        void _SetSkyInstance();
+
     public:
         Scene();
         ~Scene();
 
         static Scene *From(Scene *scene);
 
-        void SetName(const std::string &name) { this->name = name; };
+        // TODO: Maybe keep name to the path?
         inline std::string GetName() { return name; };
 
         void Start();

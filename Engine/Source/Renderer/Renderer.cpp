@@ -22,17 +22,6 @@
 
 namespace Core
 {
-    static float screenQuadVertices[] = {
-        // positions   // texCoords
-        -1.0f, 1.0f, 0.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f,
-        1.0f, -1.0f, 1.0f, 0.0f,
-
-        -1.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, -1.0f, 1.0f, 0.0f,
-
-        1.0f, 1.0f, 1.0f, 1.0f};
-
     static Renderer::RendererState state;
 
     void Renderer::InitializeRenderingContext()
@@ -78,34 +67,35 @@ namespace Core
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // TODO: WTF?
+        // Necessary
         glClearColor(255, 255, 255, 255);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        if (state.skyInstance != nullptr)
+        {
+            switch (state.skyInstance->GetMode())
+            {
+            case Sky::ColorMode:
+            {
+                Color c = state.skyInstance->GetColor().Normalized();
+                glClearColor(c.r, c.g, c.b, c.a);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            }
+            break;
+
+            default:
+                glDepthMask(false);
+                state.skyInstance->Render();
+                glDepthMask(true);
+                break;
+            }
+        }
     }
 
     void Renderer::Render()
     {
         if (!state.initializedContext)
             return;
-
-        //? sky system
-        auto sky = World::GetActiveScene()->GetEnvironment()->SkyInst;
-        if (sky != nullptr)
-        {
-            switch (sky->GetMode())
-            {
-            case Sky::ColorMode:
-                glClearColor(sky->GetColor().r / 255, sky->GetColor().g / 255, sky->GetColor().b / 255, sky->GetColor().a / 255);
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                break;
-
-            default:
-                glDepthMask(false);
-                sky->Render();
-                glDepthMask(true);
-                break;
-            }
-        }
 
         // Camera
         {
@@ -114,7 +104,6 @@ namespace Core
             if (activeCamera && objShader)
             {
                 objShader->Use();
-
                 activeCamera->UpdateView();
                 objShader->Vec3(activeCamera->GetPosition(), "uCameraPosition");
                 objShader->Mat4(activeCamera->GetProjection(), "uProjection");
@@ -196,9 +185,12 @@ namespace Core
         return state.Screen.PostBuffer->GetRenderPass(index)->id;
     }
 
-    Shader *Renderer::TEMP_GetShaderFromPost(int i)
+    void Renderer::SetSkyInstance(Sky *sky, bool deleteOldSky)
     {
-        return state.postProcessor.shaders[i].shd;
+        if (deleteOldSky && state.skyInstance)
+            delete state.skyInstance;
+
+        state.skyInstance = sky;
     }
 
     void Renderer::Shutdown()
@@ -211,5 +203,4 @@ namespace Core
         delete state.Screen.Array;
         delete state.Screen.Buffer;
     }
-
 }

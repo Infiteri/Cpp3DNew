@@ -30,7 +30,6 @@ namespace Core
 {
     namespace SerializerUtils
     {
-
         CE_API void Vector2ToYAML(YAML::Emitter &out, const char *field, Vector2 *vec);
         CE_API void Vector3ToYAML(YAML::Emitter &out, const char *field, Vector3 *vec);
         CE_API void ColorToYAML(YAML::Emitter &out, const char *field, Color *vec);

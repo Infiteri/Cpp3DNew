@@ -171,7 +171,7 @@
 - Added Directional Light
 - Added Point Light
 
-# 0.1.8 - 03.11.2024 
+# 0.1.8 - 03.11.2024
 
 - Started Physics
 - Math changes
@@ -182,3 +182,11 @@
 - Added physics math
 - Added Quaternions
 - Other
+
+# 0.1.9 - 07.11.2024
+
+- Serializing / Deserializing scene environment added
+- Refactored serializing / deserializing of CeDataSet into a class of its own
+- Editor improvements
+- Editor Settings
+- Other improvements

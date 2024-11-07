@@ -76,6 +76,18 @@ namespace Core
                     break;
 
                 case Sky::ShaderMode:
+                    if (ImGui::TreeNode("Shader Data"))
+                    {
+                        EditorUtils::DrawDataSetUI(&sky->GetShaderDataSet());
+
+                        if (ImGui::Button("Add"))
+                        {
+                            sky->GetShaderDataSet().Add(new CeData(new Vector2(), CeData::DataVec2, "Data Set"));
+                        }
+
+                        ImGui::TreePop();
+                    }
+
                     if (ImGui::Button("Load"))
                     {
                         std::string path = Platform::OpenFileDialog("GLSL Shader \0*.glsl\0");
@@ -91,7 +103,6 @@ namespace Core
                 }
             }
 
-            EditorUtils::DrawDataSetUI(&sky->GetShaderDataSet());
             ImGui::TreePop();
         }
 

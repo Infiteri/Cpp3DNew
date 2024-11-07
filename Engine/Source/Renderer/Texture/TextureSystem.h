@@ -15,6 +15,8 @@ namespace Core
         static void Init();
         static void Shutdown();
 
+        static bool Exist(const std::string& name);
+
         static void Release(const std::string &name);
         static void ReleaseDefault(Texture *texture);
 

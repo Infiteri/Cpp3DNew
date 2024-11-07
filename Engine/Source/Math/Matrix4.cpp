@@ -732,4 +732,10 @@ namespace Core
 
         return m;
     }
+    Matrix4 Matrix4::Create(float *data)
+    {
+        Matrix4 m;
+        m.From(data);
+        return m;
+    }
 }

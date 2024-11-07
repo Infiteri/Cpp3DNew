@@ -15,6 +15,8 @@ namespace Core
         static void BeginFrame();
         static void EndFrame();
 
+        static void SetThemeDarkDefault();
+
         static void SetFont(const char* path, float size);
     };
 }

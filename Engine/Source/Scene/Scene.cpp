@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include "Core/Logger.h"
 
+#include "Renderer/Renderer.h"
 #include "Renderer/Texture/TextureSystem.h"
 #include "Renderer/Camera/CameraSystem.h"
 #include "Renderer/Shader/ShaderSystem.h"
@@ -25,6 +26,11 @@ namespace Core
             rigidBody->Config.Owner = a;
             rigidBody->BodyInstance = PhysicsEngine::CreateRigid(&rigidBody->Config);
         }
+    }
+
+    void Scene::_SetSkyInstance()
+    {
+        Renderer::SetSkyInstance(environemnt.SkyInst, false);
     }
 
     Scene::Scene()
@@ -70,9 +76,11 @@ namespace Core
             actor->Start();
         }
 
-        // Post load section
-        // All actors are ready, post component loading and actor setup section
-        // Things like scripting and physics setup goes here
+        //? -- Post load section --
+        //? All actors are ready, post component loading and actor setup section
+        //? Things like scripting and physics setup goes here
+
+_SetSkyInstance();
         ActivateSceneCamera();
         ScriptEngine::StartRuntime();
     }

@@ -285,11 +285,17 @@ namespace Core
                 switch (mat->GetType())
                 {
                 case Material::Config:
-                    EditorUtils::ImGuiColorEdit("Color", &mat->GetState().Color);
 
-                    if (ImGui::TreeNode("Color Texture"))
+                    if (ImGui::TreeNode("Color"))
                     {
-                        EditorUtils::DrawTextureUI("Color Texture", EditorUtils::TextureColor, mat);
+                        EditorUtils::ImGuiColorEdit("Color", &mat->GetState().Color);
+
+                        if (ImGui::TreeNode("Texture"))
+                        {
+                            EditorUtils::DrawTextureUI("Color Texture", EditorUtils::TextureColor, mat);
+                            ImGui::TreePop();
+                        }
+
                         ImGui::TreePop();
                     }
                     break;

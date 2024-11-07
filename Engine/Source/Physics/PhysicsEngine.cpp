@@ -7,8 +7,6 @@ namespace Core
 
     void PhysicsEngine::Init()
     {
-        state.TempSpring.RestLength = 1.0f;
-        state.TempSpring.SpringConstant = 1.0f;
     }
 
     void PhysicsEngine::Shutdown()
@@ -29,11 +27,6 @@ namespace Core
         {
             body->Update();
         }
-
-        // state.TempSpring.OtherSpring = new Spring();
-        // state.TempSpring.OtherSpring->TargetBody = (RigidBody *)state.Bodies[1];
-        // state.TempSpring.TargetBody = (RigidBody *)state.Bodies[0];
-        // state.TempSpring.Update();
     }
 
     void PhysicsEngine::StopRuntime()
@@ -52,10 +45,5 @@ namespace Core
     PhysicsEngine::NumericValues &PhysicsEngine::GetNumericValueSet()
     {
         return state.Numeric;
-    }
-
-    Spring *PhysicsEngine::GetTempSpring()
-    {
-        return &state.TempSpring;
     }
 }

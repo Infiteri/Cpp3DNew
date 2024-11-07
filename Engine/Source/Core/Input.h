@@ -3,6 +3,8 @@
 #include "Base.h"
 #include "Math/Vectors.h"
 
+#include <unordered_map>
+
 namespace Core
 {
     /// @brief Keys
@@ -154,6 +156,8 @@ namespace Core
     class CE_API Input
     {
     public:
+        typedef std::unordered_map<Keys, bool> KeySet;
+
         Input() {};
         ~Input() {};
 
@@ -214,6 +218,10 @@ namespace Core
         /// @brief Will return a Vector2 with the mouse position.
         /// @return The Vector.
         static Vector2 GetMousePosition();
+
+        static KeySet GetKeys();
+
+        static Keys KeyFromString(const std::string& key);
     };
 
     void InputUpdateKey(Keys key, bool p);

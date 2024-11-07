@@ -8,8 +8,12 @@
 
 namespace Core
 {
-    namespace EditorUtils
+    class EditorUtils
     {
+    public:
+        EditorUtils();
+        ~EditorUtils();
+
         enum TextureType
         {
             TextureColor,
@@ -21,21 +25,23 @@ namespace Core
             bool Changed;
         };
 
-        void ImGuiVec2Edit(const char *l, Vector2 *v);
-        void ImGuiVec3Edit(const char *l, Vector3 *v);
+        static Texture *LoadTexture(const std::string &name);
 
-        void ImGuiVector3StyledEdit(const char *label, Vector3 *vec, float defaultValue = 0.0f);
-        void TransformGUIRender(Transform *transform);
-        StringEdit ImGuiStringEdit(const char *label, const std::string &str);
-        void ImGuiColorEdit(const char *label, Color *color);
-        void DrawTextureUI(const char *label, TextureType texType, Material *mat);
-        void DrawTextureUIChangeFilter(Texture *texture);
+        static void ImGuiVec2Edit(const char *l, Vector2 *v);
+        static void ImGuiVec3Edit(const char *l, Vector3 *v);
 
-        bool DrawDataSetUI(CeDataSet *set);
-        void SetSetIDTo0();
+        static void ImGuiVector3StyledEdit(const char *label, Vector3 *vec, float defaultValue = 0.0f);
+        static void TransformGUIRender(Transform *transform);
+        static StringEdit ImGuiStringEdit(const char *label, const std::string &str);
+        static void ImGuiColorEdit(const char *label, Color *color);
+        static void DrawTextureUI(const char *label, TextureType texType, Material *mat);
+        static void DrawTextureUIChangeFilter(Texture *texture);
+
+        static bool DrawDataSetUI(CeDataSet *set);
+        static void SetSetIDTo0();
 
         template <typename T, typename UIFun>
-        void DrawComponentBaseUI(const std::string &name, T *component, int index, Actor *a, UIFun fun)
+        static void DrawComponentBaseUI(const std::string &name, T *component, int index, Actor *a, UIFun fun)
         {
             const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_AllowItemOverlap;
             if (component)

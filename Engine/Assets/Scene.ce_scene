@@ -1,4 +1,12 @@
 Scene: EngineResources/Scene.ce_scene
+SceneEnvironment:
+  DirectionalLight:
+    Color: [255, 255, 255, 255]
+    Direction: [0, 0, -1]
+    Intensity: 1
+  Sky:
+    Mode: 0
+    Color: [57.3542862, 75.2239075, 93.8082886, 255]
 Actors:
   - Actor: Filed
     Name: Actor
@@ -12,6 +20,8 @@ Actors:
     DataSetComponentCount: 0
     ScriptComponentCount: 0
     CameraComponentCount: 0
+    PointLightComponentCount: 0
+    RigidBodyComponentCount: 0
     MeshComponent 0:
       Type: 1
       Name: ""
@@ -28,15 +38,17 @@ Actors:
     UUID: 1275278976166057676
     ParentUUID: 0
     Transform:
-      Position: [0, 0, 0]
+      Position: [0, 0, 2.91350293]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshComponentCount: 0
     DataSetComponentCount: 0
     ScriptComponentCount: 0
     CameraComponentCount: 1
+    PointLightComponentCount: 0
+    RigidBodyComponentCount: 0
     CameraComponent 0:
       FOV: 90
-      Near: 0.005
+      Near: 0.00499999989
       Far: 1000
       IsPrimary: true

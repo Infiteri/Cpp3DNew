@@ -1,12 +1,90 @@
 #include "SceneSerializer.h"
 #include "Core/Logger.h"
 #include "Core/Serializer/CeSerializerUtils.h"
+#include "Core/Serializer/CeDataSerializer.h"
 #include "ComponentSerializer.h"
 
 #include <fstream>
 
 namespace Core
 {
+    void SceneSerializer::_SerializeDirLight(DirectionalLight *l, YAML::Emitter &out)
+    {
+        out << YAML::Key << "DirectionalLight" << YAML::Value << YAML::BeginMap;
+        SerializerUtils::ColorToYAML(out, "Color", &l->Color);
+        SerializerUtils::Vector3ToYAML(out, "Direction", &l->Direction);
+        CE_SERIALIZE_FIELD("Intensity", l->Intensity);
+        out << YAML::EndMap;
+    }
+
+    void SceneSerializer::_SerializeSky(Sky *sky, YAML::Emitter &out)
+    {
+        out << YAML::Key << "Sky" << YAML::Value << YAML::BeginMap;
+        CE_SERIALIZE_FIELD("Mode", (int)sky->GetMode());
+
+        switch (sky->GetMode())
+        {
+        case Sky::ColorMode:
+            SerializerUtils::ColorToYAML(out, "Color", &sky->GetColor());
+            break;
+
+        case Sky::CubeMapMode:
+            CE_SERIALIZE_FIELD("CubeMapPath", sky->GetCubemapPath().c_str());
+            break;
+
+        case Sky::ShaderMode:
+        {
+            CE_SERIALIZE_FIELD("ShaderPath", sky->GetShaderName().c_str());
+            CeDataSerializer ser(&sky->GetShaderDataSet());
+            out << YAML::Key << "ShaderData" << YAML::Value << YAML::BeginMap;
+            ser.Serialize(out);
+            out << YAML::EndMap;
+        }
+        break;
+        }
+        out << YAML::EndMap;
+    }
+
+    void SceneSerializer::_DeserializeDirLight(DirectionalLight *l, YAML::Node node)
+    {
+        SerializerUtils::YAMLToColor(node["Color"], &l->Color);
+        SerializerUtils::YAMLToVector3(node["Direction"], &l->Direction);
+        l->Intensity = node["Intensity"].as<float>();
+    }
+
+    void SceneSerializer::_DeserializeSky(Sky *sky, YAML::Node node)
+    {
+        Sky::Mode mode = (Sky::Mode)node["Mode"].as<int>();
+
+        switch (mode)
+        {
+        case Sky::ColorMode:
+        {
+            Color c;
+            SerializerUtils::YAMLToColor(node["Color"], &c);
+            sky->SetModeToColor(c);
+        }
+        break;
+
+        case Sky::CubeMapMode:
+        {
+            std::string cubeMapPath = node["CubeMapPath"].as<std::string>();
+            sky->SetModeToCubeMap(cubeMapPath);
+        }
+        break;
+
+        case Sky::ShaderMode:
+        {
+            std::string shaderPath = node["ShaderPath"].as<std::string>();
+            sky->SetModeToShader(shaderPath);
+
+            CeDataSerializer ser(&sky->GetShaderDataSet());
+            ser.Deserialize(node["ShaderData"]);
+        }
+        break;
+        }
+    }
+
     SceneSerializer::SceneSerializer(Scene *scene)
     {
         this->scene = nullptr;
@@ -23,6 +101,18 @@ namespace Core
         out << YAML::BeginMap;
         out << YAML::Key << "Scene";
         out << YAML::Value << scene->GetName().c_str();
+
+        // Serialize scene environment
+        {
+            SceneEnvironment *env = scene->GetEnvironment();
+            if (env)
+            {
+                out << YAML::Key << "SceneEnvironment" << YAML::Value << YAML::BeginMap;
+                _SerializeDirLight(&env->DirectionalLight, out);
+                _SerializeSky(env->SkyInst, out);
+                out << YAML::EndMap;
+            }
+        }
 
         auto actors = scene->GetActors();
         if (actors.size() > 0)
@@ -59,6 +149,10 @@ namespace Core
 
         if (!data["Scene"])
             return;
+
+        // Takes the directional light field directly
+        _DeserializeDirLight(&scene->GetEnvironment()->DirectionalLight, data["SceneEnvironment"]["DirectionalLight"]);
+        _DeserializeSky(scene->GetEnvironment()->SkyInst, data["SceneEnvironment"]["Sky"]);
 
         auto actors = data["Actors"];
         if (actors)
@@ -105,6 +199,12 @@ namespace Core
                     a->id = 0;
             }
         }
+
+        //? update scene state
+
+        // Note: After loading the proper sky configuration, the sky instance must be updated/
+        // TODO: There should be problems with the new sky design so make sure no matter what happens everything is right ( _SetSkyInstance could be moved to the Render function of the scene )
+        scene->_SetSkyInstance();
     }
 
     void SceneSerializer::SerializeActor(Actor *a, YAML::Emitter &out)

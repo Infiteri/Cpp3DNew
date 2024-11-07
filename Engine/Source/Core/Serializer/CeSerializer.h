@@ -9,21 +9,22 @@
 namespace YAML
 {
     class Emitter;
+    class Node;
 }
 
 namespace Core
 {
-
     class CE_API CeSerializer
     {
     public:
         CeSerializer() {};
         ~CeSerializer() {};
 
+        virtual void Serialize() {};
         virtual void Serialize(YAML::Emitter &out) {};
         virtual void Serialize(const std::string &filepath, YAML::Emitter &out) {};
         virtual void Serialize(const std::string &filepath) {};
         virtual void Deserialize(const std::string &filepath) {};
+        virtual void Deserialize() {};
     };
-
 }

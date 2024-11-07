@@ -39,6 +39,8 @@ namespace Core
         void DestroyShader();
         void DestroyFromMode();
 
+        void ReloadNewModeWithPreviousData();
+
     public:
         Sky();
         ~Sky();

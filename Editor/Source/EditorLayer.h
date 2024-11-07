@@ -2,8 +2,10 @@
 
 #include "Core.h"
 #include "Panel/PanelSystem.h"
+#include "EditorSetting.h"
 #include "EditorCamera.h"
 
+#include <string>
 #include <ImGuizmo.h>
 
 namespace Core
@@ -43,6 +45,11 @@ namespace Core
         CurrentSceneState StateScene;
 
         Scene *EditorScene = nullptr;
+
+        std::string ActiveScenePath;
+
+        EditorSettings Settings;
+        bool RenderSettings = false;
     };
 
     class EditorLayer : public Layer
@@ -61,7 +68,15 @@ namespace Core
 
         // --- UI FUNCTION ---
         void UI_TopBar();
+        void UI_MenuBar();
+        void UI_EditorSettings();
+        void UI_UTIL_RenderColorChange(const char *label, int target);
         // -------------------
+
+        void SaveSettings();
+        void LoadSettings();
+        void RegisterColorsToSettings();
+        void UseSettings();
 
         // -- SCENE FUNCTION --
         void StartSceneRuntime();
@@ -81,6 +96,10 @@ namespace Core
 
         // -- SCENE RELATED --
         void OpenScene(const std::string &name);
+        void OpenScene();
+        void NewScene();
+        void SaveScene();
+        void SaveSceneAs();
         // -------------------
 
         // -- DOCKSPACE --

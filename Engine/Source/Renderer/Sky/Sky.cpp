@@ -37,6 +37,33 @@ namespace Core
         }
     }
 
+    void Sky::ReloadNewModeWithPreviousData()
+    {
+        switch (mode)
+        {
+        case CubeMapMode:
+        {
+            // c++ pros dont kill me for copying the code below pls 🙏🙏🙏 i swear i will refactor it someday rn i got better things to do then worry this, i cant call SetModeToCubeMap.
+            // Due to the fact that i calls back in SetMode, which will call this functions again, which calls SetModeToCubeMap, repeating this cycle over and over and the app never continues
+            // Call stack exceeds or something, but im 100% it wont work
+            // also it will call into destroy from mode which is prob. not safe to do
+            // it does check weather or not its safe to delete the object that has to be deleted but still im no professional c++ programmer so ill stay safe from calling DestroyFromMode twice for a while
+            // TODO: Fix this bs
+            CubeMapTexture::Configuration c;
+            CubeMapLoader l;
+            l.Deserialize(cubeMapPath, &c);
+            cubeTexture = new CubeMapTexture(c);
+        }
+        break;
+
+        case ShaderMode:
+        {
+            shader = new Shader(shaderName);
+        }
+        break;
+        }
+    }
+
     static float cubeVertices[] = {
         // Front face
         -1.0f, 1.0f, 1.0f,
@@ -190,8 +217,8 @@ namespace Core
     void Sky::SetMode(Mode newMode)
     {
         DestroyFromMode();
-
         mode = newMode;
+        ReloadNewModeWithPreviousData();
     }
 
     void Sky::SetModeToColor(const Color &c)

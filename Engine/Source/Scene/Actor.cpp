@@ -86,9 +86,6 @@ namespace Core
 
     void Actor::Render()
     {
-        if (state == Stopped)
-            return;
-
         //? what
         _CalculateMatrices();
         auto shader = ShaderSystem::GetFromEngineResource("Object");

@@ -30,6 +30,7 @@ namespace Core
 
     Scene *World::CreateScene(const std::string &name)
     {
+        CE_LOG("CE_WORLD", Debug, "Creating new scene: %s.", name.c_str());
         Scene *scene = new Scene();
         SceneSerializer ser(scene);
         scene->SetName(name);
@@ -40,6 +41,7 @@ namespace Core
 
     Scene *World::CreateScene(const std::string &name, const std::string &filepath)
     {
+        CE_LOG("CE_WORLD", Debug, "Creating new scene: %s.", name.c_str());
         Scene *scene = new Scene();
         scene->SetName(name);
         SceneSerializer s(scene);
@@ -64,7 +66,6 @@ namespace Core
 
     void World::ActivateSceneInstance(Scene *scene)
     {
-        StopActiveScene();
         activeScene = scene;
     }
 
