@@ -59,18 +59,21 @@ namespace Core
         /// @brief Will return any actor with the same name, if more actors have the same name it will return the first on in the list.
         /// @param name The name of the actor.
         /// @return Pointer to an actor, nullptr if no actor exists with this name.
-        Actor *GetActorByName(const std::string &name);
+        Actor *GetActor(const std::string &name);
 
         /// @brief Will return any actor with the same UUID.
         /// @param uuid The UUID of the actor.
         /// @return Pointer to an actor, nullptr if no actor exists with this UUID.
-        Actor *GetActorByUUID(const UUID &uuid);
+        Actor *GetActor(const UUID &uuid);
+
+        Actor* GetActorByTag(const std::string& tagValue);
 
         inline ActorList GetActors() { return actors; };
 
         Actor *GetActorInHierarchy(const UUID &uuid);
 
-        void RemoveActorByUUID(const UUID &uid);
+        void RemoveActor(const std::string &name);
+        void RemoveActor(const UUID &uid);
 
         void MoveChildInHierarchy(const UUID &uid, int newIndex);
 

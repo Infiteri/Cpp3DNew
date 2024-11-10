@@ -59,7 +59,7 @@ namespace Core
 
         float Pow(float x, float y)
         {
-            return powf(x, y);
+            return pow(x, y);
         }
 
         float Lerp(float min, float max, float t)

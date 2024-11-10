@@ -87,6 +87,11 @@ namespace Core
                               (o.data[11] * data[10]) + data[11];
             return result;
         }
+
+        Vector3 GetAxisVector3(int i)
+        {
+            return Vector3(data[i], data[i + 4], data[i + 8]);
+        }
     };
 
     /// @brief Useful for inertia tensor. Used in physics not of use by the user
@@ -220,6 +225,6 @@ namespace Core
         static Matrix4 Scale(Vector3 *vec);
         static Matrix4 Scale(float x, float y, float z);
 
-        static Matrix4 Create(float* data);
+        static Matrix4 Create(float *data);
     };
 }

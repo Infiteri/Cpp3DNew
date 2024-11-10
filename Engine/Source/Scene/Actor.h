@@ -68,8 +68,9 @@ namespace Core
         inline std::string GetName() { return name; };
 
         inline State GetState() { return state; };
+        inline Scene* GetScene() { return scene; };
 
-        UUID GetUUID() { return UUID(id.Get()); };
+        inline UUID GetUUID() { return UUID(id.Get()); };
 
         void Start();
         void Render();
@@ -165,6 +166,20 @@ namespace Core
                     components.erase(it);
                     delete typedComponent;
                     break;
+                }
+            }
+        };
+
+        template <typename T>
+        void RemoveComponents()
+        {
+            for (auto it = components.begin(); it != components.end(); ++it)
+            {
+                T *typedComponent = dynamic_cast<T *>(*it);
+                if (typedComponent)
+                {
+                    components.erase(it);
+                    delete typedComponent;
                 }
             }
         };

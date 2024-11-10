@@ -4,6 +4,7 @@
 #include "Math/Vectors.h"
 #include "Math/Matrix4.h"
 #include "Math/Quaternion.h"
+#include "Physics/Collider/Collider.h"
 
 namespace Core
 {
@@ -33,8 +34,12 @@ namespace Core
         PhysMatrix3 inverseInertiaTensor;
         PhysMatrix3 inverseInertiaTensorWorld;
 
+        AABBCollider collider;
+
         void _ClearForces();
         void _CalculateData();
+
+        friend class PhysicsEngine;
 
     public:
         RigidBody();
@@ -45,6 +50,8 @@ namespace Core
         void UseConfiguration(RigidBodyConfiguration *config);
 
         void Update();
+
+        inline PhysMatrix4x3 *GetTransformMatrix() { return &transformMatrix; };
 
         /// @brief Adds a velocity force to the rigid body.
         /// @param force The force to add.

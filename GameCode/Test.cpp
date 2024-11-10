@@ -6,7 +6,7 @@ void TestScript::OnStart()
 
 void TestScript::OnUpdate()
 {
-    auto rc = Owner->GetComponent<RigidBodyComponent>();
+    auto rc = GetComponent<RigidBodyComponent>();
     if (!rc)
         return;
 
@@ -17,11 +17,8 @@ void TestScript::OnUpdate()
         rc->BodyInstance->AddForce({1, 0, 0});
 
     if (Input::GetKey(Keys::Q))
-        rc->BodyInstance->AddTorque({10, 0, 0});
+        rc->BodyInstance->AddTorque({0, 0, 10});
 
     if (Input::GetKey(Keys::R))
         rc->BodyInstance->AddTorque({-10, 0, 0});
-
-    if (Input::GetKey(Keys::U))
-        rc->BodyInstance->AddForceAtPoint({5, 0, 0}, {0.5, 0, 0});
 }

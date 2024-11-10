@@ -1,5 +1,7 @@
 #include "PhysicsEngine.h"
+#include "Core/Logger.h"
 #include "Body/RigidBody.h"
+#include "Collision/ContactGenerator.h"
 
 namespace Core
 {
@@ -7,6 +9,7 @@ namespace Core
 
     void PhysicsEngine::Init()
     {
+        state.Numeric.MathFPS = 240.0f;
     }
 
     void PhysicsEngine::Shutdown()
@@ -23,9 +26,28 @@ namespace Core
 
     void PhysicsEngine::UpdateRuntime()
     {
-        for (auto body : state.Bodies)
+        for (int i = 0; i < state.Bodies.size(); i++)
         {
+            auto body = state.Bodies[i];
             body->Update();
+
+            for (int j = 0; j < state.Bodies.size(); j++)
+            {
+                if (i == j)
+                    continue;
+
+                auto body2 = state.Bodies[j];
+
+                ContactGenerator gen;
+
+                auto col1 = &body->As<RigidBody>()->collider;
+                auto col2 = &body2->As<RigidBody>()->collider;
+
+                bool res = gen.BoxAndBox(col1, col2);
+
+                if (res)
+                    CE_TRACE("YESSSSSSSSSSSSSS");
+            }
         }
     }
 

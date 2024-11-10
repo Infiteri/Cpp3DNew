@@ -80,7 +80,7 @@ namespace Core
         //? All actors are ready, post component loading and actor setup section
         //? Things like scripting and physics setup goes here
 
-_SetSkyInstance();
+        _SetSkyInstance();
         ActivateSceneCamera();
         ScriptEngine::StartRuntime();
     }
@@ -155,7 +155,7 @@ _SetSkyInstance();
         return a;
     }
 
-    Actor *Scene::GetActorByName(const std::string &name)
+    Actor *Scene::GetActor(const std::string &name)
     {
         for (auto a : actors)
             if (a->GetName() == name)
@@ -164,7 +164,7 @@ _SetSkyInstance();
         return nullptr;
     }
 
-    Actor *Scene::GetActorByUUID(const UUID &uuid)
+    Actor *Scene::GetActor(const UUID &uuid)
     {
         for (auto a : actors)
             if (a->GetUUID() == uuid)
@@ -173,9 +173,23 @@ _SetSkyInstance();
         return nullptr;
     }
 
+    Actor *Scene::GetActorByTag(const std::string &tagValue)
+    {
+        for (auto a : actors)
+        {
+            for (auto t : a->GetComponents<TagComponent>())
+            {
+                if (t->Tag == tagValue)
+                    return a;
+            }
+        }
+
+        return nullptr;
+    }
+
     Actor *Scene::GetActorInHierarchy(const UUID &uuid)
     {
-        Actor *a = GetActorByUUID(uuid);
+        Actor *a = GetActor(uuid);
 
         if (!a)
         {
@@ -190,10 +204,22 @@ _SetSkyInstance();
         return a;
     }
 
-    void Scene::RemoveActorByUUID(const UUID &uid)
+    void Scene::RemoveActor(const std::string &name)
     {
-        Actor *a;
+        int index = -1;
+        for (auto actor : actors)
+        {
+            index++;
+            if (actor->name == name)
+            {
+                actors.erase(actors.begin() + index);
+                break;
+            }
+        }
+    }
 
+    void Scene::RemoveActor(const UUID &uid)
+    {
         int index = -1;
         for (auto actor : actors)
         {
@@ -208,30 +234,19 @@ _SetSkyInstance();
 
     void Scene::MoveChildInHierarchy(const UUID &uid, int newIndex)
     {
-
-        Actor *actorToMove = GetActorByUUID(uid);
+        Actor *actorToMove = GetActor(uid);
 
         if (!actorToMove)
-        {
             return;
-        }
 
         if (newIndex < 0 || newIndex >= actors.size())
-        {
             return;
-        }
-
-        // Find the current index of the actor
         auto actorIterator = std::find(actors.begin(), actors.end(), actorToMove);
 
         if (actorIterator != actors.end())
         {
             size_t currentIndex = std::distance(actors.begin(), actorIterator);
-
-            // Remove the actor from the current position
             actors.erase(actorIterator);
-
-            // Insert the actor at the new index
             actors.insert(actors.begin() + newIndex, actorToMove);
         }
     }

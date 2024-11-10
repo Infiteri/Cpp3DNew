@@ -266,7 +266,6 @@ namespace Core
         UUID id = 0;
         if (panel->selectionContext)
             id = panel->selectionContext->GetUUID();
-
         panel->selectionContext = nullptr;
 
         World::StopActiveScene(); // Stop last scene
@@ -279,9 +278,7 @@ namespace Core
         Renderer::Viewport();
 
         if (id != 0)
-        {
-            panel->selectionContext = World::GetActiveScene()->GetActorByUUID(id);
-        }
+            panel->selectionContext = World::GetActiveScene()->GetActor(id);
     }
 
     void EditorLayer::ActivateCamera(CurrentSceneState mode)
@@ -325,7 +322,7 @@ namespace Core
 
         if (Input::GetButton(Buttons::Right))
         {
-            Vector2 position = Input::GetMousePosition();
+            Vector2 position = Input::GetMousePosition() + Vector2(Engine::GetWindow()->GetInfo()->X, Engine::GetWindow()->GetInfo()->Y);
             if (position.x > state.Dockspace.ViewportLeftTop.x &&
                 position.y > state.Dockspace.ViewportLeftTop.y &&
                 position.x < state.Dockspace.ViewportLeftTop.x + state.Dockspace.ViewportRightBottom.x &&
@@ -405,64 +402,48 @@ namespace Core
         HandleDragDrop();
 
         //? Some gizmo things
-        // TODO: Fix Rotation (somehow)
         {
             auto panel = (SceneHierarchyPanel *)state.Panels.panels[0];
             Actor *actorContext = panel->selectionContext;
             PerspectiveCamera *camera = CameraSystem::GetPerspectiveActive();
             if (actorContext != nullptr && camera != nullptr)
             {
-                auto tc = actorContext->GetTransform();
-                auto delta = actorContext->GetParent() ? Matrix4::Invert(actorContext->GetParent()->GetTransformMatrix()).data : NULL;
-                auto data = actorContext->GetTransformMatrix().data;
+                Transform *transform = actorContext->GetTransform();
+                float *delta = actorContext->GetParent() ? Matrix4::Invert(actorContext->GetParent()->GetTransformMatrix()).data : NULL;
+                float *data = actorContext->GetTransformMatrix().data;
 
                 DrawGizmo(camera, data, delta);
 
                 if (ImGuizmo::IsUsing())
                 {
-                    Matrix4 dater;
+                    Matrix4 matrixData;
                     if (actorContext->GetParent() != nullptr)
                     {
-                        Matrix4 dataMatrix = Matrix4();
+                        Matrix4 dataMatrix;
                         dataMatrix.From(actorContext->GetLocalMatrix());
 
-                        Matrix4 deltaMatrix = Matrix4();
-                        if (delta)
-                            deltaMatrix.From(delta);
-                        else
-                            deltaMatrix = Matrix4::Identity();
-
-                        dater = Matrix4::Multiply(dataMatrix, deltaMatrix);
+                        Matrix4 deltaMatrix = delta ? Matrix4::Create(delta) : Matrix4::Identity();
+                        matrixData = Matrix4::Multiply(dataMatrix, deltaMatrix);
                     }
                     else
-                    {
-                        dater.From(data);
-                    }
+                        matrixData.From(data);
 
                     float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-                    ImGuizmo::DecomposeMatrixToComponents(dater, matrixTranslation, matrixRotation, matrixScale);
-                    // ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, dater);
+                    ImGuizmo::DecomposeMatrixToComponents(matrixData, matrixTranslation, matrixRotation, matrixScale);
 
-                    // todo: fix
-                    if (state.GuizmoOperation == ImGuizmo::TRANSLATE)
+                    switch (state.GuizmoOperation)
                     {
-                        matrixTranslation[0] = dater[12];
-                        matrixTranslation[1] = dater[13];
-                        matrixTranslation[2] = dater[14];
-                        tc->Position.Set(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]);
-                    }
-                    else if (state.GuizmoOperation == ImGuizmo::ROTATE)
-                    {
-                        Matrix4 m = dater;
-                        Vector3 r = dater.GetEulerAnglesZYX();
-                        tc->Rotation.Set(r);
-                    }
-                    else if (state.GuizmoOperation == ImGuizmo::SCALE)
-                    {
-                        matrixScale[0] = dater[0];
-                        matrixScale[1] = dater[5];
-                        matrixScale[2] = dater[10];
-                        tc->Scale.Set(matrixScale[0], matrixScale[1], matrixScale[2]);
+                    case ImGuizmo::TRANSLATE:
+                        transform->SetPosition(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]);
+                        break;
+
+                    case ImGuizmo::ROTATE:
+                        transform->SetRotation(matrixData.GetEulerAnglesZYX() * CE_RAD_TO_DEG);
+                        break;
+
+                    case ImGuizmo::SCALE:
+                        transform->SetScale(matrixScale[0], matrixScale[1], matrixScale[2]);
+                        break;
                     }
                 }
             }
@@ -529,9 +510,8 @@ namespace Core
 
     void EditorLayer::NewScene()
     {
-        // TODO: Saving of current scene if present
-
         StopSceneRuntime();
+        SaveScene();
 
         state.ActiveScenePath = "";
 
@@ -548,6 +528,7 @@ namespace Core
         }
 
         SceneSerializer ser(World::GetActiveScene());
+        scene->SetName(state.ActiveScenePath);
         ser.Serialize(state.ActiveScenePath);
     }
 

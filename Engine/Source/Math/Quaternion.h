@@ -33,7 +33,7 @@ namespace Core
         void Normalize();
         Quaternion Normalized();
 
-        void RotateBy(const Vector3 &vector);
+        void SetFromEuler(const Vector3 &euler);
 
         void operator*=(const Quaternion &multiplier)
         {

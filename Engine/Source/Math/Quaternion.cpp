@@ -1,11 +1,14 @@
 #include "Quaternion.h"
 #include "Math.h"
 
+#include <float.h>
+#include <cmath>
+
 namespace Core
 {
     Quaternion::Quaternion()
     {
-        Set(0, 0, 0, 1);
+        Set(1, 0, 0, 0);
     }
 
     Quaternion::Quaternion(const Quaternion &q)
@@ -43,7 +46,7 @@ namespace Core
     void Quaternion::Normalize()
     {
         float d = r * r + i * i + j * j + k * k;
-        if (d == 0)
+        if (d < DBL_EPSILON)
         {
             r = 1;
             return;
@@ -63,10 +66,19 @@ namespace Core
         return q;
     }
 
-    void Quaternion::RotateBy(const Vector3 &vector)
+    void Quaternion::SetFromEuler(const Vector3 &euler)
     {
-        Quaternion q(0, vector.x, vector.y,
-                     vector.z);
-        (*this) *= q;
+        float cy = cos(euler.z * 0.5f);
+        float sy = sin(euler.z * 0.5f);
+        float cp = cos(euler.y * 0.5f);
+        float sp = sin(euler.y * 0.5f);
+        float cr = cos(euler.x * 0.5f);
+        float sr = sin(euler.x * 0.5f);
+
+        r = cr * cp * cy + sr * sp * sy;
+        i = sr * cp * cy - cr * sp * sy;
+        j = cr * sp * cy + sr * cp * sy;
+        k = cr * cp * sy - sr * sp * cy;
     }
+
 }

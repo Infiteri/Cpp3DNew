@@ -43,6 +43,9 @@ namespace Core
     void Buffer::Destroy()
     {
         glDeleteBuffers(1, &id);
+
+        if (bufferType == BufferType::Vertex)
+            layouts.clear();
     }
 
     void Buffer::Bind()

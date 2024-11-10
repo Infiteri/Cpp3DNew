@@ -112,4 +112,16 @@ namespace Core
 
         void From(RigidBodyComponent *c);
     };
+
+    class CE_API TagComponent : public Component
+    {
+    public:
+        std::string Tag;
+
+        TagComponent();
+        TagComponent(const std::string &tag) : Tag(tag) {};
+        ~TagComponent();
+
+        void From(TagComponent *c);
+    };
 }

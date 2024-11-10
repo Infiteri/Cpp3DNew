@@ -1,4 +1,5 @@
 #include "ContentBrowserPanel.h"
+#include "EditorUtils.h"
 #include "Platform/Platform.h"
 
 namespace Core
@@ -10,13 +11,8 @@ namespace Core
         state.padding = 16.0f;
         state.thumbnailSize = 64.0f;
 
-        state.folderTexture = new Texture(false);
-        state.folderTexture->INTERNAL_REQUIRE_GENERATION = false;
-        state.folderTexture->Load("EngineResources/Images/Icons/folder.png", {});
-
-        state.iconTexture = new Texture(false);
-        state.iconTexture->INTERNAL_REQUIRE_GENERATION = false;
-        state.iconTexture->Load("EngineResources/Images/Icons/icon.png", {});
+        state.folderTexture = EditorUtils::LoadTexture("EngineResources/Images/Icons/folder.png");
+        state.iconTexture = EditorUtils::LoadTexture("EngineResources/Images/Icons/icon.png");
     }
 
     ContentBrowserPanel::~ContentBrowserPanel()

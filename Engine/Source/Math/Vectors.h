@@ -82,6 +82,15 @@ namespace Core
         void Set(Vector3 *v);
         void Set(const Vector3 &v);
 
+        float &operator[](int index)
+        {
+            if (index == 0)
+                return x;
+            else if (index == 1)
+                return y;
+            return z;
+        }
+
         void operator+=(const Vector3 &o)
         {
             x += o.x;
@@ -148,6 +157,16 @@ namespace Core
             return {x - o.x, y - o.y, z - o.z};
         }
 
+        Vector3 operator*(const Vector3 &o) const
+        {
+            return {x * o.x, y * o.y, z * o.z};
+        }
+
+        Vector3 operator/(const Vector3 &o) const
+        {
+            return {x / o.x, y / o.y, z / o.z};
+        }
+
         Vector3 operator*(float scalar) const
         {
             return {x * scalar, y * scalar, z * scalar};
@@ -173,6 +192,11 @@ namespace Core
         bool operator!=(const Vector3 &o) const
         {
             return !(*this == o);
+        }
+
+        float Dot(const Vector3 &other) const
+        {
+            return x * other.x + y * other.y + z * other.z;
         }
 
         bool NotZero() const;

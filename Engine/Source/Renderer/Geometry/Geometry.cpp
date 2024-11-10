@@ -1,4 +1,7 @@
 #include "Geometry.h"
+#include "Math/Math.h"
+
+#include <cmath>
 
 namespace Core
 {
@@ -114,6 +117,66 @@ namespace Core
     }
 
     BoxGeometry::~BoxGeometry()
+    {
+        Indices.clear();
+        Vertices.clear();
+    }
+
+    SphereGeometry::SphereGeometry(float radius, int latitudeSegments, int longitudeSegments)
+    {
+        type = Sphere;
+        Radius = radius;
+        LatitudeSegments = latitudeSegments;
+        LongitudeSegments = longitudeSegments;
+
+        for (int lat = 0; lat <= LatitudeSegments; ++lat)
+        {
+            float theta = lat * CE_PI / LatitudeSegments;
+            float sinTheta = sin(theta);
+            float cosTheta = cos(theta);
+
+            for (int lon = 0; lon < LongitudeSegments; ++lon) // Exclude last longitude to avoid duplicate vertices
+            {
+                float phi = lon * 2 * CE_PI / LongitudeSegments;
+                float sinPhi = sin(phi);
+                float cosPhi = cos(phi);
+
+                Vector3 position(
+                    Radius * sinTheta * cosPhi,
+                    Radius * cosTheta,
+                    Radius * sinTheta * sinPhi);
+
+                Vector2 uv(
+                    static_cast<float>(lon) / LongitudeSegments,
+                    static_cast<float>(lat) / LatitudeSegments);
+
+                Vector3 normal = position; // Sphere normals are the same as the position vectors
+                normal.Normalize();
+
+                Vertices.push_back({position, uv, normal});
+            }
+        }
+
+        // Generate indices with wrapping along the longitude
+        for (int lat = 0; lat < LatitudeSegments; ++lat)
+        {
+            for (int lon = 0; lon < LongitudeSegments; ++lon)
+            {
+                int first = (lat * LongitudeSegments) + lon;
+                int second = first + LongitudeSegments;
+
+                Indices.push_back(first);
+                Indices.push_back(second);
+                Indices.push_back((first + 1) % LongitudeSegments + lat * LongitudeSegments);
+
+                Indices.push_back(second);
+                Indices.push_back((second + 1) % LongitudeSegments + (lat + 1) * LongitudeSegments);
+                Indices.push_back((first + 1) % LongitudeSegments + lat * LongitudeSegments);
+            }
+        }
+    }
+
+    SphereGeometry::~SphereGeometry()
     {
         Indices.clear();
         Vertices.clear();

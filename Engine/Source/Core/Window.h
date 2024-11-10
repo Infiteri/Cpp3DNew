@@ -14,6 +14,7 @@ namespace Core
         {
             /// @brief Represents a normal type window, with the topbar and sizes (X, Y, Width, height) respected.
             Normal,
+
             /// @brief Represents a windowed window. The sizes are not taken into consideration.
             Windowed,
 

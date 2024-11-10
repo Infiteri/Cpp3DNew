@@ -5,14 +5,6 @@
 
 namespace Core
 {
-    static float intensity = 0.5;
-    static float blurRadius = 0.5;
-    static float blurStrength = 0.5;
-    static int samples = 1;
-
-    static float falloff = 1.0;
-    static float vignetteAmount = 1.0;
-
     SceneSettingsPanel::SceneSettingsPanel()
     {
     }

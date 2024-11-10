@@ -94,7 +94,6 @@ namespace Core
 
     void EditorUtils::TransformGUIRender(Transform *transform)
     {
-
         ImGuiVector3StyledEdit("Position", &transform->Position, 0.0f);
         ImGuiVector3StyledEdit("Rotation", &transform->Rotation, 0.0f);
         ImGuiVector3StyledEdit("Scale", &transform->Scale, 1.0f);

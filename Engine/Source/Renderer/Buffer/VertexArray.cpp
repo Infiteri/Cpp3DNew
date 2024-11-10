@@ -8,7 +8,9 @@ namespace Core
     {
         glGenVertexArrays(1, &id);
         glBindVertexArray(id);
-     }
+
+        vertexBuffer = indexBuffer = nullptr;
+    }
 
     VertexArray::~VertexArray()
     {
@@ -18,6 +20,14 @@ namespace Core
     void VertexArray::Destroy()
     {
         glDeleteVertexArrays(1, &id);
+
+        if (vertexBuffer)
+            delete vertexBuffer;
+
+        if (indexBuffer)
+            delete indexBuffer;
+
+        vertexBuffer = indexBuffer = nullptr;
     }
 
     void VertexArray::Bind()

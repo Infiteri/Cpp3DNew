@@ -86,7 +86,16 @@ namespace Core
 
     void Actor::Render()
     {
-        //? what
+        // Clamp transform rotation
+        for (int i = 0; i < 3; i++)
+        {
+            if (transform.Rotation[i] > 360)
+                transform.Rotation[i] -= 360;
+
+            if (transform.Rotation[i] < 0)
+                transform.Rotation[i] += 360;
+        }
+
         _CalculateMatrices();
         auto shader = ShaderSystem::GetFromEngineResource("Object");
         if (shader)

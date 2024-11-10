@@ -5,4 +5,4 @@
 
 #define CE_PHYSICS_FPS (Core::PhysicsEngine::GetNumericValueSet().MathFPS)
 #define CE_DELTA_TIME (Core::Engine::GetDeltaTime())
-#define CE_PHYSICS_DELTA_TIME (Core::Engine::GetDeltaTime() * (60 / CE_PHYSICS_FPS))
+#define CE_PHYSICS_DELTA_TIME (Core::Engine::GetDeltaTime() / (CE_PHYSICS_FPS / 60))

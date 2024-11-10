@@ -1,4 +1,5 @@
 #include "RigidBody.h"
+#include "Core/Logger.h"
 #include "Physics/PhysCore.h"
 #include "Scene/Actor.h"
 #include "Math/Math.h"
@@ -104,18 +105,22 @@ namespace Core
 
     void RigidBody::_CalculateData()
     {
-        // TODO: Make sure that the rotation is correct
-        orientation.Set(0, 0, 0, 1);
-        orientation.RotateBy(owner->GetTransform()->Rotation);
+        Vector3 rotationRadians = owner->GetTransform()->Rotation * CE_DEG_TO_RAD;
+        orientation.SetFromEuler(rotationRadians);
+        orientation.Normalize();
 
         _CalculateTransformMatrix(transformMatrix, owner->GetTransform()->Position, orientation);
         _TransformInertiaTensor(inverseInertiaTensorWorld, orientation, inverseInertiaTensor, transformMatrix);
+
+        collider.TransformMatrix = &transformMatrix;
     }
 
     RigidBody::RigidBody()
     {
         owner = nullptr;
         config = RigidBodyConfiguration();
+
+        collider.Size = {1, 1, 1};
     }
 
     RigidBody::~RigidBody()
@@ -133,14 +138,12 @@ namespace Core
         if (!owner)
             return;
 
-        _CalculateData();
-
         auto transform = owner->GetTransform();
 
         // transform happens here
         {
-            transform->Position += velocity * CE_PHYSICS_DELTA_TIME;
-            transform->Rotation += torque * CE_PHYSICS_DELTA_TIME;
+            transform->Position += velocity * CE_DELTA_TIME;
+            transform->Rotation += torque * CE_DELTA_TIME;
         }
 
         Vector3 resultingAcceleration{0, 0, 0};
@@ -148,11 +151,12 @@ namespace Core
 
         // Modify with accelerations
         velocity += resultingAcceleration;
-        velocity *= Math::Pow(config.LinearDamp, CE_PHYSICS_DELTA_TIME);
+        velocity *= Math::Pow(config.LinearDamp, CE_DELTA_TIME);
 
         torque += torqueAccum / config.Mass;
-        torque *= Math::Pow(config.LinearDamp, CE_PHYSICS_DELTA_TIME);
+        torque *= Math::Pow(config.AngularDamp, CE_DELTA_TIME);
 
+        _CalculateData();
         _ClearForces();
     }
 
@@ -172,7 +176,7 @@ namespace Core
 
     void RigidBody::AddTorque(const Vector3 &force)
     {
-        torqueAccum += force * CE_DEG_TO_RAD;
+        torqueAccum += force;
     }
 
     void RigidBody::SetInertiaTensor(const PhysMatrix3 &matrix)

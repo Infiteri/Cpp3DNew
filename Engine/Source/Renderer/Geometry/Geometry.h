@@ -20,7 +20,8 @@ namespace Core
         enum Types
         {
             None,
-            Box
+            Box,
+            Sphere
         };
 
     protected:
@@ -48,5 +49,16 @@ namespace Core
 
         BoxGeometry(float width = 1, float height = 1, float depth = 1);
         ~BoxGeometry();
+    };
+
+    class CE_API SphereGeometry : public Geometry
+    {
+    public:
+        float Radius = 1;
+        int LatitudeSegments = 16;
+        int LongitudeSegments = 16;
+
+        SphereGeometry(float radius = 1, int latitudeSegments = 16, int longitudeSegments = 16);
+        ~SphereGeometry();
     };
 }

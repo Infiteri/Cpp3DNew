@@ -48,6 +48,7 @@ namespace Core
         CE_SERIALIZE_COMP_CALLBACK(Camera);
         CE_SERIALIZE_COMP_CALLBACK(PointLight);
         CE_SERIALIZE_COMP_CALLBACK(RigidBody);
+        CE_SERIALIZE_COMP_CALLBACK(Tag);
     }
 
     void ComponentSerializer::Deserialize(YAML::Node actorNode)
@@ -60,6 +61,7 @@ namespace Core
         CE_DESERIALIZE_COMPONENT("CameraComponent", DeserializeCameraComponent);
         CE_DESERIALIZE_COMPONENT("PointLightComponent", DeserializePointLightComponent);
         CE_DESERIALIZE_COMPONENT("RigidBodyComponent", DeserializeRigidBodyComponent);
+        CE_DESERIALIZE_COMPONENT("TagComponent", DeserializeTagComponent);
     }
 
     void ComponentSerializer::FillComponentCountData()
@@ -71,6 +73,7 @@ namespace Core
         CE_COMP_SIZE(Camera);
         CE_COMP_SIZE(PointLight);
         CE_COMP_SIZE(RigidBody);
+        CE_COMP_SIZE(Tag);
     }
 
     void ComponentSerializer::SerializeComponentCount(YAML::Emitter &out)
@@ -84,6 +87,7 @@ namespace Core
         CE_SERIALIZE_FIELD("CameraComponentCount", count.CameraCount);
         CE_SERIALIZE_FIELD("PointLightComponentCount", count.PointLightCount);
         CE_SERIALIZE_FIELD("RigidBodyComponentCount", count.RigidBodyCount);
+        CE_SERIALIZE_FIELD("TagComponentCount", count.TagCount);
     }
 
     void ComponentSerializer::SerializeMeshComponent(MeshComponent *c, int index, YAML::Emitter &out)
@@ -118,11 +122,22 @@ namespace Core
             switch (geo->GetType())
             {
             case Geometry::Box:
+            {
                 auto g = (BoxGeometry *)geo;
                 CE_SERIALIZE_FIELD("Width", g->Width);
                 CE_SERIALIZE_FIELD("Height", g->Height);
                 CE_SERIALIZE_FIELD("Depth", g->Depth);
-                break;
+            }
+            break;
+
+            case Geometry::Sphere:
+            {
+                auto g = (SphereGeometry *)geo;
+                CE_SERIALIZE_FIELD("Radius", g->Radius);
+                CE_SERIALIZE_FIELD("LongitudeSegments", g->LongitudeSegments);
+                CE_SERIALIZE_FIELD("LatitudeSegments", g->LatitudeSegments);
+            }
+            break;
             }
         }
 
@@ -165,6 +180,10 @@ namespace Core
             {
             case Geometry::Box:
                 c->mesh->SetGeometry(new BoxGeometry(mc["Width"].as<float>(), mc["Height"].as<float>(), mc["Depth"].as<float>()));
+                break;
+
+            case Geometry::Sphere:
+                c->mesh->SetGeometry(new SphereGeometry(mc["Radius"].as<float>(), mc["LongitudeSegments"].as<float>(), mc["LatitudeSegments"].as<float>()));
                 break;
 
             default:
@@ -273,5 +292,19 @@ namespace Core
         c->Config.LinearDamp = node["LinearDamp"].as<float>();
         c->Config.AngularDamp = node["AngularDamp"].as<float>();
         c->Config.Mass = node["Mass"].as<float>();
+    }
+
+    void ComponentSerializer::SerializeTagComponent(TagComponent *c, int index, YAML::Emitter &out)
+    {
+        out << YAML::Key << "TagComponent " + std::to_string(index);
+        out << YAML::BeginMap;
+        CE_SERIALIZE_FIELD("Tag", c->Tag.c_str());
+        out << YAML::EndMap;
+    }
+
+    void ComponentSerializer::DeserializeTagComponent(YAML::Node node)
+    {
+        auto c = a->AddComponent<TagComponent>();
+        c->Tag = node["Tag"].as<std::string>();
     }
 }

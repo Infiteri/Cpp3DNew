@@ -23,7 +23,6 @@
 namespace Core
 {
     static Engine::State state;
-    Platform::DynamicLibrary lib;
 
     void Engine::PreInit()
     {
@@ -50,15 +49,6 @@ namespace Core
         ImGuiLayer::Init(); // NOTE: Requires window
 
         LayerStack::Init();
-
-        lib = Platform::CreateLibrary("GameCode.dll");
-        typedef void (*TestPFN)();
-
-        if (Platform::LoadFunction(&lib, "Test"))
-        {
-            auto t = (TestPFN)(lib.Functions["Test"]->PFN);
-            t();
-        }
     }
 
     void Engine::Init()

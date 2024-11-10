@@ -57,7 +57,6 @@ namespace Core
         geometry = new Geometry();
 
         MakeMaterialDefault();
-
         _BufferArrayWithGeometry();
     }
 

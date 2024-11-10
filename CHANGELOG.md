@@ -190,3 +190,12 @@
 - Editor improvements
 - Editor Settings
 - Other improvements
+
+# 0.2.0 - 10.11.2024
+
+- Changed rotation to being in degrees, necessary radian casting is done in the right places.
+- Started Physics Collision
+- Somewhat working AABB collision detection
+- Added Tag components and all the specifics
+- Fixed camera mouse movement when the window is not fullscreen
+- Added sphere geometry

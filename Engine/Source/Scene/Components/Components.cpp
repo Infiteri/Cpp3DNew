@@ -47,9 +47,18 @@ namespace Core
             break;
 
         case Geometry::Box:
+        {
             auto *cast = geometry->As<BoxGeometry>();
             mesh->SetGeometry(new BoxGeometry(cast->Width, cast->Height, cast->Depth));
-            break;
+        }
+        break;
+
+        case Geometry::Sphere:
+        {
+            auto *cast = geometry->As<SphereGeometry>();
+            mesh->SetGeometry(new SphereGeometry(cast->Radius, cast->LongitudeSegments, cast->LatitudeSegments));
+        }
+        break;
         }
     }
 
@@ -159,5 +168,19 @@ namespace Core
     void RigidBodyComponent::From(RigidBodyComponent *c)
     {
         Config.From(&c->Config);
+    }
+
+    TagComponent::TagComponent()
+    {
+        Tag = "";
+    }
+
+    TagComponent::~TagComponent()
+    {
+    }
+
+    void TagComponent::From(TagComponent *c)
+    {
+        Tag = c->Tag;
     }
 }

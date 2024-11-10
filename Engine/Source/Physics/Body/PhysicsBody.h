@@ -22,5 +22,8 @@ namespace Core
         virtual void Update();
 
         Vector3 &GetPosition();
+
+        template <typename T>
+        T *As() { return (T *)this; };
     };
 }
