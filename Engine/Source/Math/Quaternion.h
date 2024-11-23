@@ -18,6 +18,14 @@ namespace Core
                 float k;
             };
 
+            struct
+            {
+                float w;
+                float x;
+                float y;
+                float z;
+            };
+
             float data[4];
         };
 
@@ -33,7 +41,8 @@ namespace Core
         void Normalize();
         Quaternion Normalized();
 
-        void SetFromEuler(const Vector3 &euler);
+        void SetFromEuler(const Vector3 &euler, bool convertToRadians = true);
+        Vector3 GetEulerAngles(bool convertToDegree = true);
 
         void operator*=(const Quaternion &multiplier)
         {
@@ -54,6 +63,19 @@ namespace Core
                          vec.x,
                          vec.y,
                          vec.z);
+            q *= *this;
+            r += q.r * 0.5f;
+            i += q.i * 0.5f;
+            j += q.j * 0.5f;
+            k += q.k * 0.5f;
+        }
+
+        void AddScaledVector(const Vector3 &vector, float scale)
+        {
+            Quaternion q(0,
+                         vector.x * scale,
+                         vector.y * scale,
+                         vector.z * scale);
             q *= *this;
             r += q.r * 0.5f;
             i += q.i * 0.5f;

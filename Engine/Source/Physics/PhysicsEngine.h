@@ -3,6 +3,8 @@
 #include "Base.h"
 #include "Body/RigidBody.h"
 #include "Objects/Spring.h"
+#include "Collision/Contact.h"
+#include "Collision/ContactResolver.h"
 
 #include <vector>
 
@@ -16,7 +18,7 @@ namespace Core
 
         struct NumericValues
         {
-            float MathFPS = 240.0f;
+            float MathFPS = 600.0f;
         };
 
         struct PhysicsEngineState
@@ -24,6 +26,8 @@ namespace Core
             Spring TempSpring;
             NumericValues Numeric;
             std::vector<PhysicsBody *> Bodies;
+
+            ContactResolver Resolver;
         };
 
         static void Init();
@@ -35,6 +39,9 @@ namespace Core
         static void StopRuntime();
 
         static void DestroyBodies();
+
+        static void CheckCollision(PhysicsBody *a, PhysicsBody *b);
+        static void ResolveContacts();
 
         static NumericValues &GetNumericValueSet();
     };

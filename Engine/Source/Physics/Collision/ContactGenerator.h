@@ -6,12 +6,12 @@
 
 namespace Core
 {
-    class ContactGenerator
+    class CollisionDetector
     {
     public:
-        ContactGenerator();
-        ~ContactGenerator();
+        CollisionDetector() {};
+        ~CollisionDetector() {};
 
-        bool BoxAndBox(AABBCollider *a1, AABBCollider *a2);
+        bool BoxAndBox(AABBCollider *a1, AABBCollider *a2, Contact *contact);
     };
 }

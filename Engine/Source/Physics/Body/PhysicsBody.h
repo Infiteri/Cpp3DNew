@@ -2,6 +2,7 @@
 
 #include "Base.h"
 #include "Math/Vectors.h"
+#include "Physics/Collider/Collider.h"
 
 namespace Core
 {
@@ -10,6 +11,8 @@ namespace Core
     {
     protected:
         Actor *owner;
+
+        AABBCollider collider;
 
         friend class Scene;
 
@@ -22,6 +25,9 @@ namespace Core
         virtual void Update();
 
         Vector3 &GetPosition();
+        Vector3 GetRotation(bool asRadians = false);
+
+        inline Collider *GetCollider() { return &collider; };
 
         template <typename T>
         T *As() { return (T *)this; };

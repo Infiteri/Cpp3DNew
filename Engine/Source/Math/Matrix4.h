@@ -50,9 +50,11 @@ namespace Core
                 vector.x * data[0] +
                     vector.y * data[1] +
                     vector.z * data[2] + data[3],
+
                 vector.x * data[4] +
                     vector.y * data[5] +
                     vector.z * data[6] + data[7],
+
                 vector.x * data[8] +
                     vector.y * data[9] +
                     vector.z * data[10] + data[11]);
@@ -61,30 +63,21 @@ namespace Core
         PhysMatrix4x3 operator*(const PhysMatrix4x3 &o) const
         {
             PhysMatrix4x3 result;
-            result.data[0] = (o.data[0] * data[0]) + (o.data[4] * data[1]) +
-                             (o.data[8] * data[2]);
-            result.data[4] = (o.data[0] * data[4]) + (o.data[4] * data[5]) +
-                             (o.data[8] * data[6]);
-            result.data[8] = (o.data[0] * data[8]) + (o.data[4] * data[9]) +
-                             (o.data[8] * data[10]);
-            result.data[1] = (o.data[1] * data[0]) + (o.data[5] * data[1]) +
-                             (o.data[9] * data[2]);
-            result.data[5] = (o.data[1] * data[4]) + (o.data[5] * data[5]) +
-                             (o.data[9] * data[6]);
-            result.data[9] = (o.data[1] * data[8]) + (o.data[5] * data[9]) +
-                             (o.data[9] * data[10]);
-            result.data[2] = (o.data[2] * data[0]) + (o.data[6] * data[1]) +
-                             (o.data[10] * data[2]);
-            result.data[6] = (o.data[2] * data[4]) + (o.data[6] * data[5]) +
-                             (o.data[10] * data[6]);
-            result.data[10] = (o.data[2] * data[8]) + (o.data[6] * data[9]) +
-                              (o.data[10] * data[10]);
-            result.data[3] = (o.data[3] * data[0]) + (o.data[7] * data[1]) +
-                             (o.data[11] * data[2]) + data[3];
-            result.data[7] = (o.data[3] * data[4]) + (o.data[7] * data[5]) +
-                             (o.data[11] * data[6]) + data[7];
-            result.data[11] = (o.data[3] * data[8]) + (o.data[7] * data[9]) +
-                              (o.data[11] * data[10]) + data[11];
+            result.data[0] = (o.data[0] * data[0]) + (o.data[4] * data[1]) + (o.data[8] * data[2]);
+            result.data[4] = (o.data[0] * data[4]) + (o.data[4] * data[5]) + (o.data[8] * data[6]);
+            result.data[8] = (o.data[0] * data[8]) + (o.data[4] * data[9]) + (o.data[8] * data[10]);
+
+            result.data[1] = (o.data[1] * data[0]) + (o.data[5] * data[1]) + (o.data[9] * data[2]);
+            result.data[5] = (o.data[1] * data[4]) + (o.data[5] * data[5]) + (o.data[9] * data[6]);
+            result.data[9] = (o.data[1] * data[8]) + (o.data[5] * data[9]) + (o.data[9] * data[10]);
+
+            result.data[2] = (o.data[2] * data[0]) + (o.data[6] * data[1]) + (o.data[10] * data[2]);
+            result.data[6] = (o.data[2] * data[4]) + (o.data[6] * data[5]) + (o.data[10] * data[6]);
+            result.data[10] = (o.data[2] * data[8]) + (o.data[6] * data[9]) + (o.data[10] * data[10]);
+
+            result.data[3] = (o.data[3] * data[0]) + (o.data[7] * data[1]) + (o.data[11] * data[2]) + data[3];
+            result.data[7] = (o.data[3] * data[4]) + (o.data[7] * data[5]) + (o.data[11] * data[6]) + data[7];
+            result.data[11] = (o.data[3] * data[8]) + (o.data[7] * data[9]) + (o.data[11] * data[10]) + data[11];
             return result;
         }
 
@@ -125,11 +118,22 @@ namespace Core
         void SetTranspose(const PhysMatrix3 &m);
         void Transpose();
 
+        void SetComponents(const Vector3 &compOne, const Vector3 &compTwo,
+                           const Vector3 &compThree);
+
         operator const float *() { return data; };
         float &operator[](int index)
         {
             return data[index];
         };
+
+        Vector3 operator*(const Vector3 &vector) const
+        {
+            return Vector3(
+                vector.x * data[0] + vector.y * data[1] + vector.z * data[2],
+                vector.x * data[3] + vector.y * data[4] + vector.z * data[5],
+                vector.x * data[6] + vector.y * data[7] + vector.z * data[8]);
+        }
 
         PhysMatrix3 operator*(const PhysMatrix3 &o) const
         {
@@ -146,8 +150,27 @@ namespace Core
                                data[6] * o.data[2] + data[7] * o.data[5] + data[8] * o.data[8]);
         }
 
+        Vector3 TransformTranspose(const Vector3 &vector) const
+        {
+            return Vector3(
+                vector.x * data[0] + vector.y * data[3] + vector.z * data[6],
+                vector.x * data[1] + vector.y * data[4] + vector.z * data[7],
+                vector.x * data[2] + vector.y * data[5] + vector.z * data[8]);
+        }
+
+        Vector3 Transform(const Vector3 &vector) const
+        {
+            return (*this) * vector;
+        }
+
         void SetInverse(const PhysMatrix3 &m);
         PhysMatrix3 Inverted();
+        void Invert();
+
+        void SetInertiaTensorCoeffs(float ix, float iy, float iz,
+                                    float ixy = 0, float ixz = 0, float iyz = 0);
+
+        void SetBlockInertiaTensor(const Vector3 &sizes, float mass);
     };
 
     /// @brief Brief structure of the matrix

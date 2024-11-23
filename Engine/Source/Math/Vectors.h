@@ -75,8 +75,11 @@ namespace Core
         float z;
 
         Vector3();
+        Vector3(const Vector3 &v);
         Vector3(float x, float y, float z);
         ~Vector3();
+
+        void operator=(const Vector3 &v) { Set(v); };
 
         void Set(float x, float y, float z);
         void Set(Vector3 *v);
@@ -147,6 +150,11 @@ namespace Core
             z /= scalar;
         }
 
+        Vector3 operator-() const
+        {
+            return {-x, -y, -z};
+        }
+
         Vector3 operator+(const Vector3 &o) const
         {
             return {x + o.x, y + o.y, z + o.z};
@@ -167,6 +175,16 @@ namespace Core
             return {x / o.x, y / o.y, z / o.z};
         }
 
+        Vector3 operator-(float scalar) const
+        {
+            return {x - scalar, y - scalar, z - scalar};
+        }
+
+        Vector3 operator+(float scalar) const
+        {
+            return {x + scalar, y + scalar, z + scalar};
+        }
+
         Vector3 operator*(float scalar) const
         {
             return {x * scalar, y * scalar, z * scalar};
@@ -178,6 +196,13 @@ namespace Core
         }
 
         Vector3 operator%(const Vector3 &vector) const
+        {
+            return Vector3(y * vector.z - z * vector.y,
+                           z * vector.x - x * vector.z,
+                           x * vector.y - y * vector.x);
+        }
+
+        Vector3 VectorProduct(const Vector3 &vector) const
         {
             return Vector3(y * vector.z - z * vector.y,
                            z * vector.x - x * vector.z,
@@ -201,6 +226,11 @@ namespace Core
 
         bool NotZero() const;
 
+        float SquaredMagnitude() const
+        {
+            return x * x + y * y + z * z;
+        }
+
         float Magnitude() const
         {
             return sqrtf(x * x + y * y + z * z);
@@ -208,13 +238,9 @@ namespace Core
 
         void Normalize()
         {
-            float length = sqrtf(x * x + y * y + z * z);
+            float length = Magnitude();
             if (length > 0.0f)
-            {
-                x /= length;
-                y /= length;
-                z /= length;
-            }
+                (*this) *= 1.0f / length;
         }
     };
 

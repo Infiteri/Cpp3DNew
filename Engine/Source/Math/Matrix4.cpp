@@ -194,13 +194,48 @@ namespace Core
         PhysMatrix3 result;
         result.SetInverse(*this);
         return result;
-        return result;
+    }
+
+    void PhysMatrix3::Invert()
+    {
+        From(Inverted());
+    }
+
+    void PhysMatrix3::SetInertiaTensorCoeffs(float ix, float iy, float iz, float ixy, float ixz, float iyz)
+    {
+        data[0] = ix;
+        data[1] = data[3] = -ixy;
+        data[2] = data[6] = -ixz;
+        data[4] = iy;
+        data[5] = data[7] = -iyz;
+        data[8] = iz;
+    }
+
+    void PhysMatrix3::SetBlockInertiaTensor(const Vector3 &sizes, float mass)
+    {
+        Vector3 squares = (sizes * sizes);
+        SetInertiaTensorCoeffs(0.3f * mass * (squares.y + squares.z),
+                               0.3f * mass * (squares.x + squares.z),
+                               0.3f * mass * (squares.x + squares.y));
     }
 
     void PhysMatrix3::From(float *data)
     {
         for (int i = 0; i < 9; i++)
             data[i] = data[i];
+    }
+
+    void PhysMatrix3::SetComponents(const Vector3 &compOne, const Vector3 &compTwo, const Vector3 &compThree)
+    {
+        data[0] = compOne.x;
+        data[1] = compTwo.x;
+        data[2] = compThree.x;
+        data[3] = compOne.y;
+        data[4] = compTwo.y;
+        data[5] = compThree.y;
+        data[6] = compOne.z;
+        data[7] = compTwo.z;
+        data[8] = compThree.z;
     }
 
     Matrix4::Matrix4()

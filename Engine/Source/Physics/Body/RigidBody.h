@@ -4,7 +4,6 @@
 #include "Math/Vectors.h"
 #include "Math/Matrix4.h"
 #include "Math/Quaternion.h"
-#include "Physics/Collider/Collider.h"
 
 namespace Core
 {
@@ -24,9 +23,12 @@ namespace Core
         RigidBodyConfiguration config;
 
         Vector3 velocity;
+        Vector3 forceAccum;
+
+        /// @brief MUST BE IN RADIANS
         Vector3 torque;
 
-        Vector3 forceAccum;
+        /// @brief MUST BE IN RADIANS
         Vector3 torqueAccum;
 
         Quaternion orientation;
@@ -34,12 +36,16 @@ namespace Core
         PhysMatrix3 inverseInertiaTensor;
         PhysMatrix3 inverseInertiaTensorWorld;
 
-        AABBCollider collider;
+        Vector3 lastFrameAcceleration;
 
         void _ClearForces();
         void _CalculateData();
 
         friend class PhysicsEngine;
+        friend class Contact;
+
+        void _AddVelocity(const Vector3 &v);
+        void _AddRotation(const Vector3 &v);
 
     public:
         RigidBody();
@@ -51,7 +57,7 @@ namespace Core
 
         void Update();
 
-        inline PhysMatrix4x3 *GetTransformMatrix() { return &transformMatrix; };
+        inline PhysMatrix4x3 &GetTransformMatrix() { return transformMatrix; };
 
         /// @brief Adds a velocity force to the rigid body.
         /// @param force The force to add.
@@ -64,5 +70,25 @@ namespace Core
         void AddTorque(const Vector3 &force);
 
         void SetInertiaTensor(const PhysMatrix3 &matrix);
+        inline PhysMatrix3 GetInverseInertiaTensorWorld() { return inverseInertiaTensorWorld; };
+        inline PhysMatrix3 GetInverseInertiaTensor() { return inverseInertiaTensor; };
+
+        /// @brief Will set the orientation and will change the body rotation to the respected values/
+        /// @param quat The quaternion.
+        void SetOrientation(const Quaternion &quat);
+
+        /// @brief TODO NEEDED?
+        /// @return
+        inline Vector3 &GetVelocity() { return velocity; };
+
+        inline Quaternion &GetOrientation() { return orientation; };
+
+        inline Vector3 GetLastFrameAcceleration() { return lastFrameAcceleration; };
+
+        inline float GetMass() { return config.Mass; };
+
+        inline float GetInverseMass() { return 1.0f / config.Mass; };
+
+        inline Vector3 GetTorque() { return torque; };
     };
 }

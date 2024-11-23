@@ -68,7 +68,7 @@ namespace Core
         inline std::string GetName() { return name; };
 
         inline State GetState() { return state; };
-        inline Scene* GetScene() { return scene; };
+        inline Scene *GetScene() { return scene; };
 
         inline UUID GetUUID() { return UUID(id.Get()); };
 

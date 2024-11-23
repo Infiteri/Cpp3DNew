@@ -19,6 +19,7 @@
 #include "Math/Matrix4.h"
 #include "Math/Transform.h"
 #include "Math/Vectors.h"
+#include "Math/Quaternion.h"
 
 #include "Platform/Platform.h"
 

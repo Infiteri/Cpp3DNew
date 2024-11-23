@@ -1,4 +1,5 @@
 #include "Vectors.h"
+#include "Core/Logger.h"
 
 namespace Core
 {
@@ -36,6 +37,11 @@ namespace Core
     Vector3::Vector3()
     {
         Set(0, 0, 0);
+    }
+
+    Vector3::Vector3(const Vector3 &v)
+    {
+        Set(v);
     }
 
     Vector3::Vector3(float x, float y, float z)

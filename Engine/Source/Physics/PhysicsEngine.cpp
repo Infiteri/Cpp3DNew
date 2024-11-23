@@ -21,6 +21,7 @@ namespace Core
         auto b = new RigidBody();
         b->UseConfiguration(config);
         state.Bodies.push_back(b);
+        b->Update();
         return b;
     }
 
@@ -31,24 +32,16 @@ namespace Core
             auto body = state.Bodies[i];
             body->Update();
 
-            for (int j = 0; j < state.Bodies.size(); j++)
+            for (int j = i + 1; j < state.Bodies.size(); j++)
             {
-                if (i == j)
-                    continue;
-
                 auto body2 = state.Bodies[j];
+                body2->As<RigidBody>()->_CalculateData();
 
-                ContactGenerator gen;
-
-                auto col1 = &body->As<RigidBody>()->collider;
-                auto col2 = &body2->As<RigidBody>()->collider;
-
-                bool res = gen.BoxAndBox(col1, col2);
-
-                if (res)
-                    CE_TRACE("YESSSSSSSSSSSSSS");
+                CheckCollision(body2, body);
             }
         }
+
+        ResolveContacts();
     }
 
     void PhysicsEngine::StopRuntime()
@@ -62,6 +55,41 @@ namespace Core
             delete body;
 
         state.Bodies.clear();
+    }
+
+    void PhysicsEngine::CheckCollision(PhysicsBody *a, PhysicsBody *b)
+    {
+        auto aCollider = a->GetCollider();
+        auto bCollider = b->GetCollider();
+
+        switch (aCollider->GetType())
+        {
+        case Collider::Box:
+        {
+            switch (bCollider->GetType())
+            {
+            case Collider::Box:
+            {
+                CollisionDetector detector;
+                Contact c;
+                if (detector.BoxAndBox(aCollider->As<AABBCollider>(), bCollider->As<AABBCollider>(), &c))
+                    state.Resolver.Contacts.push_back(c);
+            }
+            break;
+            }
+        }
+        break;
+        }
+    }
+
+    void PhysicsEngine::ResolveContacts()
+    {
+        if (state.Resolver.Contacts.size() == 0)
+            return;
+
+        state.Resolver.Resolve();
+
+        state.Resolver.Contacts.clear();
     }
 
     PhysicsEngine::NumericValues &PhysicsEngine::GetNumericValueSet()

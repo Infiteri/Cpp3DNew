@@ -113,8 +113,8 @@ namespace Core
             actor->Update();
         }
 
-        ScriptEngine::UpdateRuntime();
         PhysicsEngine::UpdateRuntime();
+        ScriptEngine::UpdateRuntime();
     }
 
     void Scene::Stop()

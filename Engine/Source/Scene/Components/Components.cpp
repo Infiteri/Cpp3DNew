@@ -3,6 +3,8 @@
 #include "Core/Logger.h"
 #include "Core/Engine.h"
 
+#include "Physics/Body/RigidBody.h"
+
 namespace Core
 {
     MeshComponent::MeshComponent()

@@ -52,7 +52,7 @@ namespace Core
             return;
         }
 
-        d = 1.0 / Math::Sqrt(d);
+        d = 1.0f / Math::Sqrt(d);
         r *= d;
         i *= d;
         j *= d;
@@ -66,19 +66,54 @@ namespace Core
         return q;
     }
 
-    void Quaternion::SetFromEuler(const Vector3 &euler)
+    void Quaternion::SetFromEuler(const Vector3 &euler, bool convertToRadians)
     {
-        float cy = cos(euler.z * 0.5f);
-        float sy = sin(euler.z * 0.5f);
-        float cp = cos(euler.y * 0.5f);
-        float sp = sin(euler.y * 0.5f);
-        float cr = cos(euler.x * 0.5f);
-        float sr = sin(euler.x * 0.5f);
+        float halfX = euler.x * (convertToRadians ? CE_DEG_TO_RAD : 1.0f) * 0.5f;
+        float halfY = euler.y * (convertToRadians ? CE_DEG_TO_RAD : 1.0f) * 0.5f;
+        float halfZ = euler.z * (convertToRadians ? CE_DEG_TO_RAD : 1.0f) * 0.5f;
 
-        r = cr * cp * cy + sr * sp * sy;
-        i = sr * cp * cy - cr * sp * sy;
-        j = cr * sp * cy + sr * cp * sy;
-        k = cr * cp * sy - sr * sp * cy;
+        float cr = cos(halfX);
+        float sr = sin(halfX);
+        float cp = cos(halfY);
+        float sp = sin(halfY);
+        float cy = cos(halfZ);
+        float sy = sin(halfZ);
+
+        w = cr * cp * cy + sr * sp * sy;
+        x = sr * cp * cy - cr * sp * sy;
+        y = cr * sp * cy + sr * cp * sy;
+        z = cr * cp * sy - sr * sp * cy;
+    }
+
+    Vector3 Quaternion::GetEulerAngles(bool convertToDegree)
+    {
+        Vector3 angles;
+
+        float norm = sqrt(r * r + i * i + j * j + k * k);
+        float qx = i / norm;
+        float qy = j / norm;
+        float qz = k / norm;
+        float qw = r / norm;
+
+        // Roll (x-axis rotation)
+        float sinr_cosp = 2 * (qw * qx + qy * qz);
+        float cosr_cosp = 1 - 2 * (qx * qx + qy * qy);
+        angles.x = atan2(sinr_cosp, cosr_cosp);
+
+        float sinp = 2 * (qw * qy - qz * qx);
+        if (abs(sinp) >= 1)
+            angles.y = copysign(CE_PI / 2, sinp); // Clamp to ±90 degrees
+        else
+            angles.y = asin(sinp);
+
+        // Yaw (z-axis rotation)
+        float siny_cosp = 2 * (qw * qz + qx * qy);
+        float cosy_cosp = 1 - 2 * (qy * qy + qz * qz);
+        angles.z = atan2(siny_cosp, cosy_cosp);
+
+        angles *= convertToDegree ? CE_RAD_TO_DEG : 1.0f;
+
+        return angles;
     }
 
 }

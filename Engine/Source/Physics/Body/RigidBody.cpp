@@ -6,6 +6,31 @@
 
 namespace Core
 {
+    static inline PhysMatrix3 _ComposeInertiaMatrix(RigidBody *body, Collider *collider)
+    {
+        PhysMatrix3 m;
+
+        switch (collider->GetType())
+        {
+        case Collider::Box:
+        {
+            auto b = collider->As<AABBCollider>();
+            float mass = b->Size.x * b->Size.y * b->Size.z * body->GetMass();
+            m.SetBlockInertiaTensor(b->Size, mass);
+        }
+        break;
+
+        case Collider::Base:
+            break;
+
+        default:
+            CE_CORE_WARN("Unknown collider type");
+            break;
+        }
+
+        return m;
+    }
+
     static inline void _TransformInertiaTensor(PhysMatrix3 &iitWorld,
                                                const Quaternion &q,
                                                const PhysMatrix3 &iitBody,
@@ -105,14 +130,24 @@ namespace Core
 
     void RigidBody::_CalculateData()
     {
-        Vector3 rotationRadians = owner->GetTransform()->Rotation * CE_DEG_TO_RAD;
-        orientation.SetFromEuler(rotationRadians);
         orientation.Normalize();
 
         _CalculateTransformMatrix(transformMatrix, owner->GetTransform()->Position, orientation);
         _TransformInertiaTensor(inverseInertiaTensorWorld, orientation, inverseInertiaTensor, transformMatrix);
 
         collider.TransformMatrix = &transformMatrix;
+        collider.Owner = this;
+    }
+
+    void RigidBody::_AddVelocity(const Vector3 &v)
+    {
+        velocity += v;
+    }
+
+    void RigidBody::_AddRotation(const Vector3 &v)
+    {
+        // TODO: this internal function call should only take the vector in radians, make sure all function calls of this do that
+        torque += v;
     }
 
     RigidBody::RigidBody()
@@ -121,6 +156,9 @@ namespace Core
         config = RigidBodyConfiguration();
 
         collider.Size = {1, 1, 1};
+
+        inverseInertiaTensor = _ComposeInertiaMatrix(this, &collider);
+        inverseInertiaTensor.Invert();
     }
 
     RigidBody::~RigidBody()
@@ -140,21 +178,24 @@ namespace Core
 
         auto transform = owner->GetTransform();
 
-        // transform happens here
-        {
-            transform->Position += velocity * CE_DELTA_TIME;
-            transform->Rotation += torque * CE_DELTA_TIME;
-        }
-
-        Vector3 resultingAcceleration{0, 0, 0};
-        resultingAcceleration += forceAccum / config.Mass;
+        lastFrameAcceleration = {0, 0, 0};
+        lastFrameAcceleration += forceAccum / config.Mass;
 
         // Modify with accelerations
-        velocity += resultingAcceleration;
+        velocity += lastFrameAcceleration;
         velocity *= Math::Pow(config.LinearDamp, CE_DELTA_TIME);
 
-        torque += torqueAccum / config.Mass;
+        Vector3 angularAcceleration = inverseInertiaTensorWorld.Transform(torqueAccum);
+        torque += angularAcceleration;
         torque *= Math::Pow(config.AngularDamp, CE_DELTA_TIME);
+
+        orientation.AddScaledVector(torque, CE_PHYSICS_DELTA_TIME);
+
+        // transform happens here
+        {
+            transform->Position += velocity * CE_PHYSICS_DELTA_TIME;
+            transform->Rotation += torque * CE_RAD_TO_DEG * CE_PHYSICS_DELTA_TIME;
+        }
 
         _CalculateData();
         _ClearForces();
@@ -163,6 +204,11 @@ namespace Core
     void RigidBody::AddForce(const Vector3 &force)
     {
         forceAccum += force;
+    }
+
+    void RigidBody::AddTorque(const Vector3 &force)
+    {
+        torqueAccum += force * CE_DEG_TO_RAD;
     }
 
     void RigidBody::AddForceAtPoint(const Vector3 &force, const Vector3 &point)
@@ -174,14 +220,15 @@ namespace Core
         torqueAccum += pt % force;
     }
 
-    void RigidBody::AddTorque(const Vector3 &force)
-    {
-        torqueAccum += force;
-    }
-
     void RigidBody::SetInertiaTensor(const PhysMatrix3 &matrix)
     {
         inverseInertiaTensor.SetInverse(matrix);
+    }
+
+    void RigidBody::SetOrientation(const Quaternion &quat)
+    {
+        orientation.Set(quat);
+        orientation.Normalize();
     }
 
     void RigidBodyConfiguration::From(RigidBodyConfiguration *c)

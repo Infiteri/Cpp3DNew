@@ -199,3 +199,9 @@
 - Added Tag components and all the specifics
 - Fixed camera mouse movement when the window is not fullscreen
 - Added sphere geometry
+
+# 0.2.1 - 23.11.2024
+
+- Started physics contact
+- Added Contact collision response
+- Got mad

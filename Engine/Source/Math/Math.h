@@ -2,7 +2,7 @@
 
 #include "Base.h"
 
-#define CE_PI 3.14f
+#define CE_PI 3.14159265358979323846264338327950288f
 #define CE_DEG_TO_RAD (CE_PI / 180)
 #define CE_RAD_TO_DEG (180 / CE_PI)
 

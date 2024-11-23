@@ -7,6 +7,7 @@
 
 namespace Core
 {
+    class PhysicsBody;
     class Collider
     {
     public:
@@ -20,6 +21,7 @@ namespace Core
         Type type = Base;
 
     public:
+        PhysicsBody *Owner;
         PhysMatrix4x3 *TransformMatrix = nullptr;
 
         Collider() {};
