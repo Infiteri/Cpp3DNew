@@ -24,7 +24,7 @@ namespace Core
         PhysicsBody *Owner;
         PhysMatrix4x3 *TransformMatrix = nullptr;
 
-        Collider() {};
+        Collider() { type = Base; };
         ~Collider() {};
 
         inline Type GetType() { return type; };

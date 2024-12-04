@@ -62,7 +62,11 @@ namespace Core
         Actor();
         ~Actor();
 
-        static Actor *From(Actor *a);
+        /// @brief Will return a new copy of an actor, all of its components are also copied respectively.
+        /// @param a The actor co copy.
+        /// @param copyUUID Wether or not to use the same UUID for the new actor. True by default.
+        /// @return A pointer to a new actor.
+        static Actor *From(Actor *a, bool copyUUID = true);
 
         void SetName(const std::string &name) { this->name = name; };
         inline std::string GetName() { return name; };

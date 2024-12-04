@@ -28,7 +28,7 @@ namespace Core
         /// @brief Will create a new scene. Name must be unique.
         /// @param name The name of the scene.
         /// @return Pointer to a newly created scene.
-        static Scene *CreateScene(const std::string &name);
+        static Scene *CreateScene(const std::string &name, bool loadFromFile = true);
         static Scene *CreateScene(const std::string &name, const std::string &filepath);
 
         /// @brief Will activate a scene with this name. ActiveScene will be set to nullptr if there is no scene with the given name.

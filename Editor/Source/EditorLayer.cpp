@@ -2,6 +2,9 @@
 #include "EditorUtils.h"
 #include "Panel/SceneHierarchyPanel.h"
 #include "Core/Utils/StringUtils.h"
+#include "Project/Project.h"
+#include "EditorUtils.h"
+#include "Panel/ContentBrowserPanel.h"
 
 #define CE_DEFINE_COLOR_EDITABLE(name, color) state.Settings.Colors.push_back({name, color})
 
@@ -9,8 +12,6 @@
 
 namespace Core
 {
-    static Scene *scene;
-
     void EditorLayer::OnAttach()
     {
         state.Camera.camera = CameraSystem::CreatePerspective("EditorCamera", 120.0f);
@@ -21,16 +22,20 @@ namespace Core
         RegisterColorsToSettings();
         ImGuiLayer::SetFont("EngineResources/Font/Open_Sans/static/OpenSans-Bold.ttf", state.Settings.FontSize); // Fonts get set once only :
 
-        // TODO:This type of scene creation sucks. Project soon?
-        scene = World::CreateScene("EngineResources/Scene.ce_scene");
-        World::ActivateScene("EngineResources/Scene.ce_scene");
-        state.ActiveScenePath = scene->GetName();
-
         // Load textures
         state.TextureSet.PlayButton = EditorUtils::LoadTexture("EngineResources/Images/Icons/PlayButton.png");
         state.TextureSet.StopButton = EditorUtils::LoadTexture("EngineResources/Images/Icons/StopButton.png");
 
         StopSceneRuntime();
+
+        Project::Load("Project.ce_proj");
+        state.ActiveProjectPath = "Project.ce_proj";
+
+        SetContextToProject();
+        OpenScene(Project::GetActiveConfiguration().GetStartScenePathFormatted());
+
+        // TODO: Better structure
+        ((ContentBrowserPanel *)(state.Panels.panels[2]))->state.activePath = Project::GetActiveConfiguration().AssetDirectory;
     }
 
     void EditorLayer::OnImGuiRender()
@@ -44,20 +49,23 @@ namespace Core
         UI_TopBar();
         UI_MenuBar();
         UI_EditorSettings();
+        UI_ProjectEdit();
 
         // NOTE: temporary
         ImGui::Begin("Debug");
         if (ImGui::Button("Save"))
         {
-            SceneSerializer serializer(scene);
+            SceneSerializer serializer(World::GetActiveScene());
             serializer.Serialize("EngineResources/Scene.ce_scene");
         }
 
         if (ImGui::Button("Load"))
         {
-            SceneSerializer serializer(scene);
+            SceneSerializer serializer(World::GetActiveScene());
             serializer.Deserialize("EngineResources/Scene.ce_scene");
         }
+
+        ImGui::Text("Active project: %s", Project::GetActiveConfiguration().Name.c_str());
 
         ImGui::Text("FPS: %.3f", 1.0f / Engine::GetDeltaTime());
 
@@ -113,8 +121,11 @@ namespace Core
             if (ImGui::MenuItem("File"))
                 ImGui::OpenPopup("FileMenu");
 
+            if (ImGui::MenuItem("Project"))
+                ImGui::OpenPopup("ProjectMenu");
+
             if (ImGui::MenuItem("Editor"))
-                ImGui::OpenPopup("EditorSettings");
+                ImGui::OpenPopup("EditorMenu");
 
             ImGui::SetNextWindowSize({250, 0});
             if (ImGui::BeginPopup("FileMenu"))
@@ -137,7 +148,27 @@ namespace Core
             }
 
             ImGui::SetNextWindowSize({250, 0});
-            if (ImGui::BeginPopup("EditorSettings"))
+            if (ImGui::BeginPopup("ProjectMenu"))
+            {
+                ImGui::SeparatorText("Project");
+
+                if (ImGui::MenuItem("New"))
+                    NewProject();
+
+                if (ImGui::MenuItem("Open"))
+                    OpenProject();
+
+                if (ImGui::MenuItem("Save"))
+                    SaveProject();
+
+                if (ImGui::MenuItem("Edit"))
+                    state.RenderEditProject = true;
+
+                ImGui::EndPopup();
+            }
+
+            ImGui::SetNextWindowSize({250, 0});
+            if (ImGui::BeginPopup("EditorMenu"))
             {
                 if (ImGui::MenuItem("Open Editor Settings"))
                     state.RenderSettings = true;
@@ -184,6 +215,40 @@ namespace Core
             state.RenderSettings = false;
             SaveSettings();
             UseSettings();
+        }
+
+        ImGui::End();
+    }
+
+    void EditorLayer::UI_ProjectEdit()
+    {
+        if (!state.RenderEditProject)
+            return;
+
+        float margin = 50.0f;
+
+        ImGui::SetNextWindowPos({margin, margin});
+        ImGui::SetNextWindowSize({Engine::GetWindow()->GetWidth() - (margin + 5), Engine::GetWindow()->GetHeight() - (margin + 5)});
+
+        ImGui::Begin("Project configuration Menu");
+
+        // Edit strings
+        auto &config = Project::GetActiveConfiguration();
+        config.Name = EditorUtils::ImGuiStringEditReturnString("Name", config.Name);
+        config.AssetDirectory = EditorUtils::ImGuiStringEditReturnString("Asset Directory", config.AssetDirectory);
+        config.StartScenePath = EditorUtils::ImGuiStringEditReturnString("Start Scene", config.StartScenePath);
+
+        ImGui::Dummy(ImVec2(0, 0));
+        ImVec2 buttonSize = ImVec2(80, ImGui::GetFrameHeightWithSpacing());
+        ImVec2 buttonPos = ImVec2(ImGui::GetWindowSize().x - buttonSize.x - ImGui::GetStyle().FramePadding.x * 2,
+                                  ImGui::GetWindowSize().y - buttonSize.y - ImGui::GetStyle().FramePadding.y * 2);
+        ImGui::SetCursorPos(buttonPos);
+
+        if (ImGui::Button("Ok", buttonSize))
+        {
+            state.RenderEditProject = false;
+            SaveProject();
+            SetContextToProject();
         }
 
         ImGui::End();
@@ -331,11 +396,33 @@ namespace Core
         }
         else
             state.Camera.updateWithMouse = false;
+
+        // Key binds
+        Actor *selection = ((SceneHierarchyPanel *)(state.Panels.panels[0]))->selectionContext;
+        if (Input::GetKey(Keys::Delete) && selection)
+        {
+            if (selection->GetParent())
+                selection->GetParent()->RemoveActorByUUID(selection->GetUUID());
+            else
+                World::GetActiveScene()->RemoveActor(selection->GetUUID());
+
+            selection = nullptr;
+        }
+
+        if (Input::GetKeyJustNow(Keys::D) && Input::GetKey(Keys::LeftControl) && selection)
+        {
+            Actor *copy = Actor::From(selection, false);
+            copy->SetName(copy->GetName() + " Copy");
+            if (selection->GetParent())
+                selection->GetParent()->AddChild(copy);
+            else
+                World::GetActiveScene()->AddActor(copy);
+        }
     }
 
     void EditorLayer::PreparePanelInfo()
     {
-        // TODO: Do this :)) <3
+        state.PanelInfo.AssetDirectory = Project::GetActiveConfiguration().AssetDirectory;
     }
 
     void EditorLayer::BeginDockspace()
@@ -416,17 +503,9 @@ namespace Core
 
                 if (ImGuizmo::IsUsing())
                 {
-                    Matrix4 matrixData;
+                    Matrix4 matrixData = Matrix4::Create(data);
                     if (actorContext->GetParent() != nullptr)
-                    {
-                        Matrix4 dataMatrix;
-                        dataMatrix.From(actorContext->GetLocalMatrix());
-
-                        Matrix4 deltaMatrix = delta ? Matrix4::Create(delta) : Matrix4::Identity();
-                        matrixData = Matrix4::Multiply(dataMatrix, deltaMatrix);
-                    }
-                    else
-                        matrixData.From(data);
+                        matrixData = Matrix4::Multiply(actorContext->GetLocalMatrix(), delta ? Matrix4::Create(delta) : Matrix4::Identity());
 
                     float matrixTranslation[3], matrixRotation[3], matrixScale[3];
                     ImGuizmo::DecomposeMatrixToComponents(matrixData, matrixTranslation, matrixRotation, matrixScale);
@@ -499,6 +578,7 @@ namespace Core
             World::CreateScene(name);
 
         World::ActivateScene(name);
+        state.ActiveScenePath = name;
     }
 
     void EditorLayer::OpenScene()
@@ -508,14 +588,46 @@ namespace Core
             OpenScene(path);
     }
 
+    void EditorLayer::NewProject()
+    {
+        // TODO: Prompt user to generate some project with configuration
+        Project::New();
+        state.ActiveProjectPath = "";
+    }
+
+    void EditorLayer::SaveProject()
+    {
+        Project::SaveActive(state.ActiveProjectPath);
+    }
+
+    void EditorLayer::OpenProject()
+    {
+        std::string path = Platform::OpenFileDialog("*.ce_proj \0*.ce_proj\0");
+        if (!path.empty())
+            OpenProject(path);
+    }
+
+    void EditorLayer::OpenProject(const std::string &name)
+    {
+        Project::Load(name);
+        state.ActiveProjectPath = name;
+
+        SetContextToProject();
+    }
+
+    void EditorLayer::SetContextToProject()
+    {
+    }
+
     void EditorLayer::NewScene()
     {
         StopSceneRuntime();
-        SaveScene();
+        if (!state.ActiveScenePath.empty())
+            SaveScene();
 
         state.ActiveScenePath = "";
 
-        World::CreateScene("TEMPORARY SCENE NAME");
+        World::CreateScene("TEMPORARY SCENE NAME", false);
         World::ActivateScene("TEMPORARY SCENE NAME");
     }
 
@@ -528,7 +640,7 @@ namespace Core
         }
 
         SceneSerializer ser(World::GetActiveScene());
-        scene->SetName(state.ActiveScenePath);
+        World::GetActiveScene()->SetName(state.ActiveScenePath);
         ser.Serialize(state.ActiveScenePath);
     }
 

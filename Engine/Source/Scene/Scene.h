@@ -66,7 +66,7 @@ namespace Core
         /// @return Pointer to an actor, nullptr if no actor exists with this UUID.
         Actor *GetActor(const UUID &uuid);
 
-        Actor* GetActorByTag(const std::string& tagValue);
+        Actor *GetActorByTag(const std::string &tagValue);
 
         inline ActorList GetActors() { return actors; };
 

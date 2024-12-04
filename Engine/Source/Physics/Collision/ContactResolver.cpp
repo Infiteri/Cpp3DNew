@@ -6,8 +6,6 @@ namespace Core
 {
     void ContactResolver::Resolve()
     {
-        PositionEpsilon = VelocityEpsilon = 0;
-
         PrepareContacts();
         AdjustPosition();
         AdjustVelocity();
@@ -37,15 +35,10 @@ namespace Core
                     max = Contacts[i].DesiredDeltaVelocity;
                     index = i;
                 }
-                else
-                    CE_CORE_TRACE("bad ddv value %f", Contacts[i].DesiredDeltaVelocity);
             }
 
             if (index == numContacts)
-            {
-                CE_CORE_TRACE("Adjusting velocity gets skipped");
                 break;
-            }
 
             Contacts[index].ApplyVelocityChange(velocityChange, rotationChange);
 
@@ -98,10 +91,7 @@ namespace Core
             }
 
             if (index == numContacts)
-            {
-                CE_CORE_TRACE("Adjusting position gets skipped");
                 break;
-            }
 
             // Resolves the worst contact
             Contacts[index].ApplyPositionChange(linearChange, angularChange, max);

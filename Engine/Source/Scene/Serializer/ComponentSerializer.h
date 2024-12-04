@@ -24,6 +24,7 @@ namespace Core
             int PointLightCount;
             int RigidBodyCount;
             int TagCount;
+            int StaticBodyCount;
         };
         ComponentCount count;
 
@@ -54,6 +55,9 @@ namespace Core
 
         void SerializeTagComponent(TagComponent *c, int index, YAML::Emitter &out);
         void DeserializeTagComponent(YAML::Node node);
+
+        void SerializeStaticBodyComponent(StaticBodyComponent *c, int index, YAML::Emitter &out);
+        void DeserializeStaticBodyComponent(YAML::Node node);
 
     public:
         ComponentSerializer(Actor *target);

@@ -2,6 +2,8 @@
 
 #include "Base.h"
 #include "Body/RigidBody.h"
+#include "Body/StaticBody.h"
+
 #include "Objects/Spring.h"
 #include "Collision/Contact.h"
 #include "Collision/ContactResolver.h"
@@ -34,6 +36,7 @@ namespace Core
         static void Shutdown();
 
         static RigidBody *CreateRigid(RigidBodyConfiguration *config);
+        static StaticBody *CreateStatic(StaticBodyConfiguration *config);
 
         static void UpdateRuntime();
         static void StopRuntime();

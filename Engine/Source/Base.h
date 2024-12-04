@@ -1,7 +1,7 @@
 #pragma once
 
 /// @brief Version (MAJOR.MINOR.SUBTLE - DD/MM/YYYY)
-#define CE_VERSION "0.2.1 - 23.11.2024"
+#define CE_VERSION "0.2.2 - 04.12.2024"
 
 /// @brief Value for the unknown OS
 #define CE_UNKNOWN_PLATFORM_VALUE 0
@@ -50,3 +50,11 @@ typedef signed long long CeI64;
 
 #define CE_DEFINE_SCRIPT_EXPORT(className) \
     extern "C" __declspec(dllexport) ActorScript *className##Create() { return new className(); }
+
+#define CE_VERIFY(value) \
+    if (!(value))        \
+    return
+
+#define CE_VERIFY_RET(value, retVal) \
+    if (!(value))                    \
+    return (retVal)

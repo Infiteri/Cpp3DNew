@@ -28,13 +28,17 @@ namespace Core
     {
     }
 
-    Scene *World::CreateScene(const std::string &name)
+    Scene *World::CreateScene(const std::string &name, bool loadFromFile)
     {
         CE_LOG("CE_WORLD", Debug, "Creating new scene: %s.", name.c_str());
         Scene *scene = new Scene();
-        SceneSerializer ser(scene);
         scene->SetName(name);
-        ser.Deserialize(name);
+
+        if (loadFromFile)
+        {
+            SceneSerializer ser(scene);
+            ser.Deserialize(name);
+        }
         scenes[name] = scene;
         return scene;
     }
@@ -67,6 +71,7 @@ namespace Core
     void World::ActivateSceneInstance(Scene *scene)
     {
         activeScene = scene;
+        activeScene->_SetSkyInstance();
     }
 
     Scene *World::GetActiveScene()

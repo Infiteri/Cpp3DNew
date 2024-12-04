@@ -17,6 +17,7 @@ namespace Core
 
         void Set(float x, float y);
         void Set(Vector2 *v);
+        void Set(const Vector2 &v);
 
         void operator+=(const Vector2 &o)
         {
@@ -244,4 +245,174 @@ namespace Core
         }
     };
 
+    class CE_API Vector4
+    {
+    public:
+        float x;
+        float y;
+        float z;
+        float w;
+
+        Vector4();
+        Vector4(const Vector4 &v);
+        Vector4(float x, float y, float z, float w);
+        ~Vector4();
+
+        void operator=(const Vector4 &v) { Set(v); };
+
+        void Set(float x, float y, float z, float w);
+        void Set(const Vector4 &v);
+
+        float &operator[](int index)
+        {
+            if (index == 0)
+                return x;
+            if (index == 1)
+                return y;
+            if (index == 2)
+                return z;
+            return w;
+        }
+
+        void operator+=(const Vector4 &o)
+        {
+            x += o.x;
+            y += o.y;
+            z += o.z;
+            w += o.w;
+        }
+
+        void operator*=(const Vector4 &o)
+        {
+            x *= o.x;
+            y *= o.y;
+            z *= o.z;
+            w *= o.w;
+        }
+
+        void operator-=(const Vector4 &o)
+        {
+            x -= o.x;
+            y -= o.y;
+            z -= o.z;
+            w -= o.w;
+        }
+
+        void operator/=(const Vector4 &o)
+        {
+            x /= o.x;
+            y /= o.y;
+            z /= o.z;
+            w /= o.w;
+        }
+
+        void operator+=(float scalar)
+        {
+            x += scalar;
+            y += scalar;
+            z += scalar;
+            w += scalar;
+        }
+
+        void operator*=(float scalar)
+        {
+            x *= scalar;
+            y *= scalar;
+            z *= scalar;
+            w *= scalar;
+        }
+
+        void operator-=(float scalar)
+        {
+            x -= scalar;
+            y -= scalar;
+            z -= scalar;
+            w -= scalar;
+        }
+
+        void operator/=(float scalar)
+        {
+            x /= scalar;
+            y /= scalar;
+            z /= scalar;
+            w /= scalar;
+        }
+
+        Vector4 operator-() const
+        {
+            return {-x, -y, -z, -w};
+        }
+
+        Vector4 operator+(const Vector4 &o) const
+        {
+            return {x + o.x, y + o.y, z + o.z, w + o.w};
+        }
+
+        Vector4 operator-(const Vector4 &o) const
+        {
+            return {x - o.x, y - o.y, z - o.z, w - o.w};
+        }
+
+        Vector4 operator*(const Vector4 &o) const
+        {
+            return {x * o.x, y * o.y, z * o.z, w * o.w};
+        }
+
+        Vector4 operator/(const Vector4 &o) const
+        {
+            return {x / o.x, y / o.y, z / o.z, w / o.w};
+        }
+
+        Vector4 operator+(float scalar) const
+        {
+            return {x + scalar, y + scalar, z + scalar, w + scalar};
+        }
+
+        Vector4 operator-(float scalar) const
+        {
+            return {x - scalar, y - scalar, z - scalar, w - scalar};
+        }
+
+        Vector4 operator*(float scalar) const
+        {
+            return {x * scalar, y * scalar, z * scalar, w * scalar};
+        }
+
+        Vector4 operator/(float scalar) const
+        {
+            return {x / scalar, y / scalar, z / scalar, w / scalar};
+        }
+
+        bool operator==(const Vector4 &o) const
+        {
+            return x == o.x && y == o.y && z == o.z && w == o.w;
+        }
+
+        bool operator!=(const Vector4 &o) const
+        {
+            return !(*this == o);
+        }
+
+        float Dot(const Vector4 &other) const
+        {
+            return x * other.x + y * other.y + z * other.z + w * other.w;
+        }
+
+        float SquaredMagnitude() const
+        {
+            return x * x + y * y + z * z + w * w;
+        }
+
+        float Magnitude() const
+        {
+            return sqrtf(x * x + y * y + z * z + w * w);
+        }
+
+        void Normalize()
+        {
+            float length = Magnitude();
+            if (length > 0.0f)
+                (*this) *= 1.0f / length;
+        }
+    };
 }

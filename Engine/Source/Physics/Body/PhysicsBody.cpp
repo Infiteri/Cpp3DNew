@@ -6,6 +6,8 @@ namespace Core
     static Vector3 ZERO_VECTOR = {0, 0, 0};
     PhysicsBody::PhysicsBody()
     {
+        collider = nullptr;
+        type = None;
     }
 
     PhysicsBody::~PhysicsBody()
@@ -15,6 +17,11 @@ namespace Core
     void PhysicsBody::Update()
     {
     }
+
+    void PhysicsBody::UseConfiguration(void *config)
+    {
+    }
+
     Vector3 &PhysicsBody::GetPosition()
     {
         ZERO_VECTOR.Set(0, 0, 0);
@@ -31,5 +38,16 @@ namespace Core
             return ZERO_VECTOR;
 
         return owner->GetTransform()->Rotation * (asRadians ? CE_DEG_TO_RAD : 1.0f);
+    }
+
+    void PhysicsBody::SetOrientation(const Quaternion &quat)
+    {
+        orientation.Set(quat);
+        orientation.Normalize();
+    }
+
+    void PhysicsBody::SetInertiaTensor(const PhysMatrix3 &matrix)
+    {
+        inverseInertiaTensor.SetInverse(matrix);
     }
 }

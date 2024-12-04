@@ -26,6 +26,12 @@ namespace Core
             rigidBody->Config.Owner = a;
             rigidBody->BodyInstance = PhysicsEngine::CreateRigid(&rigidBody->Config);
         }
+
+        for (auto staticBody : a->GetComponents<StaticBodyComponent>())
+        {
+            staticBody->Config.Owner = a;
+            staticBody->BodyInstance = PhysicsEngine::CreateStatic(&staticBody->Config);
+        }
     }
 
     void Scene::_SetSkyInstance()

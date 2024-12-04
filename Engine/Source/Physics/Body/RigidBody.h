@@ -31,11 +31,6 @@ namespace Core
         /// @brief MUST BE IN RADIANS
         Vector3 torqueAccum;
 
-        Quaternion orientation;
-        PhysMatrix4x3 transformMatrix;
-        PhysMatrix3 inverseInertiaTensor;
-        PhysMatrix3 inverseInertiaTensorWorld;
-
         Vector3 lastFrameAcceleration;
 
         void _ClearForces();
@@ -44,14 +39,14 @@ namespace Core
         friend class PhysicsEngine;
         friend class Contact;
 
-        void _AddVelocity(const Vector3 &v);
-        void _AddRotation(const Vector3 &v);
-
     public:
         RigidBody();
         ~RigidBody();
 
         inline RigidBodyConfiguration &GetConfiguration() { return config; };
+
+        void AddVelocity(const Vector3 &v);
+        void AddRotation(const Vector3 &v);
 
         void UseConfiguration(RigidBodyConfiguration *config);
 
@@ -69,19 +64,9 @@ namespace Core
         /// @param force The force to add.
         void AddTorque(const Vector3 &force);
 
-        void SetInertiaTensor(const PhysMatrix3 &matrix);
-        inline PhysMatrix3 GetInverseInertiaTensorWorld() { return inverseInertiaTensorWorld; };
-        inline PhysMatrix3 GetInverseInertiaTensor() { return inverseInertiaTensor; };
-
-        /// @brief Will set the orientation and will change the body rotation to the respected values/
-        /// @param quat The quaternion.
-        void SetOrientation(const Quaternion &quat);
-
         /// @brief TODO NEEDED?
         /// @return
         inline Vector3 &GetVelocity() { return velocity; };
-
-        inline Quaternion &GetOrientation() { return orientation; };
 
         inline Vector3 GetLastFrameAcceleration() { return lastFrameAcceleration; };
 

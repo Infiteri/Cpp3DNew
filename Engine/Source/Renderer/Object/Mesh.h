@@ -5,24 +5,24 @@
 #include "Renderer/Material/Material.h"
 #include "Renderer/Geometry/Geometry.h"
 
+#include "Math/Matrix4.h"
+
 namespace Core
 {
     class CE_API Mesh
     {
     private:
-        VertexArray *vertex = nullptr;
         Material *material = nullptr;
         Geometry *geometry;
 
         void _ReleaseMaterial();
         void _ReleaseGeometry();
-        void _BufferArrayWithGeometry();
 
     public:
         Mesh();
         ~Mesh();
 
-        void Render();
+        void Render(Matrix4 transformMatrix);
 
         inline Material *GetMaterial() { return material; };
         inline Geometry *GetGeometry() { return geometry; };

@@ -111,6 +111,11 @@ namespace Core
         return edit;
     }
 
+    std::string EditorUtils::ImGuiStringEditReturnString(const char *label, const std::string &str)
+    {
+        return ImGuiStringEdit(label, str).Content;
+    }
+
     void EditorUtils::ImGuiColorEdit(const char *label, Color *color)
     {
         float data[4] = {color->r / 255, color->g / 255, color->b / 255, color->a / 255};

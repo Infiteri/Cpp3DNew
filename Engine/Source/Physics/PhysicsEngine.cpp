@@ -1,6 +1,7 @@
 #include "PhysicsEngine.h"
 #include "Core/Logger.h"
 #include "Body/RigidBody.h"
+#include "Body/StaticBody.h"
 #include "Collision/ContactGenerator.h"
 
 namespace Core
@@ -19,6 +20,15 @@ namespace Core
     RigidBody *PhysicsEngine::CreateRigid(RigidBodyConfiguration *config)
     {
         auto b = new RigidBody();
+        b->UseConfiguration(config);
+        state.Bodies.push_back(b);
+        b->Update();
+        return b;
+    }
+
+    StaticBody *PhysicsEngine::CreateStatic(StaticBodyConfiguration *config)
+    {
+        auto b = new StaticBody();
         b->UseConfiguration(config);
         state.Bodies.push_back(b);
         b->Update();

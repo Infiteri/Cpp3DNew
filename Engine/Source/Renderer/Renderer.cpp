@@ -54,6 +54,8 @@ namespace Core
         state.postProcessor.Add("EngineResources/Shaders/Post/Toy.glsl", false);         // TODO: Some architecture
         state.Screen.Setup();
 
+        state.meshRenderArray = new VertexArray();
+
         glEnable(GL_MULTISAMPLE);
     }
 
@@ -97,18 +99,39 @@ namespace Core
         if (!state.initializedContext)
             return;
 
+        Shader *objShader = ShaderSystem::GetFromEngineResource("Object");
+        CE_VERIFY(objShader);
+
+        objShader->Use();
+
         // Camera
         {
             auto activeCamera = CameraSystem::GetPerspectiveActive();
-            Shader *objShader = ShaderSystem::GetFromEngineResource("Object");
-            if (activeCamera && objShader)
+            if (activeCamera)
             {
-                objShader->Use();
                 activeCamera->UpdateView();
                 objShader->Vec3(activeCamera->GetPosition(), "uCameraPosition");
                 objShader->Mat4(activeCamera->GetProjection(), "uProjection");
                 objShader->Mat4(activeCamera->GetViewInverted(), "uView");
             }
+        }
+
+        state.meshRenderArray->Bind();
+
+        for (auto &data : state.meshRenderData)
+        {
+            state.meshRenderArray->GenVertexBuffer(data.Geometry->Vertices.data(), data.Geometry->Vertices.size() * sizeof(Vertex3D));
+            state.meshRenderArray->GenIndexBuffer(data.Geometry->Indices.data(), data.Geometry->Indices.size() * sizeof(CeU32));
+            state.meshRenderArray->GetVertexBuffer()->AddLayout(0, 0, 3);
+            state.meshRenderArray->GetVertexBuffer()->AddLayout(1, 3, 2);
+            state.meshRenderArray->GetVertexBuffer()->AddLayout(2, 5, 3);
+
+            data.Material->Use();
+            objShader->Mat4(data.Transform, "uTransform");
+
+            state.meshRenderArray->Bind();
+            state.meshRenderArray->GetVertexBuffer()->Bind();
+            state.meshRenderArray->GetIndexBuffer()->Draw();
         }
     }
 
@@ -117,6 +140,7 @@ namespace Core
         if (!state.initializedContext)
             return;
         state.Screen.End();
+        state.meshRenderData.clear();
     }
 
     void Renderer::RenderScreenImage()
@@ -193,6 +217,11 @@ namespace Core
         state.skyInstance = sky;
     }
 
+    void Renderer::AddMeshRenderData(MeshRenderData &data)
+    {
+        state.meshRenderData.push_back(data);
+    }
+
     void Renderer::Shutdown()
     {
         ShaderSystem::Shutdown();
@@ -202,5 +231,6 @@ namespace Core
 
         delete state.Screen.Array;
         delete state.Screen.Buffer;
+        delete state.meshRenderArray;
     }
 }

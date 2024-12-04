@@ -47,6 +47,9 @@ namespace Core
 
     Buffer *VertexArray::GenVertexBuffer(void *data, CeU64 dataSize)
     {
+        if (vertexBuffer)
+            delete vertexBuffer;
+
         vertexBuffer = new Buffer(BufferType::Vertex);
         vertexBuffer->UploadData(data, dataSize);
 
@@ -55,6 +58,8 @@ namespace Core
 
     Buffer *VertexArray::GenIndexBuffer(void *data, CeU64 dataSize)
     {
+        if (indexBuffer)
+            delete indexBuffer;
 
         indexBuffer = new Buffer(BufferType::Index);
         indexBuffer->UploadData(data, dataSize);

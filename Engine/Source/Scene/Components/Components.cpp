@@ -19,7 +19,8 @@ namespace Core
 
     void MeshComponent::Render()
     {
-        mesh->Render();
+        Matrix4 t = Owner->GetTransformMatrix();
+        mesh->Render(t);
     }
 
     void MeshComponent::From(MeshComponent *c)
@@ -184,5 +185,18 @@ namespace Core
     void TagComponent::From(TagComponent *c)
     {
         Tag = c->Tag;
+    }
+
+    StaticBodyComponent::StaticBodyComponent()
+    {
+    }
+
+    StaticBodyComponent::~StaticBodyComponent()
+    {
+    }
+
+    void StaticBodyComponent::From(StaticBodyComponent *c)
+    {
+        Config.From(&c->Config);
     }
 }

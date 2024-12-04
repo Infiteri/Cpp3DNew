@@ -181,10 +181,33 @@ namespace Core
     class CE_API Matrix4
     {
     public:
-        float data[16];
+        union
+        {
+            float data[16];
+            float m[4][4];
+        };
 
         Matrix4();
         ~Matrix4();
+
+        Vector3 TransformVector(const Vector3 &vec) const
+        {
+            // Homogeneous vector with w = 1 (for position transformation)
+            float x = vec.x * m[0][0] + vec.y * m[0][1] + vec.z * m[0][2] + m[0][3];
+            float y = vec.x * m[1][0] + vec.y * m[1][1] + vec.z * m[1][2] + m[1][3];
+            float z = vec.x * m[2][0] + vec.y * m[2][1] + vec.z * m[2][2] + m[2][3];
+            float w = vec.x * m[3][0] + vec.y * m[3][1] + vec.z * m[3][2] + m[3][3];
+
+            // Convert back to 3D space (perspective divide for w ≠ 1)
+            if (w != 0.0f)
+            {
+                x /= w;
+                y /= w;
+                z /= w;
+            }
+
+            return Vector3(x, y, z);
+        }
 
         void operator*=(const Matrix4 &m)
         {

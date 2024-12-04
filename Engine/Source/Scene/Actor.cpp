@@ -1,7 +1,6 @@
 #include "Actor.h"
 #include "Core/Logger.h"
 #include "Renderer/Object/Mesh.h"
-#include "Renderer/Shader/ShaderSystem.h"
 
 #define CE_COPY_COMPONENT(type)                          \
     auto type##COMPONENT = other->GetComponents<type>(); \
@@ -30,7 +29,7 @@ namespace Core
         components.clear();
     }
 
-    Actor *Actor::From(Actor *other)
+    Actor *Actor::From(Actor *other, bool copyUUID)
     {
         if (!other)
             return nullptr;
@@ -38,22 +37,26 @@ namespace Core
         Actor *outActor = new Actor();
         outActor->SetName(other->GetName());
         outActor->parent = other->GetParent();
-        outActor->id = other->id;
+
+        if (copyUUID)
+            outActor->id = other->id;
 
         auto transform = other->GetTransform();
 
         outActor->GetTransform()->From(transform);
 
         // ADD WHEN NEW COMPONENTS
+        CE_COPY_COMPONENT(TagComponent);
         CE_COPY_COMPONENT(MeshComponent);
         CE_COPY_COMPONENT(DataSetComponent);
         CE_COPY_COMPONENT(ScriptComponent);
         CE_COPY_COMPONENT(CameraComponent);
         CE_COPY_COMPONENT(PointLightComponent);
         CE_COPY_COMPONENT(RigidBodyComponent);
+        CE_COPY_COMPONENT(StaticBodyComponent);
 
         for (Actor *a : other->GetChildren())
-            outActor->AddChild(Actor::From(a));
+            outActor->AddChild(Actor::From(a, copyUUID));
 
         return outActor;
     }
@@ -97,9 +100,6 @@ namespace Core
         }
 
         _CalculateMatrices();
-        auto shader = ShaderSystem::GetFromEngineResource("Object");
-        if (shader)
-            shader->Mat4(&worldMatrix, "uTransform");
 
         for (auto comp : components)
         {

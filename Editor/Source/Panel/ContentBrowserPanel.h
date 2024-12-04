@@ -8,7 +8,7 @@ namespace Core
 {
     class ContentBrowserPanel : public Panel
     {
-    private:
+    public:
         struct State
         {
             std::string activePath;

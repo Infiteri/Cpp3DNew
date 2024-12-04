@@ -6,8 +6,143 @@
 #include "Math/Math.h"
 #include "Physics/PhysCore.h"
 
+/**
+ *
+        switch (b->GetType())
+        {
+        case PhysicsBody::None:
+        default:
+        {
+            CE_CORE_WARN("%s, unknown body type", CE_FUNCTION_SIGNATURE);
+            break;
+        }
+
+        case PhysicsBody::Static:
+        {
+            auto bt = b->As<StaticBody>();
+            break;
+        }
+
+        case PhysicsBody::Rigid:
+        {
+            auto bt = b->As<RigidBody>();
+            break;
+        }
+        }
+ */
+
 namespace Core
 {
+    static inline void _CalculateLocalVelocityDataWithBody(PhysicsBody *b, Vector3 *v, Vector3 *t, Vector3 *lfa)
+    {
+        switch (b->GetType())
+        {
+        case PhysicsBody::None:
+        default:
+        {
+            CE_CORE_WARN("%s, unknown body type", CE_FUNCTION_SIGNATURE);
+            break;
+        }
+
+        case PhysicsBody::Static:
+        {
+            v->Set(0, 0, 0);
+            t->Set(0, 0, 0);
+            lfa->Set(0, 0, 0);
+            break;
+        }
+
+        case PhysicsBody::Rigid:
+        {
+            auto bt = b->As<RigidBody>();
+            v->Set(bt->GetVelocity());
+            t->Set(bt->GetTorque());
+            lfa->Set(bt->GetLastFrameAcceleration());
+            break;
+        }
+        }
+    }
+
+    static inline float _GetMassWithBodyType(PhysicsBody *b, bool inverse = false)
+    {
+        switch (b->GetType())
+        {
+        case PhysicsBody::None:
+        default:
+        {
+            CE_CORE_WARN("%s, unknown body type", CE_FUNCTION_SIGNATURE);
+            break;
+        }
+
+        case PhysicsBody::Static:
+        {
+            auto bt = b->As<StaticBody>();
+            return 1; // TODO: MASS
+            break;
+        }
+
+        case PhysicsBody::Rigid:
+        {
+            auto bt = b->As<RigidBody>();
+            return inverse ? bt->GetInverseMass() : bt->GetMass();
+            break;
+        }
+        }
+        return 0;
+    }
+
+    static inline void _ImplementValueChangeWithBodyType(PhysicsBody *b, Vector3 vel, Vector3 rot)
+    {
+        switch (b->GetType())
+        {
+        case PhysicsBody::None:
+        default:
+        {
+            CE_CORE_WARN("%s, unknown body type", CE_FUNCTION_SIGNATURE);
+            break;
+        }
+
+        case PhysicsBody::Static:
+        {
+            break;
+        }
+
+        case PhysicsBody::Rigid:
+        {
+            auto bt = b->As<RigidBody>();
+            bt->AddVelocity(vel);
+            bt->AddRotation(rot);
+            break;
+        }
+        }
+    }
+
+    static inline void _GetLastFrameAccelerationWithBodyType(PhysicsBody *b, Vector3 *lfa)
+    {
+        switch (b->GetType())
+        {
+        case PhysicsBody::None:
+        default:
+        {
+            CE_CORE_WARN("%s, unknown body type", CE_FUNCTION_SIGNATURE);
+            break;
+        }
+
+        case PhysicsBody::Static:
+        {
+            lfa->Set(0, 0, 0);
+            break;
+        }
+
+        case PhysicsBody::Rigid:
+        {
+            auto bt = b->As<RigidBody>();
+            lfa->Set(bt->GetLastFrameAcceleration());
+            break;
+        }
+        }
+    }
+
     Contact::Contact(const Contact &c)
     {
         One = c.One;
@@ -82,17 +217,20 @@ namespace Core
 
     Vector3 Contact::CalculateLocalVelocity(PhysicsBody *body, int index)
     {
-        // TODO:
-        RigidBody *b = body->As<RigidBody>();
+        Vector3 torque;
+        Vector3 bVelocity;
+        Vector3 lfa; // Last frame acceleration
+
+        _CalculateLocalVelocityDataWithBody(body, &bVelocity, &torque, &lfa);
 
         // Work out the velocity of the contact point
-        Vector3 velocity = b->GetTorque() % RelativeContactPosition[index];
-        velocity += b->GetVelocity();
+        Vector3 velocity = torque % RelativeContactPosition[index];
+        velocity += bVelocity;
 
         Vector3 contactVelocity = ContactToWorld.TransformTranspose(velocity);
 
         // Velocity due to forces without reactions
-        Vector3 accVelocity = ContactToWorld.TransformTranspose(b->GetLastFrameAcceleration() * CE_PHYSICS_DELTA_TIME);
+        Vector3 accVelocity = ContactToWorld.TransformTranspose(lfa * CE_PHYSICS_DELTA_TIME);
         accVelocity.x = 0;
 
         contactVelocity += accVelocity;
@@ -104,8 +242,10 @@ namespace Core
         const static float velocityLimit = 0.20;
         float velocityFromAcc = 0;
 
-        auto lastAAccel = One->As<RigidBody>()->GetLastFrameAcceleration();
-        auto lastBAccel = Two->As<RigidBody>()->GetLastFrameAcceleration();
+        Vector3 lastAAccel;
+        Vector3 lastBAccel;
+        _GetLastFrameAccelerationWithBodyType(One, &lastAAccel);
+        _GetLastFrameAccelerationWithBodyType(Two, &lastBAccel);
 
         velocityFromAcc += (lastAAccel * CE_PHYSICS_DELTA_TIME).Dot(ContactNormal);
         velocityFromAcc -= (lastBAccel * CE_PHYSICS_DELTA_TIME).Dot(ContactNormal);
@@ -133,8 +273,7 @@ namespace Core
 
         for (CeU32 i = 0; i < 2; i++)
         {
-            // TODO: BODY TYPE
-            auto b = BodyAt(i)->As<RigidBody>();
+            auto b = BodyAt(i);
 
             PhysMatrix3 inverseInertiaTensor;
             inverseInertiaTensor = b->GetInverseInertiaTensorWorld();
@@ -144,15 +283,14 @@ namespace Core
             angularInertiaWorld = angularInertiaWorld % RelativeContactPosition[i];
             angularInertia[i] = angularInertiaWorld.Dot(ContactNormal);
 
-            linearInertia[i] = b->GetInverseMass();
+            linearInertia[i] = _GetMassWithBodyType(b, true); // TODO: make sure this is inversed
 
             totalInertia += linearInertia[i] + angularInertia[i];
         }
 
         for (CeU32 i = 0; i < 2; i++)
         {
-            // TODO: BODY TYPE
-            auto b = BodyAt(i)->As<RigidBody>();
+            auto b = BodyAt(i);
 
             float sign = (i == 0) ? 1 : -1;
             angularMove[i] = sign * penetration * (angularInertia[i] / totalInertia);
@@ -189,24 +327,27 @@ namespace Core
 
             linearChange[i] = ContactNormal * linearMove[i];
 
-            Vector3 pos;
-            pos.Set(BodyAt(i)->As<RigidBody>()->GetPosition());
-            pos += (ContactNormal * linearMove[i]);
-            BodyAt(i)->As<RigidBody>()->GetPosition().Set(pos);
+            if (b->GetType() == PhysicsBody::Rigid)
+            {
+                Vector3 position;
+                Quaternion orientation;
+                position.Set(BodyAt(i)->GetPosition());
+                position += (ContactNormal * linearMove[i]);
+                orientation.Set(BodyAt(i)->GetOrientation());
+                orientation.AddScaledVector(angularChange[i], 1.0);
+                BodyAt(i)->GetPosition().Set(position);
+                BodyAt(i)->SetOrientation(orientation);
+            }
 
-            // TODO: Quaternions and rotations
-            Quaternion q;
-            q.Set(BodyAt(i)->As<RigidBody>()->GetOrientation());
-            q.AddScaledVector(angularChange[i], 1.0);
-            BodyAt(i)->As<RigidBody>()->SetOrientation(q);
-            BodyAt(i)->As<RigidBody>()->_CalculateData();
+            BodyAt(i)->_CalculateData();
         }
     }
 
     void Contact::ApplyVelocityChange(Vector3 velocityChange[2], Vector3 rotationChange[2])
     {
-        RigidBody *b1 = BodyAt(0)->As<RigidBody>();
-        RigidBody *b2 = BodyAt(1)->As<RigidBody>();
+        // TODO: BODY CAST
+        PhysicsBody *b1 = BodyAt(0);
+        PhysicsBody *b2 = BodyAt(1);
 
         PhysMatrix3 inverseInertiaTensor[2];
         inverseInertiaTensor[0].From(b1->GetInverseInertiaTensorWorld());
@@ -217,25 +358,24 @@ namespace Core
 
         Vector3 impulsiveTorque = (RelativeContactPosition[0] % impulse);
         rotationChange[0] = inverseInertiaTensor[0].Transform(impulsiveTorque);
-        velocityChange[0].Set(impulse * b1->GetInverseMass());
+        velocityChange[0].Set(impulse * _GetMassWithBodyType(b1, true));
 
-        b1->_AddVelocity(velocityChange[0]);
-        b1->_AddRotation(rotationChange[0]);
+        _ImplementValueChangeWithBodyType(b1, velocityChange[0], rotationChange[0]);
 
         {
             impulsiveTorque = (impulse % RelativeContactPosition[1]);
             rotationChange[1] = inverseInertiaTensor[1].Transform(impulsiveTorque);
-            velocityChange[1].Set(impulse * -b2->GetInverseMass());
+            velocityChange[1].Set(impulse * -_GetMassWithBodyType(b2, true));
 
-            b2->_AddVelocity(velocityChange[1]);
-            b2->_AddRotation(rotationChange[1]);
+            _ImplementValueChangeWithBodyType(b2, velocityChange[1], rotationChange[1]);
         }
     }
 
     Vector3 Contact::CalculateFrictionlessImpulse(PhysMatrix3 *inverseInertiaTensor)
     {
-        RigidBody *b1 = BodyAt(0)->As<RigidBody>();
-        RigidBody *b2 = BodyAt(1)->As<RigidBody>();
+        // TODO: BODY CAST
+        PhysicsBody *b1 = BodyAt(0);
+        PhysicsBody *b2 = BodyAt(1);
 
         Vector3 impulseContact;
 
@@ -244,14 +384,14 @@ namespace Core
         deltaVelWorld = deltaVelWorld % RelativeContactPosition[0];
 
         float deltaVelocity = deltaVelWorld.Dot(ContactNormal);
-        deltaVelocity += b1->GetInverseMass();
+        deltaVelocity += _GetMassWithBodyType(b1, true);
 
         {
             Vector3 deltaVelWorld = RelativeContactPosition[1] % ContactNormal;
             deltaVelWorld = inverseInertiaTensor[1].Transform(deltaVelWorld);
             deltaVelWorld = deltaVelWorld % RelativeContactPosition[1];
             deltaVelocity += deltaVelWorld.Dot(ContactNormal);
-            deltaVelocity += b2->GetInverseMass();
+            deltaVelocity += _GetMassWithBodyType(b2, true);
         }
 
         // Calculate the required size of the impulse

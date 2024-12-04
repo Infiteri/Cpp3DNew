@@ -47,9 +47,12 @@ namespace Core
         Scene *EditorScene = nullptr;
 
         std::string ActiveScenePath;
+        std::string ActiveProjectPath;
 
         EditorSettings Settings;
+
         bool RenderSettings = false;
+        bool RenderEditProject = false;
     };
 
     class EditorLayer : public Layer
@@ -70,6 +73,7 @@ namespace Core
         void UI_TopBar();
         void UI_MenuBar();
         void UI_EditorSettings();
+        void UI_ProjectEdit();
         void UI_UTIL_RenderColorChange(const char *label, int target);
         // -------------------
 
@@ -95,12 +99,20 @@ namespace Core
         void MapInputToGuizmoOperation(Keys k, ImGuizmo::OPERATION op);
 
         // -- SCENE RELATED --
-        void OpenScene(const std::string &name);
-        void OpenScene();
         void NewScene();
         void SaveScene();
         void SaveSceneAs();
+        void OpenScene(const std::string &name);
+        void OpenScene();
         // -------------------
+
+        // -- PROJECT RELATED --
+        void NewProject();
+        void SaveProject();
+        void OpenProject();
+        void OpenProject(const std::string &name);
+        void SetContextToProject();
+        // ---------------------
 
         // -- DOCKSPACE --
         void BeginDockspace();

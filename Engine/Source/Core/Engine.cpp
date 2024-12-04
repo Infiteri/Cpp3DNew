@@ -14,6 +14,8 @@
 #include "Script/ScriptEngine.h"
 #include "Physics/PhysicsEngine.h"
 
+#include "Project/Project.h"
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -49,6 +51,9 @@ namespace Core
         ImGuiLayer::Init(); // NOTE: Requires window
 
         LayerStack::Init();
+
+        // TODO: some project stuff?
+        // Note: the final exe and the '.ce_proj' file MUSt be in the same directory. Otherwise game wont run, when a better architecture is in place it will be done the right way
     }
 
     void Engine::Init()
@@ -74,8 +79,8 @@ namespace Core
         CE_PROFILE_FUNCTION();
 
         Renderer::BeginFrame();
-        Renderer::Render();
         World::RenderActiveScene();
+        Renderer::Render();
         Renderer::EndFrame();
         Renderer::RenderScreenImage();
 

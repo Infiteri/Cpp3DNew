@@ -49,6 +49,7 @@ namespace Core
         CE_SERIALIZE_COMP_CALLBACK(PointLight);
         CE_SERIALIZE_COMP_CALLBACK(RigidBody);
         CE_SERIALIZE_COMP_CALLBACK(Tag);
+        CE_SERIALIZE_COMP_CALLBACK(StaticBody);
     }
 
     void ComponentSerializer::Deserialize(YAML::Node actorNode)
@@ -62,6 +63,7 @@ namespace Core
         CE_DESERIALIZE_COMPONENT("PointLightComponent", DeserializePointLightComponent);
         CE_DESERIALIZE_COMPONENT("RigidBodyComponent", DeserializeRigidBodyComponent);
         CE_DESERIALIZE_COMPONENT("TagComponent", DeserializeTagComponent);
+        CE_DESERIALIZE_COMPONENT("StaticBodyComponent", DeserializeStaticBodyComponent);
     }
 
     void ComponentSerializer::FillComponentCountData()
@@ -74,6 +76,7 @@ namespace Core
         CE_COMP_SIZE(PointLight);
         CE_COMP_SIZE(RigidBody);
         CE_COMP_SIZE(Tag);
+        CE_COMP_SIZE(StaticBody);
     }
 
     void ComponentSerializer::SerializeComponentCount(YAML::Emitter &out)
@@ -88,6 +91,7 @@ namespace Core
         CE_SERIALIZE_FIELD("PointLightComponentCount", count.PointLightCount);
         CE_SERIALIZE_FIELD("RigidBodyComponentCount", count.RigidBodyCount);
         CE_SERIALIZE_FIELD("TagComponentCount", count.TagCount);
+        CE_SERIALIZE_FIELD("StaticBodyComponentCount", count.StaticBodyCount);
     }
 
     void ComponentSerializer::SerializeMeshComponent(MeshComponent *c, int index, YAML::Emitter &out)
@@ -306,5 +310,17 @@ namespace Core
     {
         auto c = a->AddComponent<TagComponent>();
         c->Tag = node["Tag"].as<std::string>();
+    }
+
+    void ComponentSerializer::SerializeStaticBodyComponent(StaticBodyComponent *c, int index, YAML::Emitter &out)
+    {
+        out << YAML::Key << "StaticBodyComponent " + std::to_string(index);
+        out << YAML::BeginMap;
+        out << YAML::EndMap;
+    }
+
+    void ComponentSerializer::DeserializeStaticBodyComponent(YAML::Node node)
+    {
+        auto c = a->AddComponent<StaticBodyComponent>();
     }
 }

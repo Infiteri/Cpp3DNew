@@ -59,6 +59,7 @@ namespace Core
         inline MaterialTypes GetType() { return type; };
 
         inline Texture *GetColorTexture() { return colorTexture.texture; };
+        inline Color &GetColor() { return state.Color; };
         inline std::string GetFilePath() { return filePath; };
 
         /// @brief Do not call if you dont know what you doing (ultra bad btw)

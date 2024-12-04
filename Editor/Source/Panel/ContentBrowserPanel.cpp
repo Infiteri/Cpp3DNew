@@ -1,13 +1,17 @@
 #include "ContentBrowserPanel.h"
 #include "EditorUtils.h"
 #include "Platform/Platform.h"
+#include "Project/Project.h"
 
 namespace Core
 {
     static std::string TEMP_BASE_PATH = "EngineResources";
     ContentBrowserPanel::ContentBrowserPanel()
     {
-        state.activePath = TEMP_BASE_PATH; // TODO: Project specific
+        state.activePath = TEMP_BASE_PATH;
+        if (Project::GetActiveConfiguration().AssetDirectory != "")
+            state.activePath = Project::GetActiveConfiguration().AssetDirectory;
+
         state.padding = 16.0f;
         state.thumbnailSize = 64.0f;
 
@@ -23,6 +27,8 @@ namespace Core
 
     void ContentBrowserPanel::OnImGuiRender(PanelInformation *info)
     {
+        TEMP_BASE_PATH = info->AssetDirectory;
+
         // NOTE: Extremely platform specific
         ImGui::Begin("Content Browser");
 

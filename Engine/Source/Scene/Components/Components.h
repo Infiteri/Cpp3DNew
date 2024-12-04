@@ -7,6 +7,7 @@
 #include "Renderer/Light/PointLight.h"
 
 #include "Physics/Body/RigidBody.h"
+#include "Physics/Body/StaticBody.h"
 
 namespace Core
 {
@@ -123,5 +124,17 @@ namespace Core
         ~TagComponent();
 
         void From(TagComponent *c);
+    };
+
+    class CE_API StaticBodyComponent : public Component
+    {
+    public:
+        StaticBodyConfiguration Config;
+        StaticBody *BodyInstance;
+
+        StaticBodyComponent();
+        ~StaticBodyComponent();
+
+        void From(StaticBodyComponent *c);
     };
 }

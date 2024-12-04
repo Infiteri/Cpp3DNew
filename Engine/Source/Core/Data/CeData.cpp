@@ -37,8 +37,7 @@ namespace Core
 
     void CeData::ClearDataBasedOnCurrentType()
     {
-        if (!shouldClear)
-            return;
+        CE_VERIFY(shouldClear);
 
         shouldClear = false;
         switch (type)

@@ -72,8 +72,7 @@ namespace Core
 
     void SceneHierarchyPanel::RenderActor(Actor *a, Actor *parent, bool parentNodeOpen)
     {
-        if (!a || a == nullptr)
-            return;
+        CE_VERIFY(a || a != nullptr);
 
         // Flags setup
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_AllowItemOverlap;
@@ -134,14 +133,9 @@ namespace Core
         }
 
         if (!parent)
-        {
             ImGui::Dummy({ImGui::GetWindowWidth(), 5});
-        }
-        else
-        {
-            if (parentNodeOpen)
-                ImGui::Dummy({ImGui::GetWindowWidth(), 5});
-        }
+        else if (parentNodeOpen)
+            ImGui::Dummy({ImGui::GetWindowWidth(), 5});
 
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
         {
@@ -192,11 +186,11 @@ namespace Core
     void RenderPointLightUI(PointLightComponent *c, Actor *a);
     void RenderRigidBodyUI(RigidBodyComponent *c, Actor *a);
     void RenderTagUI(TagComponent *c, Actor *a);
+    void RenderStaticBodyUI(StaticBodyComponent *c, Actor *a);
 
     void SceneHierarchyPanel::RenderActorComponents(Actor *a)
     {
-        if (!a)
-            return;
+        CE_VERIFY(a);
 
         {
             auto name = EditorUtils::ImGuiStringEdit("Name", a->GetName());
@@ -212,27 +206,28 @@ namespace Core
             ImGui::TreePop();
         }
 
+        CE_UTIL_ADD_RENDER("Tag Component", TagComponent, RenderTagUI);
         CE_UTIL_ADD_RENDER("Mesh Component", MeshComponent, RenderMeshUI);
         CE_UTIL_ADD_RENDER("Data Set Component", DataSetComponent, RenderDataSetUI);
         CE_UTIL_ADD_RENDER("Script Component", ScriptComponent, RenderScriptUI);
         CE_UTIL_ADD_RENDER("Camera Component", CameraComponent, RenderCameraUI);
         CE_UTIL_ADD_RENDER("Point Light Component", PointLightComponent, RenderPointLightUI);
         CE_UTIL_ADD_RENDER("Rigid Body Component", RigidBodyComponent, RenderRigidBodyUI);
-        CE_UTIL_ADD_RENDER("Tag Component", TagComponent, RenderTagUI);
+        CE_UTIL_ADD_RENDER("Static Body Component", StaticBodyComponent, RenderStaticBodyUI);
 
         if (ImGui::Button("Add Component"))
             ImGui::OpenPopup("ComponentPopup");
 
         if (ImGui::BeginPopupContextItem("ComponentPopup"))
         {
+            CE_ADD_COMPONENT(Tag);
             CE_ADD_COMPONENT(Mesh);
             CE_ADD_COMPONENT(DataSet);
             CE_ADD_COMPONENT(Script);
             CE_ADD_COMPONENT(Camera);
             CE_ADD_COMPONENT(PointLight);
             CE_ADD_COMPONENT(RigidBody);
-            CE_ADD_COMPONENT(Tag);
-
+            CE_ADD_COMPONENT(StaticBody);
             ImGui::EndPopup();
         }
     }
@@ -466,4 +461,6 @@ namespace Core
         if (tagChange.Changed)
             c->Tag = tagChange.Content;
     }
+
+    void RenderStaticBodyUI(StaticBodyComponent *c, Actor *a) {}
 }

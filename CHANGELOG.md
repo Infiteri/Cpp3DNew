@@ -205,3 +205,12 @@
 - Started physics contact
 - Added Contact collision response
 - Got mad
+
+# 0.2.2 - 04.12.2024
+
+- Small editor utilities
+- Started Project system
+- Editor Project connection
+- Coupled meshes to renderer in a better way
+- Fixed bugs
+- Other

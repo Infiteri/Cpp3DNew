@@ -2,13 +2,14 @@
 
 #include "Core.h"
 #include <imgui.h>
+#include <string>
 
 namespace Core
 {
     /// @brief General Panel information, edited by the EditorLayer class, passed to all the panels
     struct PanelInformation
     {
-        // TODO: Add needed data
+        std::string AssetDirectory;
     };
 
     /// @brief Abstract class for panels
