@@ -39,6 +39,6 @@ namespace Core
         ~EditorSettingsSerializer();
 
         void Serialize();
-        void Deserialize();
+        bool Deserialize();
     };
 }

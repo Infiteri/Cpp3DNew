@@ -8,24 +8,26 @@
 namespace Core
 {
     class PhysicsBody;
-    class Collider
+    class CE_API Collider
     {
     public:
         enum Type
         {
-            Base,
+            None,
             Box
         };
 
     protected:
-        Type type = Base;
+        Type type = None;
 
     public:
         PhysicsBody *Owner;
         PhysMatrix4x3 *TransformMatrix = nullptr;
 
-        Collider() { type = Base; };
+        Collider();
         ~Collider() {};
+
+        virtual void From(Collider *col) {};
 
         inline Type GetType() { return type; };
 
@@ -35,12 +37,13 @@ namespace Core
         Vector3 GetAxis(int index);
     };
 
-    class AABBCollider : public Collider
+    class CE_API AABBCollider : public Collider
     {
     public:
         Vector3 Size;
 
-        AABBCollider() { type = Box; };
+        AABBCollider();
         ~AABBCollider() {}
+        void From(AABBCollider *col);
     };
 }

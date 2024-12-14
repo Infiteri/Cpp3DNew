@@ -56,10 +56,10 @@ namespace Core
         fout << out.c_str();
     }
 
-    void EditorSettingsSerializer::Deserialize()
+    bool EditorSettingsSerializer::Deserialize()
     {
         if (!Settings)
-            return;
+            return false;
 
         std::ifstream stream(SettingsFilePath);
         std::stringstream strStream(SettingsFilePath);
@@ -67,15 +67,12 @@ namespace Core
         strStream << stream.rdbuf();
 
         if (!stream.good())
-            return;
-
-        if (strStream.str().size() <= 0) // Empty file
-            return;
+            return false;
 
         YAML::Node data = YAML::Load(strStream.str());
 
         if (data.IsNull() || !data["Settings"])
-            return;
+            return false;
 
         Settings->CameraFOV = data["CameraFOV"].as<float>();
         Settings->FontSize = data["FontSize"].as<float>();
@@ -93,5 +90,7 @@ namespace Core
                 imColors[(ImGuiCol)c["Color"].as<int>()].w = c["Color Value"][3].as<float>();
             }
         }
+
+        return true;
     }
 }

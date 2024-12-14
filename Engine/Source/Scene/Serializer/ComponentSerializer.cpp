@@ -52,7 +52,7 @@ namespace Core
         CE_SERIALIZE_COMP_CALLBACK(StaticBody);
     }
 
-    void ComponentSerializer::Deserialize(YAML::Node actorNode)
+    bool ComponentSerializer::Deserialize(YAML::Node actorNode)
     {
         // ADD WHEN NEW COMPONENTS
 
@@ -64,6 +64,8 @@ namespace Core
         CE_DESERIALIZE_COMPONENT("RigidBodyComponent", DeserializeRigidBodyComponent);
         CE_DESERIALIZE_COMPONENT("TagComponent", DeserializeTagComponent);
         CE_DESERIALIZE_COMPONENT("StaticBodyComponent", DeserializeStaticBodyComponent);
+
+        return true;
     }
 
     void ComponentSerializer::FillComponentCountData()
@@ -316,11 +318,13 @@ namespace Core
     {
         out << YAML::Key << "StaticBodyComponent " + std::to_string(index);
         out << YAML::BeginMap;
+        CE_SERIALIZE_FIELD("Mass", c->Config.Mass);
         out << YAML::EndMap;
     }
 
     void ComponentSerializer::DeserializeStaticBodyComponent(YAML::Node node)
     {
         auto c = a->AddComponent<StaticBodyComponent>();
+        c->Config.Mass = node["Mass"].as<float>();
     }
-}
+}        

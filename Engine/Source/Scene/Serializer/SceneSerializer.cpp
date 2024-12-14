@@ -132,7 +132,7 @@ namespace Core
         fout << out.c_str();
     }
 
-    void SceneSerializer::Deserialize(const std::string &filepath)
+    bool SceneSerializer::Deserialize(const std::string &filepath)
     {
         CE_CORE_TRACE("Deserializing scene: %s", filepath.c_str());
 
@@ -147,8 +147,10 @@ namespace Core
         strStream << stream.rdbuf();
         YAML::Node data = YAML::Load(strStream.str());
 
-        if (!data["Scene"])
-            return;
+        if (!data || !data["Scene"])
+        {
+            return false;
+        }
 
         // Takes the directional light field directly
         _DeserializeDirLight(&scene->GetEnvironment()->DirectionalLight, data["SceneEnvironment"]["DirectionalLight"]);
@@ -202,9 +204,11 @@ namespace Core
 
         //? update scene state
 
-        // Note: After loading the proper sky configuration, the sky instance must be updated/
         // TODO: There should be problems with the new sky design so make sure no matter what happens everything is right ( _SetSkyInstance could be moved to the Render function of the scene )
+        // Note: After loading the proper sky configuration, the sky instance must be updated/
         scene->_SetSkyInstance();
+
+        return true;
     }
 
     void SceneSerializer::SerializeActor(Actor *a, YAML::Emitter &out)

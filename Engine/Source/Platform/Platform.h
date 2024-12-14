@@ -21,6 +21,11 @@ namespace Core
             void *PFN;
         };
 
+        enum ExtentionType
+        {
+            ExtensionLibrary
+        };
+
         struct DynamicLibrary
         {
             std::string Name;
@@ -71,6 +76,12 @@ namespace Core
         static DynamicLibrary CreateLibrary(const std::string &name);
         static void DestroyLibrary(DynamicLibrary *lib);
         static bool LoadFunction(DynamicLibrary *lib, const std::string &name);
+
+        /// @brief Will return an 'std::string' with the proper platform-specific extension.
+        /// @param type The type fo extension to get. (for 'ExtensionLibrary' on Win32 its 'dll')
+        /// @param withDot Wether or not to add a '.' before the extension. (For library on windows, with this being true it will be '.dll')
+        /// @return The string return value.
+        static std::string GetExtensionFormat(ExtentionType type, bool withDot = true);
 
         template <typename T>
         static T GetFunction(DynamicLibrary *lib, const std::string &name)

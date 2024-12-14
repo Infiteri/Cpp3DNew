@@ -33,12 +33,20 @@ namespace Core
         CE_LOG("CE_WORLD", Debug, "Creating new scene: %s.", name.c_str());
         Scene *scene = new Scene();
         scene->SetName(name);
+        bool deserialized = false;
 
         if (loadFromFile)
         {
             SceneSerializer ser(scene);
-            ser.Deserialize(name);
+            deserialized = ser.Deserialize(name);
         }
+
+        if (loadFromFile && !deserialized)
+        {
+            CE_LOG("CE_WORLD", Error, "Unable to load scene '%s'. Probable cause: File doesn't exist.", name.c_str());
+            return nullptr;
+        }
+
         scenes[name] = scene;
         return scene;
     }

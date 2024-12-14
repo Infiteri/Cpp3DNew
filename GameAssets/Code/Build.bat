@@ -1,5 +1,2 @@
 @ECHO OFF
-
-PUSHD Bin
-g++ -g -shared ../GameAssets/Code/*.cpp -I../GameAssets/Code -I../Engine/Source -L../Bin -lEngine  -o GameCode.dll
-POPD
+g++ -g -shared -IEngine/Source Bin/Assets/Code/Test.cpp -IBin/Assets/Code -LBin -lEngine -o Bin/Assets/TestLib.dll

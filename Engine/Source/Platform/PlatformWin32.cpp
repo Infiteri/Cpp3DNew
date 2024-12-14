@@ -263,6 +263,24 @@ namespace Core
 
         return true;
     }
+
+    std::string Platform::GetExtensionFormat(ExtentionType type, bool withDot)
+    {
+        std::string res = withDot ? "." : "";
+
+        switch (type)
+        {
+        case ExtensionLibrary:
+            res += "dll";
+            break;
+
+        default:
+            res += "UNKNOWN";
+            break;
+        }
+
+        return res;
+    }
 }
 
 #endif

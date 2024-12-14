@@ -10,17 +10,12 @@ namespace Core
 {
     class CE_API Engine
     {
+    private:
+        static void SetupWindow();
+        static void LoadProject();
+        static void LoadSystemsWithProject();
+
     public:
-        struct State
-        {
-            Window *Window;
-            Application *GApp;
-
-            // Delta
-            float DeltaTime;
-            float LastTime;
-        };
-
         Engine() {}
         ~Engine() {}
 
@@ -34,6 +29,8 @@ namespace Core
         static void FeedApplication(Application *App);
 
         static float GetDeltaTime();
+
+        static bool IsProjectValid();
 
         static std::string ReadFileContent(const std::string &filename);
     };

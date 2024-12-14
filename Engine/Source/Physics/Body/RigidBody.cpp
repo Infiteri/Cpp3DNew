@@ -23,6 +23,9 @@ namespace Core
             return;
         collider->TransformMatrix = &transformMatrix;
         collider->Owner = this;
+        // TODO: dont do on every frame
+        inverseInertiaTensor = _ComposeInertiaMatrix(collider, config.Mass);
+        inverseInertiaTensor.Invert();
     }
 
     void RigidBody::AddVelocity(const Vector3 &v)
@@ -40,12 +43,7 @@ namespace Core
     {
         owner = nullptr;
         config = RigidBodyConfiguration();
-
-        collider = new AABBCollider();
-        collider->As<AABBCollider>()->Size = {1, 1, 1};
-
-        inverseInertiaTensor = _ComposeInertiaMatrix(collider, config.Mass);
-        inverseInertiaTensor.Invert();
+        collider = nullptr;
         type = Rigid;
     }
 
@@ -72,11 +70,11 @@ namespace Core
 
         // Modify with accelerations
         velocity += lastFrameAcceleration;
-        velocity *= Math::Pow(config.LinearDamp, CE_DELTA_TIME);
+        velocity *= Math::Pow(config.LinearDamp, 0.05);
 
         Vector3 angularAcceleration = inverseInertiaTensorWorld.Transform(torqueAccum);
         torque += angularAcceleration;
-        torque *= Math::Pow(config.AngularDamp, CE_DELTA_TIME);
+        torque *= Math::Pow(config.AngularDamp, 0.05);
 
         orientation.AddScaledVector(torque, CE_PHYSICS_DELTA_TIME);
 

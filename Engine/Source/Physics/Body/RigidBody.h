@@ -13,7 +13,6 @@ namespace Core
         float LinearDamp = 0.1f;
         float AngularDamp = 0.1f;
         float Mass = 1.0f;
-
         void From(RigidBodyConfiguration *c);
     };
 

@@ -102,18 +102,6 @@ namespace Core
         void From(PointLightComponent *c);
     };
 
-    class CE_API RigidBodyComponent : public Component
-    {
-    public:
-        RigidBodyConfiguration Config;
-        RigidBody *BodyInstance;
-
-        RigidBodyComponent();
-        ~RigidBodyComponent();
-
-        void From(RigidBodyComponent *c);
-    };
-
     class CE_API TagComponent : public Component
     {
     public:
@@ -126,9 +114,24 @@ namespace Core
         void From(TagComponent *c);
     };
 
+    class CE_API RigidBodyComponent : public Component
+    {
+    public:
+        Collider *Collider;
+        RigidBodyConfiguration Config;
+        RigidBody *BodyInstance;
+
+        RigidBodyComponent();
+        ~RigidBodyComponent();
+
+        void From(RigidBodyComponent *c);
+    };
+
+
     class CE_API StaticBodyComponent : public Component
     {
     public:
+        Collider *Collider;
         StaticBodyConfiguration Config;
         StaticBody *BodyInstance;
 

@@ -83,7 +83,7 @@ namespace Core
             for (i = 0; i < numContacts; i++)
             {
                 // TODO: Abs?
-                if (Math::Abs(Contacts[i].Penetration) > max)
+                if ((Contacts[i].Penetration) > max)
                 {
                     max = (Contacts[i].Penetration);
                     index = i;

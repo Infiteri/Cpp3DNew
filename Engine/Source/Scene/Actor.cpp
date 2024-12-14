@@ -178,7 +178,7 @@ namespace Core
         return a;
     }
 
-    Actor *Actor::FindChildByUUID(const UUID &uuid)
+    Actor *Actor::FindChild(const UUID &uuid)
     {
         if (id == uuid)
             return this;
@@ -190,7 +190,7 @@ namespace Core
         return nullptr;
     }
 
-    Actor *Actor::FindChildInHierarchyByUUID(const UUID &uuid)
+    Actor *Actor::FindChildInHierarchy(const UUID &uuid)
     {
         if (this->id == uuid)
             return this;
@@ -201,7 +201,7 @@ namespace Core
 
         for (Actor *child : children)
         {
-            Actor *result = child->FindChildInHierarchyByUUID(uuid);
+            Actor *result = child->FindChildInHierarchy(uuid);
             if (result != nullptr)
                 return result;
         }
@@ -209,7 +209,7 @@ namespace Core
         return nullptr;
     }
 
-    void Actor::RemoveActorByUUID(const UUID &uuid)
+    void Actor::RemoveActor(const UUID &uuid)
     {
         Actor *a;
 

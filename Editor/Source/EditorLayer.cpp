@@ -14,6 +14,8 @@ namespace Core
 {
     void EditorLayer::OnAttach()
     {
+        CE_DEFINE_LOG_CATEGORY("CE_ED", "Editor");
+
         state.Camera.camera = CameraSystem::CreatePerspective("EditorCamera", 120.0f);
         CameraSystem::Activate("EditorCamera");
 
@@ -28,14 +30,30 @@ namespace Core
 
         StopSceneRuntime();
 
-        Project::Load("Project.ce_proj");
-        state.ActiveProjectPath = "Project.ce_proj";
+        if (Engine::IsProjectValid())
+        {
+            std::string spf = Project::GetActiveConfiguration().GetStartScenePathFormatted(); // Scene Path Formatted
+            SetContextToProject();
+            OpenScene(spf);
 
-        SetContextToProject();
-        OpenScene(Project::GetActiveConfiguration().GetStartScenePathFormatted());
+            // Check if scene is valid
+            if (!World::GetActiveScene())
+            {
+                CE_LOG("CE_ED", Error, "Scene '%s' is invalid, opening an empty temporary scene.", spf.c_str());
+            }
 
-        // TODO: Better structure
-        ((ContentBrowserPanel *)(state.Panels.panels[2]))->state.activePath = Project::GetActiveConfiguration().AssetDirectory;
+            // TODO: Better structure
+            if (!Project::GetActiveConfiguration().AssetDirectory.empty())
+            {
+                ((ContentBrowserPanel *)(state.Panels.panels[2]))->state.activePath = Project::GetActiveConfiguration().AssetDirectory;
+            }
+        }
+        else
+        {
+            CE_LOG("CE_ED", Warn, "Unable to load scene, project invalid.");
+            CE_LOG("CE_ED", Warn, "An empty scene will be created.");
+            NewScene();
+        }
     }
 
     void EditorLayer::OnImGuiRender()
@@ -127,6 +145,9 @@ namespace Core
             if (ImGui::MenuItem("Editor"))
                 ImGui::OpenPopup("EditorMenu");
 
+            if (ImGui::MenuItem("Script"))
+                ImGui::OpenPopup("ScriptMenu");
+
             ImGui::SetNextWindowSize({250, 0});
             if (ImGui::BeginPopup("FileMenu"))
             {
@@ -172,6 +193,24 @@ namespace Core
             {
                 if (ImGui::MenuItem("Open Editor Settings"))
                     state.RenderSettings = true;
+
+                ImGui::EndPopup();
+            }
+
+            ImGui::SetNextWindowSize({250, 0});
+            if (ImGui::BeginPopup("ScriptMenu"))
+            {
+                if (ImGui::MenuItem("Reload Library"))
+                {
+                    ScriptEngine::ReloadScriptLibrary(Project::GetActiveConfiguration().GetScriptLibPathFormatted());
+                }
+
+                if (ImGui::MenuItem("Build Library"))
+                {
+                    ScriptEngine::UnloadScriptLibrary();
+                    system(std::string("call " + Project::GetActiveConfiguration().GetScriptBuildTaskFormatted()).c_str()); // TODO: Better? (abs could be done better)
+                    ScriptEngine::LoadScriptLibrary(Project::GetActiveConfiguration().GetScriptLibPathFormatted());
+                }
 
                 ImGui::EndPopup();
             }
@@ -237,6 +276,7 @@ namespace Core
         config.Name = EditorUtils::ImGuiStringEditReturnString("Name", config.Name);
         config.AssetDirectory = EditorUtils::ImGuiStringEditReturnString("Asset Directory", config.AssetDirectory);
         config.StartScenePath = EditorUtils::ImGuiStringEditReturnString("Start Scene", config.StartScenePath);
+        config.ScriptLibraryPath = EditorUtils::ImGuiStringEditReturnString("Script Library", config.ScriptLibraryPath);
 
         ImGui::Dummy(ImVec2(0, 0));
         ImVec2 buttonSize = ImVec2(80, ImGui::GetFrameHeightWithSpacing());
@@ -402,7 +442,7 @@ namespace Core
         if (Input::GetKey(Keys::Delete) && selection)
         {
             if (selection->GetParent())
-                selection->GetParent()->RemoveActorByUUID(selection->GetUUID());
+                selection->GetParent()->RemoveActor(selection->GetUUID());
             else
                 World::GetActiveScene()->RemoveActor(selection->GetUUID());
 
@@ -633,6 +673,17 @@ namespace Core
 
     void EditorLayer::SaveScene()
     {
+        // todo: ensure you have a project
+        // kind of a random thought but maybe:
+        // if there is no project existing nothing works, and i just thought "how do you open the editor, like if there is no project there is no way of making one"
+        // maybe creating a project in a specific path using a "Project Manager" popup, kinda like Unity yk?
+        // had this random thought that will surely be a problem in the future so im glad i thought op something
+        if (!Engine::IsProjectValid())
+        {
+            CE_LOG("CE_ED", Warn, "Unable to save scene. Make sure a project exists.");
+            return;
+        }
+
         if (state.ActiveScenePath.empty())
         {
             SaveSceneAs();
@@ -640,6 +691,12 @@ namespace Core
         }
 
         SceneSerializer ser(World::GetActiveScene());
+        // Note: ensure that name == filepath. todo: better structure for this
+        // its wired that it has to be this way as making a scene "TEMPORARY SCENE NAME", due to scenes name being their filepath, kinda breaks stuff
+        // a better structure should be implemented or at least:
+        //  1 - different way of making a temporary scene (maybe World has something to do in here)
+        //  2 - do the "SetName" call somewhere else, just not in the serializer
+        // future me, please fix this :)
         World::GetActiveScene()->SetName(state.ActiveScenePath);
         ser.Serialize(state.ActiveScenePath);
     }

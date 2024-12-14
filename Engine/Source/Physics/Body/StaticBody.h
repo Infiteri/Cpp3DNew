@@ -12,6 +12,7 @@ namespace Core
     struct StaticBodyConfiguration
     {
         Actor *Owner;
+        float Mass = 1.0f;
 
         void From(StaticBodyConfiguration *c);
     };
@@ -35,7 +36,9 @@ namespace Core
 
         void UseConfiguration(StaticBodyConfiguration *config);
 
-
         void Update();
+
+        inline float GetMass() { return state.Mass; };
+        inline float GetInverseMass() {return 1.0f / state.Mass; };
     };
 }

@@ -102,14 +102,14 @@ namespace Core
         /// @brief Searches for an actor in the children list of this actor. Goes only one level deep.
         /// @param uuid The uuid.
         /// @return Actor * or nullptr.
-        Actor *FindChildByUUID(const UUID &uuid);
+        Actor *FindChild(const UUID &uuid);
 
         /// @brief Searches for an actor in the children list of this actor. Goes fully deep (recursive).
         /// @param uuid The uuid.
         /// @return Actor * or nullptr.
-        Actor *FindChildInHierarchyByUUID(const UUID &uuid);
+        Actor *FindChildInHierarchy(const UUID &uuid);
 
-        void RemoveActorByUUID(const UUID &uuid);
+        void RemoveActor(const UUID &uuid);
         // --------------------------------
 
         // ---------- COMPONENTS ----------

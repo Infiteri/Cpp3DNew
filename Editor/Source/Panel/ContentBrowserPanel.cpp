@@ -1,7 +1,6 @@
 #include "ContentBrowserPanel.h"
 #include "EditorUtils.h"
 #include "Platform/Platform.h"
-#include "Project/Project.h"
 
 namespace Core
 {

@@ -33,7 +33,7 @@
 
 namespace Core
 {
-    static inline void _CalculateLocalVelocityDataWithBody(PhysicsBody *b, Vector3 *v, Vector3 *t, Vector3 *lfa)
+    static inline void _CalculateLocalVelocityDataWithBodyType(PhysicsBody *b, Vector3 *v, Vector3 *t, Vector3 *lfa)
     {
         switch (b->GetType())
         {
@@ -77,7 +77,7 @@ namespace Core
         case PhysicsBody::Static:
         {
             auto bt = b->As<StaticBody>();
-            return 1; // TODO: MASS
+            return inverse ? bt->GetInverseMass() : bt->GetMass(); // TODO: MASS
             break;
         }
 
@@ -221,7 +221,7 @@ namespace Core
         Vector3 bVelocity;
         Vector3 lfa; // Last frame acceleration
 
-        _CalculateLocalVelocityDataWithBody(body, &bVelocity, &torque, &lfa);
+        _CalculateLocalVelocityDataWithBodyType(body, &bVelocity, &torque, &lfa);
 
         // Work out the velocity of the contact point
         Vector3 velocity = torque % RelativeContactPosition[index];

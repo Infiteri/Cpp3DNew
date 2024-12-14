@@ -333,4 +333,56 @@ namespace Core
     {
         SetID = 0;
     }
+
+    void EditorUtils::RenderColliderUI(Collider *c)
+    {
+        if (!c)
+            return;
+
+        // Type editing
+        {
+            const int maxSelections = 2;
+            const char *selections[maxSelections] = {"None", "AABB"};
+            const char *current = selections[(int)c->GetType()];
+
+            if (ImGui::BeginCombo("Type", current))
+            {
+                for (int i = 0; i < maxSelections; i++)
+                {
+                    bool isSelected = (current == selections[i]);
+
+                    if (ImGui::Selectable(selections[i], isSelected))
+                    {
+                        delete c;
+                        switch ((Collider::Type)i)
+                        {
+                        case Collider::Box:
+                        { 
+                            c = new AABBCollider(); 
+                        }
+                        break;
+
+                        case Collider::None:
+                        {
+                            c = new Collider();
+                        }
+                        break;
+                        }
+                    }
+
+                    if (isSelected) 
+                        ImGui::SetItemDefaultFocus();
+                }
+
+                ImGui::EndCombo();
+            }
+        }
+
+        switch ((Collider::Type)c->GetType())
+        {
+        case Collider::Box:
+            ImGuiVec3Edit("Size", &(((AABBCollider *)c)->Size));
+            break;
+        }
+    }
 }

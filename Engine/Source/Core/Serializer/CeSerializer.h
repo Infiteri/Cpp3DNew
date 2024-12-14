@@ -24,7 +24,7 @@ namespace Core
         virtual void Serialize(YAML::Emitter &out) {};
         virtual void Serialize(const std::string &filepath, YAML::Emitter &out) {};
         virtual void Serialize(const std::string &filepath) {};
-        virtual void Deserialize(const std::string &filepath) {};
-        virtual void Deserialize() {};
+        virtual bool Deserialize(const std::string &filepath) { return true; };
+        virtual bool Deserialize() { return true; };
     };
 }

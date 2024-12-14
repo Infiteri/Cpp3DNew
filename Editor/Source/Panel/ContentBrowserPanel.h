@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Panel.h"
+#include "Project/Project.h"
 
 #include <string>
 

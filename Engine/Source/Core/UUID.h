@@ -19,6 +19,6 @@ namespace Core
 
         inline CeU64 Get() { return id; };
 
-        bool operator==(const UUID &o) { return id == o.id; };
+        bool operator==(const UUID &o) const { return id == o.id; };
     };
 }

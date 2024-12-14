@@ -14,6 +14,6 @@ namespace Core
         ~ProjectSerializer() {};
 
         void Serialize(const std::string &name);
-        void Deserialize(const std::string &name);
+        bool Deserialize(const std::string &name);
     };
 }

@@ -25,12 +25,14 @@ namespace Core
         {
             rigidBody->Config.Owner = a;
             rigidBody->BodyInstance = PhysicsEngine::CreateRigid(&rigidBody->Config);
+            rigidBody->BodyInstance->SetCollider(rigidBody->Collider);
         }
 
         for (auto staticBody : a->GetComponents<StaticBodyComponent>())
         {
             staticBody->Config.Owner = a;
             staticBody->BodyInstance = PhysicsEngine::CreateStatic(&staticBody->Config);
+            staticBody->BodyInstance->SetCollider(staticBody->Collider);
         }
     }
 
@@ -203,7 +205,7 @@ namespace Core
             {
                 if (a)
                     break;
-                a = actor->FindChildInHierarchyByUUID(uuid);
+                a = actor->FindChildInHierarchy(uuid);
             }
         }
 

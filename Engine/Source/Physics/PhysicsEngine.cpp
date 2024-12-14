@@ -42,10 +42,13 @@ namespace Core
             auto body = state.Bodies[i];
             body->Update();
 
-            for (int j = i + 1; j < state.Bodies.size(); j++)
+            for (int j = 0; j < state.Bodies.size(); j++)
             {
+                if (i == j)
+                    continue;
+
                 auto body2 = state.Bodies[j];
-                body2->As<RigidBody>()->_CalculateData();
+                body2->_CalculateData();
 
                 CheckCollision(body2, body);
             }
@@ -71,6 +74,9 @@ namespace Core
     {
         auto aCollider = a->GetCollider();
         auto bCollider = b->GetCollider();
+
+        if (!aCollider || !bCollider)
+            return;
 
         switch (aCollider->GetType())
         {

@@ -206,11 +206,11 @@
 - Added Contact collision response
 - Got mad
 
-# 0.2.2 - 04.12.2024
+# 0.2.2 - 13.12.2024
 
-- Small editor utilities
-- Started Project system
-- Editor Project connection
-- Coupled meshes to renderer in a better way
-- Fixed bugs
-- Other
+- Added project to Engine
+- Added buggy StaticBody
+- Tied project more into engine
+- Tied script library with editor
+- Updated old dll's (libgcc_s_sjlj-1.dll missing fixed)
+- Updated Vendor build scripts

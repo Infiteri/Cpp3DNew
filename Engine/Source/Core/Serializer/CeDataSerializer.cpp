@@ -58,7 +58,7 @@ namespace Core
         }
     }
 
-    void CeDataSerializer::Deserialize(YAML::Node node)
+    bool CeDataSerializer::Deserialize(YAML::Node node)
     {
         for (auto nodeData : node)
         {
@@ -104,5 +104,7 @@ namespace Core
             break;
             }
         }
+
+        return true;
     }
 }

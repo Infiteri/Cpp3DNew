@@ -116,10 +116,10 @@ namespace Core
                 auto moveActor = World::GetActiveScene()->GetActorInHierarchy(rawUUID);
                 if (moveActor)
                 {
-                    if (!moveActor->FindChildByUUID(a->GetUUID()))
+                    if (!moveActor->FindChild(a->GetUUID()))
                     {
                         if (moveActor->GetParent())
-                            moveActor->GetParent()->RemoveActorByUUID(rawUUID);
+                            moveActor->GetParent()->RemoveActor(rawUUID);
                         else
                             World::GetActiveScene()->RemoveActor(rawUUID);
                         a->AddChild(moveActor);
@@ -162,7 +162,7 @@ namespace Core
                         World::GetActiveScene()->MoveChildInHierarchy(moveActor->GetUUID(), actorIndex);
                     else
                     {
-                        moveActor->GetParent()->RemoveActorByUUID(moveActor->GetUUID()); // remove from parent and add to scene
+                        moveActor->GetParent()->RemoveActor(moveActor->GetUUID()); // remove from parent and add to scene
                         World::GetActiveScene()->AddActor(moveActor);
                         World::GetActiveScene()->MoveChildInHierarchy(moveActor->GetUUID(), actorIndex);
                     }
@@ -448,13 +448,6 @@ namespace Core
         ImGui::DragFloat("Intensity", &c->Light->Intensity, 0.05f, 0.0f);
     }
 
-    void RenderRigidBodyUI(RigidBodyComponent *c, Actor *a)
-    {
-        ImGui::DragFloat("Linear Damp", &c->Config.LinearDamp, 0.05f, 0.0f, 1.0f);
-        ImGui::DragFloat("Angular Damp", &c->Config.AngularDamp, 0.05f, 0.0f, 1.0f);
-        ImGui::DragFloat("Mass", &c->Config.Mass, 0.05f, 0.0f);
-    }
-
     void RenderTagUI(TagComponent *c, Actor *a)
     {
         auto tagChange = EditorUtils::ImGuiStringEdit("Tag", c->Tag);
@@ -462,5 +455,27 @@ namespace Core
             c->Tag = tagChange.Content;
     }
 
-    void RenderStaticBodyUI(StaticBodyComponent *c, Actor *a) {}
+    void RenderRigidBodyUI(RigidBodyComponent *c, Actor *a)
+    {
+        ImGui::DragFloat("Linear Damp", &c->Config.LinearDamp, 0.05f, 0.0f, 1.0f);
+        ImGui::DragFloat("Angular Damp", &c->Config.AngularDamp, 0.05f, 0.0f, 1.0f);
+        ImGui::DragFloat("Mass", &c->Config.Mass, 0.05f, 0.0f);
+
+        if (ImGui::TreeNode("Collider"))
+        {
+            EditorUtils::RenderColliderUI(c->Collider);
+            ImGui::TreePop();
+        }
+    }
+
+    void RenderStaticBodyUI(StaticBodyComponent *c, Actor *a)
+    {
+        ImGui::DragFloat("Mass", &c->Config.Mass, 0.05f, 0.0f);
+
+        if (ImGui::TreeNode("Collider"))
+        {
+            EditorUtils::RenderColliderUI(c->Collider);
+            ImGui::TreePop();
+        }
+    }
 }

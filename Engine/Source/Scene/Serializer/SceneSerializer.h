@@ -22,7 +22,7 @@ namespace Core
         ~SceneSerializer();
 
         void Serialize(const std::string &filepath);
-        void Deserialize(const std::string &filepath);
+        bool Deserialize(const std::string &filepath);
 
         void SerializeActor(Actor *a, YAML::Emitter &out);
 

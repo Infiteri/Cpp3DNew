@@ -7,13 +7,7 @@ namespace Core
     {
         owner = nullptr;
         type = Static;
-
-        collider = new AABBCollider();
-        collider->As<AABBCollider>()->Size = {1, 1, 1};
-
-        // TODO: Mass?
-        inverseInertiaTensor = _ComposeInertiaMatrix(collider, 10);
-        inverseInertiaTensor.Invert();
+        collider = nullptr;
     }
 
     StaticBody::~StaticBody()
@@ -33,6 +27,7 @@ namespace Core
     void StaticBodyConfiguration::From(StaticBodyConfiguration *c)
     {
         Owner = c->Owner;
+        Mass = c->Mass;
     }
 
     void StaticBody::_CalculateData()
@@ -46,5 +41,7 @@ namespace Core
             return;
         collider->TransformMatrix = &transformMatrix;
         collider->Owner = this;
+        inverseInertiaTensor = _ComposeInertiaMatrix(collider, 1);
+        inverseInertiaTensor.Invert();
     }
 }

@@ -1,4 +1,4 @@
-Scene: EngineResources/Scene.ce_scene
+Scene: Assets/Scenes/Scene.ce_scene
 SceneEnvironment:
   DirectionalLight:
     Color: [255, 255, 255, 255]
@@ -9,8 +9,32 @@ SceneEnvironment:
     Color: [57.3542862, 75.2239075, 93.8082886, 255]
 Actors:
   - Actor: Filed
-    Name: Actor
-    UUID: 631977179020359481
+    Name: Staic
+    UUID: 8144266691232685446
+    ParentUUID: 0
+    Transform:
+      Position: [0, -4.76145267, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponentCount: 1
+    DataSetComponentCount: 0
+    ScriptComponentCount: 0
+    CameraComponentCount: 0
+    PointLightComponentCount: 0
+    RigidBodyComponentCount: 0
+    TagComponentCount: 0
+    StaticBodyComponentCount: 1
+    MeshComponent 0:
+      Type: 0
+      GeometryType: 1
+      Width: 1
+      Height: 1
+      Depth: 1
+    StaticBodyComponent 0:
+      Mass: 3.0999999
+  - Actor: Filed
+    Name: Cool
+    UUID: 366736318932059353
     ParentUUID: 0
     Transform:
       Position: [0, 0, 0]
@@ -21,24 +45,25 @@ Actors:
     ScriptComponentCount: 0
     CameraComponentCount: 0
     PointLightComponentCount: 0
-    RigidBodyComponentCount: 0
+    RigidBodyComponentCount: 1
+    TagComponentCount: 0
+    StaticBodyComponentCount: 0
     MeshComponent 0:
-      Type: 1
-      Name: ""
-      Color: [255, 255, 255, 255]
-      TextureName: D:\Ion\Cpp3DNew\Bin\EngineResources\Images\crate.png
-      TextureMin: 1
-      TextureMag: 1
+      Type: 0
       GeometryType: 1
       Width: 1
       Height: 1
       Depth: 1
+    RigidBodyComponent 0:
+      LinearDamp: 0.100000001
+      AngularDamp: 0.100000001
+      Mass: 1
   - Actor: Filed
-    Name: Actor
-    UUID: 1275278976166057676
+    Name: Camera
+    UUID: 6985607851851294225
     ParentUUID: 0
     Transform:
-      Position: [0, 0, 2.91350293]
+      Position: [0, 0, 7.76054525]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshComponentCount: 0
@@ -47,8 +72,28 @@ Actors:
     CameraComponentCount: 1
     PointLightComponentCount: 0
     RigidBodyComponentCount: 0
+    TagComponentCount: 0
+    StaticBodyComponentCount: 0
     CameraComponent 0:
       FOV: 90
-      Near: 0.00499999989
+      Near: 0.00999999978
       Far: 1000
       IsPrimary: true
+  - Actor: Filed
+    Name: Script
+    UUID: 15438311640077527475
+    ParentUUID: 0
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponentCount: 0
+    DataSetComponentCount: 0
+    ScriptComponentCount: 1
+    CameraComponentCount: 0
+    PointLightComponentCount: 0
+    RigidBodyComponentCount: 0
+    TagComponentCount: 0
+    StaticBodyComponentCount: 0
+    ScriptComponent 0:
+      ClassName: TestScript

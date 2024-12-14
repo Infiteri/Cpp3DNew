@@ -1,0 +1,5 @@
+Project:
+  Name: Project
+  AssetDirectory: "Assets"
+  StartScenePath: "Scenes/Scene.ce_scene"
+  ScriptLibraryPath: ""

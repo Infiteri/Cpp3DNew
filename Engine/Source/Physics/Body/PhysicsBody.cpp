@@ -4,6 +4,7 @@
 namespace Core
 {
     static Vector3 ZERO_VECTOR = {0, 0, 0};
+
     PhysicsBody::PhysicsBody()
     {
         collider = nullptr;
@@ -38,6 +39,13 @@ namespace Core
             return ZERO_VECTOR;
 
         return owner->GetTransform()->Rotation * (asRadians ? CE_DEG_TO_RAD : 1.0f);
+    }
+
+    void PhysicsBody::SetCollider(Collider *newCollider)
+    {
+        if (collider)
+            delete collider;
+        collider = newCollider;
     }
 
     void PhysicsBody::SetOrientation(const Quaternion &quat)

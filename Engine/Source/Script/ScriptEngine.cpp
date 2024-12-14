@@ -5,14 +5,15 @@
 
 namespace Core
 {
-    static Platform::DynamicLibrary gameCodeLibrary;
+    static Platform::DynamicLibrary scriptLib;
     static std::unordered_map<std::string, ActorScript *> scripts;
 
     typedef ActorScript *(*GetScriptPFN)();
 
-    void ScriptEngine::Init()
+    void ScriptEngine::Init(const std::string &scriptLibrary)
     {
-        gameCodeLibrary = Platform::CreateLibrary("GameCode.dll"); // TODO: project
+        if (!scriptLibrary.empty())
+            LoadScriptLibrary(scriptLibrary);
     }
 
     void ScriptEngine::Shutdown()
@@ -62,8 +63,31 @@ namespace Core
         if (scripts.find(name) != scripts.end())
             return;
 
-        auto func = Platform::GetFunction<GetScriptPFN>(&gameCodeLibrary, className + "Create");
+        auto func = Platform::GetFunction<GetScriptPFN>(&scriptLib, className + "Create");
         if (func)
             RegisterScript(name, func(), owner);
+    }
+
+    void ScriptEngine::UnloadScriptLibrary()
+    {
+        if (!scriptLib.Valid)
+        {
+            CE_CORE_ERROR("Unable to unload script library as its invalid.");
+            return;
+        }
+
+        Platform::DestroyLibrary(&scriptLib);
+    }
+
+    void ScriptEngine::LoadScriptLibrary(const std::string &name)
+    {
+        scriptLib = Platform::CreateLibrary(name);
+    }
+
+    void ScriptEngine::ReloadScriptLibrary(const std::string &name)
+    {
+        if (scriptLib.Valid)
+            UnloadScriptLibrary();
+        LoadScriptLibrary(name);
     }
 }

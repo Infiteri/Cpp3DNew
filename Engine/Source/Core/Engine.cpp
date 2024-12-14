@@ -24,35 +24,42 @@
 
 namespace Core
 {
-    static Engine::State state;
+    struct State
+    {
+        Window *Window;
+        Application *GApp;
+        bool IsProjectValid = false;
+
+        // Delta
+        float DeltaTime;
+        float LastTime;
+    };
+
+    static State state;
 
     void Engine::PreInit()
     {
         Logger::Settings LogSettings; // TODO: Maybe parse a file?
         Logger::Init(LogSettings);
 
-        // -- Cool --
         CE_CORE_INFO("VERSION: %s", CE_VERSION);
 
+        LoadProject();
+        SetupWindow();
+
+        // Note; No project specific section
         Input::Init();
-
-        // TODO: From configuration or project
-        Window::Information WindowInformation;
-        WindowInformation.SizeMode = Window::Windowed;
-        WindowInformation.Title = "Hello Core";
-        state.Window = new Window(WindowInformation);
-
         Renderer::InitializeRenderingContext();
         Renderer::Init();
         Renderer::Viewport(state.Window->GetInfo()->Width, state.Window->GetInfo()->Height);
         World::Init();
-        ScriptEngine::Init();
         PhysicsEngine::Init();
         ImGuiLayer::Init(); // NOTE: Requires window
-
         LayerStack::Init();
 
-        // TODO: some project stuff?
+        if (state.IsProjectValid)
+            LoadSystemsWithProject();
+
         // Note: the final exe and the '.ce_proj' file MUSt be in the same directory. Otherwise game wont run, when a better architecture is in place it will be done the right way
     }
 
@@ -69,9 +76,9 @@ namespace Core
         state.Window->Update();
         LayerStack::Update();
 
-        double currentFrameTime = glfwGetTime();
-        state.DeltaTime = (float)(currentFrameTime - state.LastTime);
-        state.LastTime = (float)(currentFrameTime);
+        float currentFrameTime = (float)glfwGetTime();
+        state.DeltaTime = currentFrameTime - state.LastTime;
+        state.LastTime = currentFrameTime;
     }
 
     void Engine::Render()
@@ -127,6 +134,11 @@ namespace Core
         return state.DeltaTime;
     }
 
+    bool Engine::IsProjectValid()
+    {
+        return state.IsProjectValid;
+    }
+
     std::string Engine::ReadFileContent(const std::string &filename)
     {
         std::string vertResult;
@@ -145,5 +157,37 @@ namespace Core
             vertResult = "";
         }
         return vertResult;
+    }
+
+    void Engine::SetupWindow()
+    {
+        // TODO: Check if with editor (somehow)
+        // If its not with editor it is going to create a window based on saved data to Project.ce_proj
+        Window::Information winInfo;
+        winInfo.SizeMode = Window::Windowed;
+        winInfo.Title = "Hello Core";
+        state.Window = new Window(winInfo);
+    }
+
+    void Engine::LoadProject()
+    {
+        Project::Load("Project.ce_proj");
+        state.IsProjectValid = true;
+
+        if (Project::GetActiveConfiguration().Name.empty())
+        {
+            CE_CORE_WARN("Project name is empty, this could happen due to project being invalid or the name being empty itself.");
+            CE_CORE_WARN("Engine will continue running with no project taken into consideration.");
+            CE_CORE_WARN("Make sure a 'Project.ce_proj' file exists in the same folder sa the '.exe' file begin currently run.");
+            CE_CORE_WARN("Additionally make sure that there is a valid name for the project and that its file format is correct.");
+            state.IsProjectValid = false;
+            return;
+        }
+    }
+
+    void Engine::LoadSystemsWithProject()
+    {
+        auto &config = Project::GetActiveConfiguration();
+        ScriptEngine::Init(config.GetScriptLibPathFormatted());
     }
 }

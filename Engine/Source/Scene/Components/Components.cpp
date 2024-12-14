@@ -160,19 +160,6 @@ namespace Core
         Light->Constant = c->Light->Constant;
     }
 
-    RigidBodyComponent::RigidBodyComponent()
-    {
-    }
-
-    RigidBodyComponent::~RigidBodyComponent()
-    {
-    }
-
-    void RigidBodyComponent::From(RigidBodyComponent *c)
-    {
-        Config.From(&c->Config);
-    }
-
     TagComponent::TagComponent()
     {
         Tag = "";
@@ -187,16 +174,35 @@ namespace Core
         Tag = c->Tag;
     }
 
+    RigidBodyComponent::RigidBodyComponent()
+    {
+        Collider = new AABBCollider();
+    }
+
+    RigidBodyComponent::~RigidBodyComponent()
+    {
+        delete Collider;
+    }
+
+    void RigidBodyComponent::From(RigidBodyComponent *c)
+    {
+        Config.From(&c->Config);
+        Collider->From(c->Collider);
+    }
+
     StaticBodyComponent::StaticBodyComponent()
     {
+        Collider = new AABBCollider();
     }
 
     StaticBodyComponent::~StaticBodyComponent()
     {
+        delete Collider;
     }
 
     void StaticBodyComponent::From(StaticBodyComponent *c)
     {
         Config.From(&c->Config);
+        Collider->From(c->Collider);
     }
 }

@@ -34,7 +34,7 @@ namespace Core
             }
             break;
 
-            case Collider::Base:
+            case Collider::None:
                 break;
 
             default:
@@ -145,6 +145,7 @@ namespace Core
         Quaternion orientation;
 
         friend class Scene;
+        friend class PhysicsEngine;
 
         virtual void _CalculateData() {};
 
@@ -163,6 +164,7 @@ namespace Core
         inline PhysMatrix4x3 &GetTransformMatrix() { return transformMatrix; };
 
         inline Collider *GetCollider() { return collider; };
+        void SetCollider(Collider *newCollider);
 
         /// @brief Will set the orientation and will change the body rotation to the respected values/
         /// @param quat The quaternion.
@@ -172,7 +174,6 @@ namespace Core
         inline PhysMatrix3 GetInverseInertiaTensor() { return inverseInertiaTensor; };
         void SetInertiaTensor(const PhysMatrix3 &matrix);
         inline Quaternion &GetOrientation() { return orientation; };
-
 
         template <typename T>
         T *As() { return (T *)this; };

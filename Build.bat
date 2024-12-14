@@ -1,12 +1,14 @@
 @ECHO OFF
-CLS
+CLS >con
 
 REM Record the start time
 SET Start_Time=%TIME%
 
 REM Execute the make commands
 make -f "Engine.mak" all
+echo Finished Engine.mak
 make -f "Editor.mak" all
+echo Finished Editor.mak
 
 REM Record the end time
 SET End_Time=%TIME%
@@ -40,7 +42,7 @@ ENDLOCAL & SET "Time_Difference=%Hour_Diff%:%Minute_Diff%:%Second_Diff%.%Millise
 
 
 GOTO :EOF
-
+    
 
 
 

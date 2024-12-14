@@ -9,11 +9,11 @@ namespace Core
     {
         std::vector<Contact> Contacts;
 
-        int PositionIterations = 5;
-        int VelocityIterations = 5;
+        int PositionIterations = 15;
+        int VelocityIterations = 15;
 
-        float PositionEpsilon = 0.001f;
-        float VelocityEpsilon = 0.001f;
+        float PositionEpsilon = 0.1f;
+        float VelocityEpsilon = 0.1f;
 
         void Resolve();
 

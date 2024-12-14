@@ -13,6 +13,6 @@ namespace Core
         ~CeDataSerializer();
 
         void Serialize(YAML::Emitter &out);
-        void Deserialize(YAML::Node node);
+        bool Deserialize(YAML::Node node);
     };
 }

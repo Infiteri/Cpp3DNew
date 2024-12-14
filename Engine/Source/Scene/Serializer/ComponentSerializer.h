@@ -64,7 +64,7 @@ namespace Core
         ~ComponentSerializer();
 
         void Serialize(YAML::Emitter &out);
-        void Deserialize(YAML::Node actorNode);
+        bool Deserialize(YAML::Node actorNode);
     };
 
 }
