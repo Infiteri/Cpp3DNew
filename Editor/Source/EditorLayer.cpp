@@ -16,6 +16,9 @@ namespace Core
     {
         CE_DEFINE_LOG_CATEGORY("CE_ED", "Editor");
 
+        state.OpenedScenes = {};
+        state.OpenedScenes.clear();
+
         state.Camera.camera = CameraSystem::CreatePerspective("EditorCamera", 120.0f);
         CameraSystem::Activate("EditorCamera");
 
@@ -34,7 +37,7 @@ namespace Core
         {
             std::string spf = Project::GetActiveConfiguration().GetStartScenePathFormatted(); // Scene Path Formatted
             SetContextToProject();
-            OpenScene(spf);
+            OpenEditorScene(spf);
 
             // Check if scene is valid
             if (!World::GetActiveScene())
@@ -45,7 +48,7 @@ namespace Core
             // TODO: Better structure
             if (!Project::GetActiveConfiguration().AssetDirectory.empty())
             {
-                ((ContentBrowserPanel *)(state.Panels.panels[2]))->state.activePath = Project::GetActiveConfiguration().AssetDirectory;
+                ((ContentBrowserPanel *)(state.Panels.panels[2]))->state.ActivePath = Project::GetActiveConfiguration().AssetDirectory;
             }
         }
         else
@@ -69,25 +72,8 @@ namespace Core
         UI_EditorSettings();
         UI_ProjectEdit();
 
-        // NOTE: temporary
-        ImGui::Begin("Debug");
-        if (ImGui::Button("Save"))
-        {
-            SceneSerializer serializer(World::GetActiveScene());
-            serializer.Serialize("EngineResources/Scene.ce_scene");
-        }
-
-        if (ImGui::Button("Load"))
-        {
-            SceneSerializer serializer(World::GetActiveScene());
-            serializer.Deserialize("EngineResources/Scene.ce_scene");
-        }
-
-        ImGui::Text("Active project: %s", Project::GetActiveConfiguration().Name.c_str());
-
-        ImGui::Text("FPS: %.3f", 1.0f / Engine::GetDeltaTime());
-
-        ImGui::End();
+        // Viewers
+        state.ImgViewer.Render();
 
         EndDockspace();
     }
@@ -127,6 +113,44 @@ namespace Core
                 StartSceneRuntime();
             }
             break;
+        }
+
+        // Render scene selections
+        // TODO: Make sure this system works properly
+        // 1 - make sure the ActiveOpenedScene.SceneName is correct
+        // 2 - make sure that things behave correctly when there is no opened scene
+        // 3 - bugfixes if they appear
+
+        int index = 0;
+        for (auto &sceneEd : state.OpenedScenes)
+        {
+            ImGui::SameLine();
+            ImGui::PushID(sceneEd.SceneName.c_str());
+            if (ImGui::Button(sceneEd.ComposeDisplayName().c_str()))
+                OpenEditorScene(sceneEd.SceneName);
+
+            ImGui::SameLine();
+            if (ImGui::Button("X"))
+            {
+                SaveScene();
+
+                state.OpenedScenes.erase(state.OpenedScenes.begin() + index);
+
+                if (!state.OpenedScenes.empty())
+                {
+                    state.ActiveOpenedScene.SceneName = state.OpenedScenes[0].SceneName;
+                    World::ActivateScene(state.ActiveOpenedScene.SceneName);
+                }
+                else
+                {
+                    state.ActiveOpenedScene.SceneName = "";
+                    World::DeactivateActiveScene();
+                }
+            }
+
+            ImGui::PopID();
+
+            index++;
         }
 
         ImGui::End();
@@ -582,7 +606,15 @@ namespace Core
                 std::string extension = StringUtils::GetExtension(name);
 
                 if (extension == "ce_scene")
-                    OpenScene(name);
+                    OpenEditorScene(name);
+                else if (extension == "png" || extension == "jpg" || extension == "jpeg")
+                {
+                    state.ImgViewer.Image = new Texture();
+                    state.ImgViewer.Image->Load(std::string(name), {});
+                    state.ImgViewer.ShouldRender = true;
+                    state.ImgViewer.Offset.Set(0, 0);
+                    state.ImgViewer.Scale = 1.0f;
+                }
             }
 
             ImGui::EndDragDropTarget();
@@ -618,7 +650,7 @@ namespace Core
             World::CreateScene(name);
 
         World::ActivateScene(name);
-        state.ActiveScenePath = name;
+        state.ActiveOpenedScene.SceneName = name;
     }
 
     void EditorLayer::OpenScene()
@@ -626,6 +658,24 @@ namespace Core
         std::string path = Platform::OpenFileDialog("*.ce_scene, \0*.ce_scene\0");
         if (!path.empty())
             OpenScene(path);
+    }
+
+    void EditorLayer::OpenEditorScene(const std::string &name)
+    {
+        bool exists = false;
+        for (auto &sceneEd : state.OpenedScenes)
+            if (sceneEd.SceneName == name)
+                exists = true;
+
+        if (!exists)
+        {
+            OpenedEditorScene editorScene;
+            editorScene.SceneName = name;
+            state.OpenedScenes.push_back({editorScene});
+            state.ActiveOpenedScene.SceneName = name;
+        }
+
+        OpenScene(name);
     }
 
     void EditorLayer::NewProject()
@@ -662,10 +712,10 @@ namespace Core
     void EditorLayer::NewScene()
     {
         StopSceneRuntime();
-        if (!state.ActiveScenePath.empty())
+        if (!state.ActiveOpenedScene.SceneName.empty())
             SaveScene();
 
-        state.ActiveScenePath = "";
+        state.ActiveOpenedScene.SceneName = "";
 
         World::CreateScene("TEMPORARY SCENE NAME", false);
         World::ActivateScene("TEMPORARY SCENE NAME");
@@ -684,11 +734,14 @@ namespace Core
             return;
         }
 
-        if (state.ActiveScenePath.empty())
+        if (state.ActiveOpenedScene.SceneName.empty())
         {
             SaveSceneAs();
             return;
         }
+
+        if (!World::GetActiveScene())
+            return;
 
         SceneSerializer ser(World::GetActiveScene());
         // Note: ensure that name == filepath. todo: better structure for this
@@ -697,8 +750,8 @@ namespace Core
         //  1 - different way of making a temporary scene (maybe World has something to do in here)
         //  2 - do the "SetName" call somewhere else, just not in the serializer
         // future me, please fix this :)
-        World::GetActiveScene()->SetName(state.ActiveScenePath);
-        ser.Serialize(state.ActiveScenePath);
+        World::GetActiveScene()->SetName(state.ActiveOpenedScene.SceneName);
+        ser.Serialize(state.ActiveOpenedScene.SceneName);
     }
 
     void EditorLayer::SaveSceneAs()
@@ -706,8 +759,62 @@ namespace Core
         std::string path = Platform::SaveFileDialog("*.ce_scene \0*.ce_scene\0");
         if (!path.empty())
         {
-            state.ActiveScenePath = path;
+            state.ActiveOpenedScene.SceneName = path;
             SaveScene();
+            // Since the unsaved scene didn't exist, it has to be registered
+            // This should be fine
+            OpenEditorScene(path);
         }
+    }
+
+    OpenedEditorScene::OpenedEditorScene(const OpenedEditorScene &other)
+    {
+        SceneName = other.SceneName;
+    }
+
+    std::string OpenedEditorScene::ComposeDisplayName()
+    {
+        return StringUtils::GetFormattedNoExt(SceneName);
+    }
+
+    ImageViewer::ImageViewer()
+    {
+        Image = nullptr;
+        ShouldRender = false;
+        Scale = 1.0f;
+    }
+
+    void ImageViewer::Render()
+    {
+        // minimum scale of an image when inspecting
+        static const float IMG_SCALE_LIMIT = 0.01f;
+        if (!ShouldRender || Image == nullptr)
+            return;
+
+        ImGui::Begin("Image Inspector", NULL, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+        if (ImGui::Button("Close"))
+        {
+            delete Image;
+            ShouldRender = false;
+            ImGui::End();
+            return;
+        }
+
+        if (Input::GetButton(Buttons::Right))
+        {
+            Offset += Input::GetMouseDelta();
+        }
+
+        ImVec2 windowPos = ImGui::GetCursorScreenPos();
+        ImVec2 imagePos = {windowPos.x + Offset.x, windowPos.y + Offset.y};
+        ImGui::SetCursorScreenPos(imagePos);
+        ImGui::Image((void *)(CeU64)(CeU32)Image->GetID(), {(float)Image->GetWidth() * Scale, (float)Image->GetHeight() * Scale});
+
+        Scale += Input::GetMouseWheelDelta() * 0.01f;
+        if (Scale < IMG_SCALE_LIMIT)
+            Scale = IMG_SCALE_LIMIT; // todo: fix scroll future me
+
+        ImGui::End();
     }
 }

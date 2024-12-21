@@ -64,6 +64,6 @@ namespace Core
                                  Vector3 rotationChange[2]);
 
         Vector3 CalculateFrictionlessImpulse(PhysMatrix3 *inverseInertiaTensor);
-        // TODO: With friction
+        Vector3 CalculateFrictionImpulse(PhysMatrix3 *inverseInertiaTensor);
     };
 }

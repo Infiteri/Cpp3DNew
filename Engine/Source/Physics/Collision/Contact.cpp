@@ -77,7 +77,7 @@ namespace Core
         case PhysicsBody::Static:
         {
             auto bt = b->As<StaticBody>();
-            return inverse ? bt->GetInverseMass() : bt->GetMass(); // TODO: MASS
+            return inverse ? bt->GetInverseMass() : bt->GetMass();
             break;
         }
 
@@ -283,7 +283,7 @@ namespace Core
             angularInertiaWorld = angularInertiaWorld % RelativeContactPosition[i];
             angularInertia[i] = angularInertiaWorld.Dot(ContactNormal);
 
-            linearInertia[i] = _GetMassWithBodyType(b, true); // TODO: make sure this is inversed
+            linearInertia[i] = _GetMassWithBodyType(b, true);
 
             totalInertia += linearInertia[i] + angularInertia[i];
         }
@@ -345,7 +345,6 @@ namespace Core
 
     void Contact::ApplyVelocityChange(Vector3 velocityChange[2], Vector3 rotationChange[2])
     {
-        // TODO: BODY CAST
         PhysicsBody *b1 = BodyAt(0);
         PhysicsBody *b2 = BodyAt(1);
 
@@ -353,7 +352,13 @@ namespace Core
         inverseInertiaTensor[0].From(b1->GetInverseInertiaTensorWorld());
         inverseInertiaTensor[1].From(b2->GetInverseInertiaTensorWorld());
 
-        Vector3 impulseContact = CalculateFrictionlessImpulse(inverseInertiaTensor);
+        Vector3 impulseContact;
+
+        if (Friction == 0.0)
+            impulseContact = CalculateFrictionlessImpulse(inverseInertiaTensor);
+        else
+            impulseContact = CalculateFrictionImpulse(inverseInertiaTensor);
+
         Vector3 impulse = ContactToWorld.Transform(impulseContact);
 
         Vector3 impulsiveTorque = (RelativeContactPosition[0] % impulse);
@@ -373,7 +378,6 @@ namespace Core
 
     Vector3 Contact::CalculateFrictionlessImpulse(PhysMatrix3 *inverseInertiaTensor)
     {
-        // TODO: BODY CAST
         PhysicsBody *b1 = BodyAt(0);
         PhysicsBody *b2 = BodyAt(1);
 
@@ -398,6 +402,68 @@ namespace Core
         impulseContact.x = DesiredDeltaVelocity / deltaVelocity;
         impulseContact.y = 0;
         impulseContact.z = 0;
+        return impulseContact;
+    }
+
+    Vector3 Contact::CalculateFrictionImpulse(PhysMatrix3 *inverseInertiaTensor)
+    { // todo; make sure things (copy constructor and values) are correct
+        Vector3 impulseContact;
+        float inverseMass = _GetMassWithBodyType(Body[0], true);
+
+        PhysMatrix3 impulseToTorque;
+        impulseToTorque.SetSkewSymmetric(RelativeContactPosition[0]);
+
+        PhysMatrix3 deltaVelWorld = impulseToTorque;
+        deltaVelWorld *= inverseInertiaTensor[0];
+        deltaVelWorld *= impulseToTorque;
+        deltaVelWorld *= -1;
+
+        impulseToTorque.SetSkewSymmetric(RelativeContactPosition[1]);
+        PhysMatrix3 deltaVelWorld2 = impulseToTorque;
+        deltaVelWorld2 *= inverseInertiaTensor[1];
+        deltaVelWorld2 *= impulseToTorque;
+        deltaVelWorld2 *= -1;
+        deltaVelWorld += deltaVelWorld2;
+        inverseMass += _GetMassWithBodyType(Body[1], true);
+
+        // Do a change of basis to convert into contact coordinates.
+        PhysMatrix3 deltaVelocity = ContactToWorld.Transposed();
+        deltaVelocity *= deltaVelWorld;
+        deltaVelocity *= ContactToWorld;
+
+        // Add in the linear velocity change
+        deltaVelocity.data[0] += inverseMass;
+        deltaVelocity.data[4] += inverseMass;
+        deltaVelocity.data[8] += inverseMass;
+
+        // Invert to get the impulse needed per unit velocity
+        PhysMatrix3 impulseMatrix = deltaVelocity.Inverted();
+
+        // Find the target velocities to kill
+        Vector3 velKill(DesiredDeltaVelocity,
+                        -ContactVelocity.y,
+                        -ContactVelocity.z);
+
+        // Find the impulse to kill target velocities
+        impulseContact = impulseMatrix.Transform(velKill);
+
+        // Check for exceeding friction
+        float planarImpulse = Math::Sqrt(
+            impulseContact.y * impulseContact.y +
+            impulseContact.z * impulseContact.z);
+        if (planarImpulse > impulseContact.x * Friction)
+        {
+            // We need to use dynamic Friction
+            impulseContact.y /= planarImpulse;
+            impulseContact.z /= planarImpulse;
+
+            impulseContact.x = deltaVelocity.data[0] +
+                               deltaVelocity.data[1] * Friction * impulseContact.y +
+                               deltaVelocity.data[2] * Friction * impulseContact.z;
+            impulseContact.x = DesiredDeltaVelocity / impulseContact.x;
+            impulseContact.y *= Friction * impulseContact.x;
+            impulseContact.z *= Friction * impulseContact.x;
+        }
         return impulseContact;
     }
 }

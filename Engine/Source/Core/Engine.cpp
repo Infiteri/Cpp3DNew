@@ -139,26 +139,6 @@ namespace Core
         return state.IsProjectValid;
     }
 
-    std::string Engine::ReadFileContent(const std::string &filename)
-    {
-        std::string vertResult;
-        std::ifstream inVert(filename, std::ios::in | std::ios::binary);
-        if (inVert)
-        {
-            inVert.seekg(0, std::ios::end);
-            vertResult.resize(inVert.tellg());
-            inVert.seekg(0, std::ios::beg);
-            inVert.read(&vertResult[0], vertResult.size());
-            inVert.close();
-        }
-        else
-        {
-            CE_CORE_ERROR("Unable to read file content:  %s", filename.c_str());
-            vertResult = "";
-        }
-        return vertResult;
-    }
-
     void Engine::SetupWindow()
     {
         // TODO: Check if with editor (somehow)

@@ -177,6 +177,7 @@ namespace Core
     RigidBodyComponent::RigidBodyComponent()
     {
         Collider = new AABBCollider();
+        Collider->As<AABBCollider>()->Size = {1, 1, 1};
     }
 
     RigidBodyComponent::~RigidBodyComponent()
@@ -187,12 +188,13 @@ namespace Core
     void RigidBodyComponent::From(RigidBodyComponent *c)
     {
         Config.From(&c->Config);
-        Collider->From(c->Collider);
+        Collider::FromWithBase(Collider, c->Collider);
     }
 
     StaticBodyComponent::StaticBodyComponent()
     {
         Collider = new AABBCollider();
+        Collider->As<AABBCollider>()->Size = {1, 1, 1};
     }
 
     StaticBodyComponent::~StaticBodyComponent()
@@ -203,6 +205,6 @@ namespace Core
     void StaticBodyComponent::From(StaticBodyComponent *c)
     {
         Config.From(&c->Config);
-        Collider->From(c->Collider);
+        Collider::FromWithBase(Collider, c->Collider);
     }
 }

@@ -6,10 +6,34 @@
 #include "EditorCamera.h"
 
 #include <string>
+#include <vector>
 #include <ImGuizmo.h>
 
 namespace Core
 {
+    /// @brief Represents any scene that should be displayed in editor as opened.
+    /// @note I cant explain :crying:
+    struct OpenedEditorScene
+    {
+        OpenedEditorScene() = default;
+        OpenedEditorScene(const OpenedEditorScene &other);
+        std::string SceneName; // Scene filepath equivelent
+
+        std::string ComposeDisplayName();
+    };
+
+    struct ImageViewer
+    {
+        ImageViewer();
+        Texture *Image = nullptr;
+        bool ShouldRender = false;
+        float Scale = 1.0f;
+
+        Vector2 Offset;
+
+        void Render();
+    };
+
     struct DockspaceSettings
     {
         bool Open = true;
@@ -46,13 +70,17 @@ namespace Core
 
         Scene *EditorScene = nullptr;
 
-        std::string ActiveScenePath;
+        // std::string ActiveScenePath; TODO: Is this needed anymore. Shouldn't be but things always go wrong somehow
         std::string ActiveProjectPath;
 
         EditorSettings Settings;
 
         bool RenderSettings = false;
         bool RenderEditProject = false;
+
+        std::vector<OpenedEditorScene> OpenedScenes;
+        OpenedEditorScene ActiveOpenedScene;
+        ImageViewer ImgViewer;
     };
 
     class EditorLayer : public Layer
@@ -104,6 +132,8 @@ namespace Core
         void SaveSceneAs();
         void OpenScene(const std::string &name);
         void OpenScene();
+
+        void OpenEditorScene(const std::string &name);
         // -------------------
 
         // -- PROJECT RELATED --

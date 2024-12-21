@@ -8,7 +8,11 @@
 
 namespace Core
 {
+    double accumulatedScrollX = 0.0;
+    double accumulatedScrollY = 0.0;
+
     static void Viewport(GLFWwindow *window, int w, int h);
+    static void WindowOnScroll(GLFWwindow *w, double x, double y);
 
     Window::Window(const Information &_Info)
     {
@@ -62,6 +66,7 @@ namespace Core
 
         glfwPollEvents();
         glfwSwapBuffers(handle);
+        glfwSetScrollCallback(handle, WindowOnScroll);
 
         {
             double dx, dy;
@@ -73,6 +78,9 @@ namespace Core
 
             for (int button = 0; button < GLFW_MOUSE_BUTTON_LAST; button++)
                 InputUpdateButton((Buttons)button, glfwGetMouseButton(handle, button) != 0);
+
+            InputUpdateScroll(accumulatedScrollX, accumulatedScrollY);
+            accumulatedScrollX = accumulatedScrollY = 0;
         }
     }
 
@@ -85,5 +93,11 @@ namespace Core
     {
         Renderer::Viewport(w, h);
     }
+
+    void WindowOnScroll(GLFWwindow *w, double x, double y)
+    {
+        accumulatedScrollX += x;
+        accumulatedScrollY += y;
+    };
 
 }

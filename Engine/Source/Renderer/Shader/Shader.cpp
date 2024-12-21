@@ -1,5 +1,6 @@
 #include "Shader.h"
 #include "Core/Logger.h"
+#include "Core/FileSystem/FileSystem.h"
 #include "Core/Engine.h"
 
 #include <glad/glad.h>
@@ -39,14 +40,12 @@ namespace Core
 
     void Shader::Compile(const std::string &vertexSource, const std::string &fragmentSource)
     {
-        CompileFromSource(
-            Engine::ReadFileContent(vertexSource),
-            Engine::ReadFileContent(fragmentSource));
+        CompileFromSource(FileSystem::ReadFile(vertexSource), FileSystem::ReadFile(fragmentSource));
     }
 
     void Shader::Compile(const std::string &shaderSource)
     {
-        std::string fileContent = Engine::ReadFileContent(shaderSource);
+        std::string fileContent = FileSystem::ReadFile(shaderSource);
         auto vertexCommentPosition = fileContent.find("// VERTEX");
         auto fragmentCommentPosition = fileContent.find("// FRAGMENT");
         if (vertexCommentPosition == std::string::npos || fragmentCommentPosition == std::string::npos)

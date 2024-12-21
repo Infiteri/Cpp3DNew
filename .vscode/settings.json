@@ -1,6 +1,6 @@
 {
   "files.associations": {
-    "*.json": "code-text-binary",
+    "*.json": "json",
     "*.h": "cpp",
     "functional": "cpp",
     "array": "cpp",

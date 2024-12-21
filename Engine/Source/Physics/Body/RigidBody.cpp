@@ -49,6 +49,7 @@ namespace Core
 
     RigidBody::~RigidBody()
     {
+        // todo: collider component
     }
 
     void RigidBody::UseConfiguration(RigidBodyConfiguration *config)

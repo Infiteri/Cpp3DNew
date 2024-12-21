@@ -219,13 +219,21 @@ namespace Core
         /// @brief Will return a Vector2 with the mouse position.
         /// @return The Vector.
         static Vector2 GetMousePosition();
+        
+        static Vector2 GetMouseDelta();
 
+        /// @brief Returns a set of keys.
         static KeySet GetKeys();
 
-        static Keys KeyFromString(const std::string& key);
+        /// @brief Will return the mouse wheel delta.
+        /// @return Floating point number.
+        static float GetMouseWheelDelta();
+
+        static Keys KeyFromString(const std::string &key);
     };
 
     void InputUpdateKey(Keys key, bool p);
     void InputUpdateButton(Buttons button, bool p);
     void InputUpdateMouse(int x, int y);
+    void InputUpdateScroll(float x, float y);
 }

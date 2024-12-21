@@ -214,3 +214,9 @@
 - Tied script library with editor
 - Updated old dll's (libgcc_s_sjlj-1.dll missing fixed)
 - Updated Vendor build scripts
+
+# 0.2.3 - 21.12.2024
+
+- Added a logger panel
+- Added more functionality to the content browser panel (broken still)
+- Stuff

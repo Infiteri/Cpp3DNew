@@ -44,5 +44,19 @@ namespace Core
             return image->GetPath();
         }
         inline Image *GetImage() { return image; };
+
+        inline float GetWidth()
+        {
+            if (!image)
+                return 0.0f;
+            return image->GetWidth();
+        };
+
+        inline float GetHeight()
+        {
+            if (!image)
+                return 0.0f;
+            return image->GetHeight();
+        };
     };
 }

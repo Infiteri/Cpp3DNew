@@ -17,6 +17,8 @@ namespace Core
             Box
         };
 
+        static void FromWithBase(Collider *target, Collider *from);
+
     protected:
         Type type = None;
 

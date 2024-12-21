@@ -31,7 +31,5 @@ namespace Core
         static float GetDeltaTime();
 
         static bool IsProjectValid();
-
-        static std::string ReadFileContent(const std::string &filename);
     };
 }

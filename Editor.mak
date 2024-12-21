@@ -4,9 +4,9 @@ OBJ_DIR := Bin-Obj
 
 ASSEMBLY := Editor
 EXTENSION := .exe
-COMPILER_FLAGS := -g -std=c++17 -static-libgcc
+COMPILER_FLAGS := -g -std=c++17
 INCLUDE_FLAGS := -IEditor\Source -IEngine/Source -IEngine/Vendor/ImGui -IEngine/Vendor/stb -IEngine/Vendor/YAML/include  -IEngine/Vendor/ImGuizmo
-LINKER_FLAGS := -g -static-libgcc -lEngine -L$(BUILD_DIR) -lImGui -lImGuizmo -lYAML
+LINKER_FLAGS := -g -lEngine -L$(BUILD_DIR) -lImGui -lImGuizmo -lYAML
 DEFINES := -D_DEBUG -D_CRT_SECURE_NO_WARNINGS -DCE_WITH_EDITOR
 
 # Make does not offer a recursive wildcard function, so here's one:

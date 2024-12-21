@@ -1,4 +1,4 @@
-    #pragma once
+#pragma once
 
 #include "Base.h"
 #include <string>
@@ -35,6 +35,13 @@ namespace Core
             Debug
         };
 
+        struct LogInfo
+        {
+            std::string Message;
+            std::string Pending;
+            Level Level;
+        };
+
         Logger() {}
         ~Logger() {}
 
@@ -48,6 +55,9 @@ namespace Core
         static void RegisterCategory(const std::string &Name, const std::string &Prefix);
 
         static void Log(const std::string &_CategoryName, Level level, const char *_Message, ...);
+
+        static std::vector<LogInfo> GetLogInfos();
+        static void ClearLogInfos();
     };
 }
 

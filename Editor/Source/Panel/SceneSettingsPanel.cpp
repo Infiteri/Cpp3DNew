@@ -17,7 +17,7 @@ namespace Core
     {
         ImGui::Begin("Scene Settings");
 
-        if (ImGui::TreeNode("Sky"))
+        if (World::GetActiveScene() && ImGui::TreeNode("Sky"))
         {
             auto sky = World::GetActiveScene()->GetEnvironment()->SkyInst;
 
@@ -98,7 +98,7 @@ namespace Core
             ImGui::TreePop();
         }
 
-        if (ImGui::TreeNode("Directional Light"))
+        if (World::GetActiveScene() && ImGui::TreeNode("Directional Light"))
         {
             DirectionalLight *light = &World::GetActiveScene()->GetEnvironment()->DirectionalLight;
 

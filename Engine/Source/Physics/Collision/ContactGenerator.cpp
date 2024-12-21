@@ -87,10 +87,6 @@ namespace Core
         contact->ContactPoint = (*two->TransformMatrix) * vertex;
         contact->One = one->Owner;
         contact->Two = two->Owner;
-
-        // TODO: figure out
-        contact->Restitution = 0.8f;
-        contact->Friction = 0.8f;
     }
 
     static inline Vector3 ContactPoint(
@@ -224,10 +220,6 @@ namespace Core
             c->ContactPoint = vertex;
             c->One = one->Owner;
             c->Two = two->Owner;
-
-            // TODO: figure out
-            c->Restitution = 1.0f;
-            c->Friction = 1.0f;
 
             return true;
         }

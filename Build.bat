@@ -5,7 +5,7 @@ REM Record the start time
 SET Start_Time=%TIME%
 
 REM Execute the make commands
-make -f "Engine.mak" all
+make -f "Engine.mak" all EXTENSION=.dll
 echo Finished Engine.mak
 make -f "Editor.mak" all
 echo Finished Editor.mak

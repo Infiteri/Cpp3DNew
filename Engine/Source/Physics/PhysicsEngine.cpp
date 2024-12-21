@@ -88,6 +88,8 @@ namespace Core
             {
                 CollisionDetector detector;
                 Contact c;
+                c.Restitution = 0.5f;
+                c.Friction = 0.1f;
                 if (detector.BoxAndBox(aCollider->As<AABBCollider>(), bCollider->As<AABBCollider>(), &c))
                     state.Resolver.Contacts.push_back(c);
             }
@@ -103,6 +105,8 @@ namespace Core
         if (state.Resolver.Contacts.size() == 0)
             return;
 
+        state.Resolver.PositionEpsilon = 0.01f; // depth
+        state.Resolver.VelocityEpsilon = 5.0f;  // ddl
         state.Resolver.Resolve();
 
         state.Resolver.Contacts.clear();

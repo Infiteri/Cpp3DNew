@@ -23,3 +23,4 @@ Where:
 
 - Refactor the way meshes are rendered so that the renderer does the rendering and maybe batching them?
 - Having no camera component crashes
+- Create collider components for better structure

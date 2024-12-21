@@ -13,6 +13,7 @@ namespace Core
         std::unordered_map<Logger::Level, std::string> LevelString;
         std::unordered_map<Logger::Level, Platform::PlatformLogColor> LogColors;
         std::unordered_map<std::string, Logger::Category> Categories;
+        std::vector<Logger::LogInfo> Logs;
     } State;
 
     void Logger::Init(const Settings &_Settings)
@@ -84,5 +85,21 @@ namespace Core
 
         Platform::SetConsoleColor(State.LogColors[level]);
         Platform::LogMessage(OutMessageWithLevels);
+
+        LogInfo inf;
+        inf.Level = level;
+        inf.Message = OutMessageWithLevels;
+        inf.Pending = category->Prefix;
+        State.Logs.push_back(inf);
+    }
+
+    std::vector<Logger::LogInfo> Logger::GetLogInfos()
+    {
+        return State.Logs;
+    }
+
+    void Logger::ClearLogInfos()
+    {
+        State.Logs.clear();
     }
 }

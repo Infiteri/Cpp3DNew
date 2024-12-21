@@ -11,5 +11,17 @@ namespace Core
                 return "";
             return name.substr(dotPosition + 1);
         }
+
+        std::string GetFormattedNoExt(const std::string &name)
+        {
+            size_t lastSlashPos = name.find_last_of("/\\");
+            std::string fileName = (lastSlashPos != std::string::npos) ? name.substr(lastSlashPos + 1) : name;
+            size_t lastDotPos = fileName.find_last_of('.');
+            if (lastDotPos != std::string::npos)
+                fileName = fileName.substr(0, lastDotPos);
+
+            return fileName;
+        }
+
     }
 }

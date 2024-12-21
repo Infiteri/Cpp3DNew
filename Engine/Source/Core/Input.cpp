@@ -6,6 +6,7 @@
 #include "Math/Vectors.h"
 
 #include <GLFW/glfw3.h>
+#include <math.h>
 
 namespace Core
 {
@@ -16,6 +17,10 @@ namespace Core
         Vector2 delta;
         MouseMode lastMode;
         MouseMode mode;
+
+        float lastScroll;
+        float deltaScroll;
+        bool negativeDelta = false;
     };
     // Static map to associate strings with Keys enums
     static const std::unordered_map<std::string, Keys> keyMap = {
@@ -138,7 +143,7 @@ namespace Core
         {"RightSuper", Keys::RightSuper},
         {"Menu", Keys::Menu}};
 
-    static InputMouseState mouse_state;
+    static InputMouseState mouseState;
     static Input::KeySet keys;
     static Input::KeySet justKeys;
     static Input::KeySet lastKeys;
@@ -173,56 +178,56 @@ namespace Core
 
     int Input::GetMouseX()
     {
-        return mouse_state.position.x;
+        return mouseState.position.x;
     }
 
     int Input::GetMouseY()
     {
-        return mouse_state.position.y;
+        return mouseState.position.y;
     }
 
     int Input::GetMouseLastX()
     {
-        return mouse_state.last.x;
+        return mouseState.last.x;
     }
 
     int Input::GetMouseLastY()
     {
-        return mouse_state.last.y;
+        return mouseState.last.y;
     }
 
     int Input::GetMouseDeltaX()
     {
-        return mouse_state.delta.x;
+        return mouseState.delta.x;
     }
 
     int Input::GetMouseDeltaY()
     {
-        return mouse_state.delta.y;
+        return mouseState.delta.y;
     }
 
     int Input::GetMouseMovementDirectionX()
     {
-        if (mouse_state.delta.x == 0)
+        if (mouseState.delta.x == 0)
             return 0;
 
-        return mouse_state.delta.x < 0 ? -1 : 1;
+        return mouseState.delta.x < 0 ? -1 : 1;
     }
 
     int Input::GetMouseMovementDirectionY()
     {
-        if (mouse_state.delta.y == 0)
+        if (mouseState.delta.y == 0)
             return 0;
 
-        return mouse_state.delta.y < 0 ? -1 : 1;
+        return mouseState.delta.y < 0 ? -1 : 1;
     }
 
     void Input::SetMouseMode(MouseMode mode)
     {
-        if (mouse_state.mode == mode)
+        if (mouseState.mode == mode)
             return;
 
-        mouse_state.mode = mode;
+        mouseState.mode = mode;
 
         Window *window = Engine::GetWindow();
         if (!window)
@@ -249,12 +254,22 @@ namespace Core
 
     Vector2 Input::GetMousePosition()
     {
-        return {mouse_state.position.x, mouse_state.position.y};
+        return {mouseState.position.x, mouseState.position.y};
+    }
+
+    Vector2 Input::GetMouseDelta()
+    {
+        return mouseState.delta;
     }
 
     Input::KeySet Input::GetKeys()
     {
         return keys;
+    }
+
+    float Input::GetMouseWheelDelta()
+    {
+        return mouseState.deltaScroll;
     }
 
     Keys Input::KeyFromString(const std::string &key)
@@ -280,8 +295,33 @@ namespace Core
 
     void InputUpdateMouse(int x, int y)
     {
-        mouse_state.delta.Set(x - mouse_state.last.x, y - mouse_state.last.y);
-        mouse_state.position.Set(x, y);
-        mouse_state.last.Set(x, y);
+        mouseState.delta.Set(x - mouseState.last.x, y - mouseState.last.y);
+        mouseState.position.Set(x, y);
+        mouseState.last.Set(x, y);
+    }
+
+    void InputUpdateScroll(float x, float y)
+    {
+        if (y == 0)
+        {
+            mouseState.deltaScroll = 0;
+            mouseState.lastScroll = 0;
+            return;
+        }
+
+        mouseState.deltaScroll = 0;
+
+        if (y < 0)
+        {
+            mouseState.deltaScroll = y - abs(mouseState.lastScroll);
+            mouseState.lastScroll = abs(y);
+            mouseState.negativeDelta = -1;
+        }
+        else
+        {
+            mouseState.deltaScroll = y + abs(mouseState.lastScroll);
+            mouseState.lastScroll = abs(y);
+            mouseState.negativeDelta = 1;
+        }
     }
 }
