@@ -4,10 +4,6 @@
 #include "Body/RigidBody.h"
 #include "Body/StaticBody.h"
 
-#include "Objects/Spring.h"
-#include "Collision/Contact.h"
-#include "Collision/ContactResolver.h"
-
 #include <vector>
 
 namespace Core
@@ -25,11 +21,8 @@ namespace Core
 
         struct PhysicsEngineState
         {
-            Spring TempSpring;
             NumericValues Numeric;
             std::vector<PhysicsBody *> Bodies;
-
-            ContactResolver Resolver;
         };
 
         static void Init();
@@ -42,9 +35,6 @@ namespace Core
         static void StopRuntime();
 
         static void DestroyBodies();
-
-        static void CheckCollision(PhysicsBody *a, PhysicsBody *b);
-        static void ResolveContacts();
 
         static NumericValues &GetNumericValueSet();
     };

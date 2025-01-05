@@ -35,6 +35,7 @@ namespace Core
 
         if (Engine::IsProjectValid())
         {
+            state.ActiveProjectPath = "Project.ce_proj";                                      // note: the actual project path is this
             std::string spf = Project::GetActiveConfiguration().GetStartScenePathFormatted(); // Scene Path Formatted
             SetContextToProject();
             OpenEditorScene(spf);
@@ -80,6 +81,14 @@ namespace Core
 
     void EditorLayer::OnUpdate()
     {
+        // temp keybind
+        if (Input::GetKeyJustNow(Keys::F5))
+        {
+            state.StateScene == SceneStatePlay ? StopSceneRuntime() : StartSceneRuntime();
+            if (state.StateScene == SceneStateStop)
+                Input::SetMouseMode(MouseMode::Visible);
+        }
+
         switch (state.StateScene)
         {
         case SceneStatePlay:
@@ -231,8 +240,10 @@ namespace Core
 
                 if (ImGui::MenuItem("Build Library"))
                 {
+                    CE_LOG("CE_ED", Info, "Started library building script");
                     ScriptEngine::UnloadScriptLibrary();
-                    system(std::string("call " + Project::GetActiveConfiguration().GetScriptBuildTaskFormatted()).c_str()); // TODO: Better? (abs could be done better)
+                    int result = system(std::string("call " + Project::GetActiveConfiguration().GetScriptBuildTaskFormatted()).c_str()); // TODO: Better? (abs could be done better)
+                    CE_LOG("CE_ED", Info, "Library build result: %i", result);
                     ScriptEngine::LoadScriptLibrary(Project::GetActiveConfiguration().GetScriptLibPathFormatted());
                 }
 

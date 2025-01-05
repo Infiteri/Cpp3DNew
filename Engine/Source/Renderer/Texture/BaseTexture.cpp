@@ -9,11 +9,7 @@ namespace Core
         if (!INTERNAL_REQUIRE_GENERATION)
             return;
 
-        // if (!hasGeneration)
-        {
             generation = TextureSystem::GetNewTextureGeneration();
-            hasGeneration = true;
-        }
     }
 
     CeU32 BaseTexture::FilterIntToGLType(CeU32 filter)

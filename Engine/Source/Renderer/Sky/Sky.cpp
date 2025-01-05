@@ -7,7 +7,7 @@
 
 namespace Core
 {
-    void Sky::DestroyCubeMap()
+    void Sky::_DestroyCubeMap()
     {
         if (cubeTexture)
             delete cubeTexture;
@@ -15,7 +15,7 @@ namespace Core
         cubeTexture = nullptr;
     }
 
-    void Sky::DestroyShader()
+    void Sky::_DestroyShader()
     {
         if (shader)
             delete shader;
@@ -23,21 +23,21 @@ namespace Core
         shader = nullptr;
     }
 
-    void Sky::DestroyFromMode()
+    void Sky::_DestroyFromMode()
     {
         switch (mode)
         {
         case CubeMapMode:
-            DestroyCubeMap();
+            _DestroyCubeMap();
             break;
 
         case ShaderMode:
-            DestroyShader();
+            _DestroyShader();
             break;
         }
     }
 
-    void Sky::ReloadNewModeWithPreviousData()
+    void Sky::_ReloadNewModeWithPreviousData()
     {
         switch (mode)
         {
@@ -129,8 +129,8 @@ namespace Core
     {
         delete array;
 
-        DestroyCubeMap();
-        DestroyShader();
+        _DestroyCubeMap();
+        _DestroyShader();
     }
 
     void Sky::Render()
@@ -195,6 +195,13 @@ namespace Core
                     shader->Vec4(*c, data->GetName().c_str());
                 }
                 break;
+
+                case CeData::DataFloat:
+                {
+                    CeData::FloatContainer *c = (CeData::FloatContainer *)data->GetData();
+                    shader->Float(c->Value, data->GetName().c_str());
+                }
+                break;
                 }
             }
 
@@ -204,7 +211,6 @@ namespace Core
 
             break;
         }
-
         case ColorMode:
             // NOTE: By the renderer
             break;
@@ -216,21 +222,20 @@ namespace Core
 
     void Sky::SetMode(Mode newMode)
     {
-        DestroyFromMode();
+        _DestroyFromMode();
         mode = newMode;
-        ReloadNewModeWithPreviousData();
     }
 
     void Sky::SetModeToColor(const Color &c)
     {
-        DestroyFromMode();
+        _DestroyFromMode();
         SetMode(ColorMode);
         color = c;
     }
 
     void Sky::SetModeToCubeMap(CubeMapTexture::Configuration &config)
     {
-        DestroyFromMode();
+        _DestroyFromMode();
         SetMode(CubeMapMode);
         cubeTexture = new CubeMapTexture(config);
     }
@@ -246,7 +251,7 @@ namespace Core
 
     void Sky::SetModeToShader(const std::string &shaderFile)
     {
-        DestroyFromMode();
+        _DestroyFromMode();
         SetMode(ShaderMode);
         shaderName = shaderFile;
         shader = new Shader(shaderName);
@@ -261,11 +266,10 @@ namespace Core
     {
         SetMode(other->GetMode());
         color.Set(other->GetColor());
+        shaderName = other->shaderName;
 
         if (other->GetMode() == CubeMapMode)
             SetModeToCubeMap(other->cubeTexture->GetConfig());
-        else if (other->GetMode() == ShaderMode)
-            shaderName = other->shaderName;
 
         //? Copy over the shader data
         for (auto o : other->shaderData.GetSet())
@@ -273,5 +277,8 @@ namespace Core
             CeData *newSet = new CeData(o);
             shaderData.Add(newSet);
         }
+
+        // setup new sky >
+        _ReloadNewModeWithPreviousData();
     }
 }

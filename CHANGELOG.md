@@ -220,3 +220,15 @@
 - Added a logger panel
 - Added more functionality to the content browser panel (broken still)
 - Stuff
+
+# 0.2.4 - 05.01.2025
+
+- Changed version year (Happy new Year)
+- Changed physics to bullet physics
+- Fixed bugs in the project editing tab
+- Removed old code
+- Fixed actor children not having their Runtime components loaded    
+- Added basic post processing utility in the Renderer to be used with scripts
+- Fixed bug where one actor couldn't have multiple scripts
+- Removed unnecessary complexity between Renderer and Mesh (should have better performance)
+- Encountered bugs with rotations (changing soon to Quaternions maybe)

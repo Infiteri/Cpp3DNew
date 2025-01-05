@@ -59,7 +59,7 @@ namespace Core
         case Geometry::Sphere:
         {
             auto *cast = geometry->As<SphereGeometry>();
-            mesh->SetGeometry(new SphereGeometry(cast->Radius, cast->LongitudeSegments, cast->LatitudeSegments));
+            mesh->SetGeometry(new SphereGeometry(cast->Radius, cast->Subdivision));
         }
         break;
         }
@@ -110,8 +110,10 @@ namespace Core
     {
         Camera->SetMatrixMode(Camera::InputMatrix);
         Camera->GetPosition().Set(Owner->GetTransform()->Position);
-        Camera->GetRotation().Set(Owner->GetTransform()->Rotation);
-        Camera->SetViewMatrix(Owner->GetTransformMatrix());
+        Camera->GetRotation().Set(Owner->GetTransform()->Rotation * CE_DEG_TO_RAD);
+
+        if (!IgnoreMatrixUpload)
+            Camera->SetViewMatrix(Owner->GetTransformMatrix());
     }
 
     void CameraComponent::UpdateCameraState()
@@ -176,35 +178,34 @@ namespace Core
 
     RigidBodyComponent::RigidBodyComponent()
     {
-        Collider = new AABBCollider();
-        Collider->As<AABBCollider>()->Size = {1, 1, 1};
     }
 
     RigidBodyComponent::~RigidBodyComponent()
     {
-        delete Collider;
     }
 
     void RigidBodyComponent::From(RigidBodyComponent *c)
     {
         Config.From(&c->Config);
-        Collider::FromWithBase(Collider, c->Collider);
     }
 
     StaticBodyComponent::StaticBodyComponent()
     {
-        Collider = new AABBCollider();
-        Collider->As<AABBCollider>()->Size = {1, 1, 1};
     }
 
     StaticBodyComponent::~StaticBodyComponent()
     {
-        delete Collider;
     }
 
     void StaticBodyComponent::From(StaticBodyComponent *c)
     {
         Config.From(&c->Config);
-        Collider::FromWithBase(Collider, c->Collider);
+    }
+
+    void BoxColliderComponent::From(BoxColliderComponent *c)
+    {
+        Width = c->Width;
+        Height = c->Height;
+        Depth = c->Depth;
     }
 }

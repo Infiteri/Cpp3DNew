@@ -25,6 +25,7 @@ namespace Core
             int RigidBodyCount;
             int TagCount;
             int StaticBodyCount;
+            int BoxColliderCount;
         };
         ComponentCount count;
 
@@ -58,6 +59,9 @@ namespace Core
 
         void SerializeStaticBodyComponent(StaticBodyComponent *c, int index, YAML::Emitter &out);
         void DeserializeStaticBodyComponent(YAML::Node node);
+
+        void SerializeBoxColliderComponent(BoxColliderComponent *c, int index, YAML::Emitter &out);
+        void DeserializeBoxColliderComponent(YAML::Node node);
 
     public:
         ComponentSerializer(Actor *target);

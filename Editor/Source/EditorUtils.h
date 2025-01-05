@@ -41,7 +41,6 @@ namespace Core
 
         static bool DrawDataSetUI(CeDataSet *set);
         static void SetSetIDTo0();
-        static void RenderColliderUI(Collider *b);
 
         template <typename T, typename UIFun>
         static void DrawComponentBaseUI(const std::string &name, T *component, int index, Actor *a, UIFun fun)

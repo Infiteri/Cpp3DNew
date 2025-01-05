@@ -36,9 +36,9 @@ namespace Core
         {
             CE_SERIALIZE_FIELD("ShaderPath", sky->GetShaderName().c_str());
             CeDataSerializer ser(&sky->GetShaderDataSet());
-            out << YAML::Key << "ShaderData" << YAML::Value << YAML::BeginMap;
+            out << YAML::Key << "ShaderData" << YAML::Value << YAML::BeginSeq;
             ser.Serialize(out);
-            out << YAML::EndMap;
+            out << YAML::EndSeq;
         }
         break;
         }

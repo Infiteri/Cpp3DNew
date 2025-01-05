@@ -16,24 +16,48 @@
 
 namespace Core
 {
+    static inline Collider *_ComposeFirstPossibleColliderForBody(Actor *actor)
+    {
+        Collider *col = nullptr;
+
+        // note: kind of a bad approach but i'd have to give every collider component a type or use a typeof/typeid check
+        // todo: future me make this better :)
+
+        BoxColliderComponent *firstBox = actor->GetComponent<BoxColliderComponent>();
+        if (firstBox)
+        {
+            col = new BoxCollider();
+            auto cast = (BoxCollider *)col;
+            cast->Width = firstBox->Width;
+            cast->Height = firstBox->Height;
+            cast->Depth = firstBox->Depth;
+            return col;
+        }
+
+        return col;
+    }
+
     void Scene::LoadRuntimeComponent(Actor *a)
     {
         for (auto script : a->GetComponents<ScriptComponent>())
-            ScriptEngine::RegisterScript(a->GetName(), script->ClassName, a);
+            ScriptEngine::RegisterScript(script->ClassName, script->ClassName, a);
 
         for (auto rigidBody : a->GetComponents<RigidBodyComponent>())
         {
+            rigidBody->Config.ColliderInstance = _ComposeFirstPossibleColliderForBody(a);
             rigidBody->Config.Owner = a;
             rigidBody->BodyInstance = PhysicsEngine::CreateRigid(&rigidBody->Config);
-            rigidBody->BodyInstance->SetCollider(rigidBody->Collider);
         }
 
         for (auto staticBody : a->GetComponents<StaticBodyComponent>())
         {
+            staticBody->Config.ColliderInstance = _ComposeFirstPossibleColliderForBody(a);
             staticBody->Config.Owner = a;
             staticBody->BodyInstance = PhysicsEngine::CreateStatic(&staticBody->Config);
-            staticBody->BodyInstance->SetCollider(staticBody->Collider);
         }
+
+        for (auto child : a->GetChildren())
+            LoadRuntimeComponent(child);
     }
 
     void Scene::_SetSkyInstance()
@@ -121,8 +145,8 @@ namespace Core
             actor->Update();
         }
 
-        PhysicsEngine::UpdateRuntime();
         ScriptEngine::UpdateRuntime();
+        PhysicsEngine::UpdateRuntime();
     }
 
     void Scene::Stop()
@@ -136,6 +160,13 @@ namespace Core
 
         ScriptEngine::StopRuntime();
         PhysicsEngine::StopRuntime();
+
+        // note: stops all the post processing shadres for the next scene / editor
+        {
+            auto post = Renderer::_GetPostProcessor();
+            for (auto &shader : post->GetEnabledShaders())
+                post->Disable(shader->GetName());
+        }
     }
 
     void Scene::AddActor(Actor *actor)
@@ -289,30 +320,23 @@ namespace Core
 
     CameraComponent *Scene::GetPrimaryCameraComponent()
     {
-        CameraComponent *ret = nullptr;
         for (auto a : actors)
         {
-            for (auto c : a->GetComponents<CameraComponent>())
-            {
-                if (c->IsPrimary)
-                {
-                    if (!ret)
-                        ret = c;
-                }
-            }
+            auto cameraComponent = a->FindCameraComponentInChildren(true); // any camera component in the actor hierarchy list that is has 'IsPrimary' marked to true
+            if (cameraComponent)
+                return cameraComponent;
         }
 
-        return ret;
+        return nullptr;
     }
 
     CameraComponent *Scene::GetFirstCameraComponent()
     {
         for (auto a : actors)
         {
-            for (auto c : a->GetComponents<CameraComponent>())
-            {
-                return c;
-            }
+            auto cameraComponent = a->FindCameraComponentInChildren(false); // any camera component in the actor hierarchy list that is has 'IsPrimary' marked to true or false as it doesn't matter
+            if (cameraComponent)
+                return cameraComponent;
         }
 
         return nullptr;

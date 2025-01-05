@@ -4,15 +4,24 @@
 #include "Math/Vectors.h"
 #include "Math/Matrix4.h"
 #include "Math/Quaternion.h"
+#include "Math/Transform.h"
+#include "Physics/Collider.h"
+
+#include "btBulletDynamicsCommon.h"
 
 namespace Core
 {
     struct RigidBodyConfiguration
     {
         Actor *Owner;
+
+        /// @brief Owned by the Rigid Body which holds this configuration.
+        Collider *ColliderInstance;
+
         float LinearDamp = 0.1f;
         float AngularDamp = 0.1f;
         float Mass = 1.0f;
+
         void From(RigidBodyConfiguration *c);
     };
 
@@ -21,22 +30,12 @@ namespace Core
     private:
         RigidBodyConfiguration config;
 
-        Vector3 velocity;
-        Vector3 forceAccum;
-
-        /// @brief MUST BE IN RADIANS
-        Vector3 torque;
-
-        /// @brief MUST BE IN RADIANS
-        Vector3 torqueAccum;
-
-        Vector3 lastFrameAcceleration;
-
-        void _ClearForces();
-        void _CalculateData();
+        btRigidBody *handle;
 
         friend class PhysicsEngine;
-        friend class Contact;
+
+        void SetHandleTransform(const btTransform& t);
+        void UpdateTransform();
 
     public:
         RigidBody();
@@ -44,35 +43,22 @@ namespace Core
 
         inline RigidBodyConfiguration &GetConfiguration() { return config; };
 
-        void AddVelocity(const Vector3 &v);
-        void AddRotation(const Vector3 &v);
-
         void UseConfiguration(RigidBodyConfiguration *config);
 
         void Update();
 
-        inline PhysMatrix4x3 &GetTransformMatrix() { return transformMatrix; };
-
-        /// @brief Adds a velocity force to the rigid body.
-        /// @param force The force to add.
-        void AddForce(const Vector3 &force);
-
-        void AddForceAtPoint(const Vector3 &force, const Vector3 &point);
-
-        /// @brief Adds a rotation force to the rigid body, in degrees. (The conversion happens in this function so no need to do it manually)
-        /// @param force The force to add.
-        void AddTorque(const Vector3 &force);
-
-        /// @brief TODO NEEDED?
-        /// @return
-        inline Vector3 &GetVelocity() { return velocity; };
-
-        inline Vector3 GetLastFrameAcceleration() { return lastFrameAcceleration; };
-
         inline float GetMass() { return config.Mass; };
-
         inline float GetInverseMass() { return 1.0f / config.Mass; };
 
-        inline Vector3 GetTorque() { return torque; };
+        void AddForce(const Vector3 &vec);
+
+        inline btRigidBody *GetHandle() { return handle; };
+
+        void SetTransform(const Transform &newTransform);
+
+        void SetPosition(const Vector3 &pos);
+        void SetRotation(const Vector3 &rot);
+
+        void SetAngularVelocity(const Vector3& vec);
     };
 }

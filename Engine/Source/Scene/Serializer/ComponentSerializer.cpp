@@ -50,6 +50,7 @@ namespace Core
         CE_SERIALIZE_COMP_CALLBACK(RigidBody);
         CE_SERIALIZE_COMP_CALLBACK(Tag);
         CE_SERIALIZE_COMP_CALLBACK(StaticBody);
+        CE_SERIALIZE_COMP_CALLBACK(BoxCollider);
     }
 
     bool ComponentSerializer::Deserialize(YAML::Node actorNode)
@@ -64,6 +65,7 @@ namespace Core
         CE_DESERIALIZE_COMPONENT("RigidBodyComponent", DeserializeRigidBodyComponent);
         CE_DESERIALIZE_COMPONENT("TagComponent", DeserializeTagComponent);
         CE_DESERIALIZE_COMPONENT("StaticBodyComponent", DeserializeStaticBodyComponent);
+        CE_DESERIALIZE_COMPONENT("BoxColliderComponent", DeserializeBoxColliderComponent);
 
         return true;
     }
@@ -79,6 +81,7 @@ namespace Core
         CE_COMP_SIZE(RigidBody);
         CE_COMP_SIZE(Tag);
         CE_COMP_SIZE(StaticBody);
+        CE_COMP_SIZE(BoxCollider);
     }
 
     void ComponentSerializer::SerializeComponentCount(YAML::Emitter &out)
@@ -94,6 +97,7 @@ namespace Core
         CE_SERIALIZE_FIELD("RigidBodyComponentCount", count.RigidBodyCount);
         CE_SERIALIZE_FIELD("TagComponentCount", count.TagCount);
         CE_SERIALIZE_FIELD("StaticBodyComponentCount", count.StaticBodyCount);
+        CE_SERIALIZE_FIELD("BoxColliderComponentCount", count.BoxColliderCount);
     }
 
     void ComponentSerializer::SerializeMeshComponent(MeshComponent *c, int index, YAML::Emitter &out)
@@ -106,6 +110,8 @@ namespace Core
 
         {
             CE_SERIALIZE_FIELD("Type", mat->GetType());
+
+            CE_DEBUG("%i", (int)mat->GetType());
 
             switch (mat->GetType())
             {
@@ -140,8 +146,7 @@ namespace Core
             {
                 auto g = (SphereGeometry *)geo;
                 CE_SERIALIZE_FIELD("Radius", g->Radius);
-                CE_SERIALIZE_FIELD("LongitudeSegments", g->LongitudeSegments);
-                CE_SERIALIZE_FIELD("LatitudeSegments", g->LatitudeSegments);
+                CE_SERIALIZE_FIELD("Subdivision", g->Subdivision);
             }
             break;
             }
@@ -189,7 +194,7 @@ namespace Core
                 break;
 
             case Geometry::Sphere:
-                c->mesh->SetGeometry(new SphereGeometry(mc["Radius"].as<float>(), mc["LongitudeSegments"].as<float>(), mc["LatitudeSegments"].as<float>()));
+                c->mesh->SetGeometry(new SphereGeometry(mc["Radius"].as<float>(), mc["Subdivision"].as<int>()));
                 break;
 
             default:
@@ -249,7 +254,7 @@ namespace Core
         c->Near = node["Near"].as<float>();
         c->Far = node["Far"].as<float>();
         c->IsPrimary = node["IsPrimary"].as<bool>();
-        c->UpdateCameraState();
+         c->UpdateCameraState();
     }
 
     void ComponentSerializer::SerializePointLightComponent(PointLightComponent *c, int index, YAML::Emitter &out)
@@ -327,4 +332,22 @@ namespace Core
         auto c = a->AddComponent<StaticBodyComponent>();
         c->Config.Mass = node["Mass"].as<float>();
     }
-}        
+
+    void ComponentSerializer::SerializeBoxColliderComponent(BoxColliderComponent *c, int index, YAML::Emitter &out)
+    {
+        out << YAML::Key << "BoxColliderComponent " + std::to_string(index);
+        out << YAML::BeginMap;
+        CE_SERIALIZE_FIELD("Width", c->Width);
+        CE_SERIALIZE_FIELD("Height", c->Height);
+        CE_SERIALIZE_FIELD("Depth", c->Depth);
+        out << YAML::EndMap;
+    }
+
+    void ComponentSerializer::DeserializeBoxColliderComponent(YAML::Node node)
+    {
+        auto c = a->AddComponent<BoxColliderComponent>();
+        c->Width = node["Width"].as<float>();
+        c->Height = node["Height"].as<float>();
+        c->Depth = node["Depth"].as<float>();
+    }
+}

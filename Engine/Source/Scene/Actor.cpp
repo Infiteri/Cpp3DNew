@@ -42,7 +42,6 @@ namespace Core
             outActor->id = other->id;
 
         auto transform = other->GetTransform();
-
         outActor->GetTransform()->From(transform);
 
         // ADD WHEN NEW COMPONENTS
@@ -54,6 +53,7 @@ namespace Core
         CE_COPY_COMPONENT(PointLightComponent);
         CE_COPY_COMPONENT(RigidBodyComponent);
         CE_COPY_COMPONENT(StaticBodyComponent);
+        CE_COPY_COMPONENT(BoxColliderComponent);
 
         for (Actor *a : other->GetChildren())
             outActor->AddChild(Actor::From(a, copyUUID));
@@ -224,5 +224,32 @@ namespace Core
                 break;
             }
         }
+    }
+
+    CameraComponent *Actor::FindCameraComponentInChildren(bool primaryMatters)
+    {
+        CameraComponent *wantedCamera = nullptr;
+        auto thisActorCameras = GetComponents<CameraComponent>();
+        for (auto cam : thisActorCameras)
+        {
+            if (primaryMatters)
+            {
+                if (cam->IsPrimary)
+                    wantedCamera = cam;
+                return cam;
+            }
+            else
+            {
+                return cam; // don't no care if its primary
+            }
+        }
+
+        // recursive
+        for (auto child : children)
+        {
+            wantedCamera = child->FindCameraComponentInChildren(primaryMatters);
+        }
+
+        return wantedCamera;
     }
 }

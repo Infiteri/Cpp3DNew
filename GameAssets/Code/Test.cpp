@@ -7,7 +7,15 @@ void TestScript::OnStart()
 void TestScript::OnUpdate()
 {
     auto t = GetTransform();
+    auto ec = GetComponent<RigidBodyComponent>();
+
+    if (!ec)
+    {
+        return;
+    }
 
     if (Input::GetKey(Keys::A))
-        t->Position.x += 1;
+    {
+        ec->BodyInstance->AddForce({100, 0, 0});
+    }
 }

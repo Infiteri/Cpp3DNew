@@ -1,16 +1,25 @@
 #include "PhysicsEngine.h"
 #include "Core/Logger.h"
+#include "Core/Engine.h"
 #include "Body/RigidBody.h"
 #include "Body/StaticBody.h"
-#include "Collision/ContactGenerator.h"
+
+#include "btBulletDynamicsCommon.h"
 
 namespace Core
 {
     static PhysicsEngine::PhysicsEngineState state;
+    static btDefaultCollisionConfiguration collisionConfiguration;
+    static btCollisionDispatcher dispatcher(&collisionConfiguration);
+    static btDbvtBroadphase broadphase;
+    static btSequentialImpulseConstraintSolver solver;
+    static btDiscreteDynamicsWorld *btWorld;
 
     void PhysicsEngine::Init()
     {
         state.Numeric.MathFPS = 240.0f;
+        btWorld = new btDiscreteDynamicsWorld(&dispatcher, &broadphase, &solver, &collisionConfiguration);
+        btWorld->setGravity(btVector3(0.0f, -9.81f, 0.0f));
     }
 
     void PhysicsEngine::Shutdown()
@@ -23,6 +32,7 @@ namespace Core
         b->UseConfiguration(config);
         state.Bodies.push_back(b);
         b->Update();
+        btWorld->addRigidBody(b->GetHandle());
         return b;
     }
 
@@ -32,84 +42,40 @@ namespace Core
         b->UseConfiguration(config);
         state.Bodies.push_back(b);
         b->Update();
+        btWorld->addRigidBody(b->GetHandle());
         return b;
     }
 
     void PhysicsEngine::UpdateRuntime()
     {
+        btWorld->stepSimulation(Engine::GetDeltaTime());
+
         for (int i = 0; i < state.Bodies.size(); i++)
         {
             auto body = state.Bodies[i];
             body->Update();
-
-            for (int j = 0; j < state.Bodies.size(); j++)
-            {
-                if (i == j)
-                    continue;
-
-                auto body2 = state.Bodies[j];
-                body2->_CalculateData();
-
-                CheckCollision(body2, body);
-            }
         }
-
-        ResolveContacts();
     }
 
     void PhysicsEngine::StopRuntime()
     {
         DestroyBodies();
+        // TODO: delete btWorld;
     }
 
     void PhysicsEngine::DestroyBodies()
     {
         for (auto body : state.Bodies)
+        {
+            if (body->GetType() == PhysicsBody::Static)
+                btWorld->removeRigidBody(body->As<StaticBody>()->GetHandle());
+            else
+                btWorld->removeRigidBody(body->As<RigidBody>()->GetHandle());
+
             delete body;
+        }
 
         state.Bodies.clear();
-    }
-
-    void PhysicsEngine::CheckCollision(PhysicsBody *a, PhysicsBody *b)
-    {
-        auto aCollider = a->GetCollider();
-        auto bCollider = b->GetCollider();
-
-        if (!aCollider || !bCollider)
-            return;
-
-        switch (aCollider->GetType())
-        {
-        case Collider::Box:
-        {
-            switch (bCollider->GetType())
-            {
-            case Collider::Box:
-            {
-                CollisionDetector detector;
-                Contact c;
-                c.Restitution = 0.5f;
-                c.Friction = 0.1f;
-                if (detector.BoxAndBox(aCollider->As<AABBCollider>(), bCollider->As<AABBCollider>(), &c))
-                    state.Resolver.Contacts.push_back(c);
-            }
-            break;
-            }
-        }
-        break;
-        }
-    }
-
-    void PhysicsEngine::ResolveContacts()
-    {
-        if (state.Resolver.Contacts.size() == 0)
-            return;
-
-        state.Resolver.PositionEpsilon = 0.01f; // depth
-        state.Resolver.VelocityEpsilon = 5.0f;  // ddl
-        state.Resolver.Resolve();
-
-        state.Resolver.Contacts.clear();
     }
 
     PhysicsEngine::NumericValues &PhysicsEngine::GetNumericValueSet()

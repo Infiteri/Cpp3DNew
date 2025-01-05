@@ -16,9 +16,6 @@ namespace Core
         std::string FilePath;
         TextureFilter MinFilter = TextureFilter::Linear;
         TextureFilter MagFilter = TextureFilter::Linear;
-
-        /// @brief Internal flag, do not touch TODO: Make better
-        bool INTERNAL_IGNORE = false;
     };
 
     class BaseTexture
@@ -27,8 +24,7 @@ namespace Core
     protected:
         CeU32 id;
         CeU32 generation;
-        bool hasGeneration = false;
-        bool INTERNAL_REQUIRE_GENERATION = true;
+        bool INTERNAL_REQUIRE_GENERATION = true; // mostly for editor
         void GenGeneration();
 
         CeU32 FilterIntToGLType(CeU32 filter);

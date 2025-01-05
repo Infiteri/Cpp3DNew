@@ -207,6 +207,10 @@ namespace Core
                 }
             }
         };
+
+        ///@brief Searches for a camera component on this actor along side its children (recursive function) for a camera component.  
+        ///@param primaryMatters Wether or not to check if the CameraComponent is primary. (Useful for finding any camera component in the list)
+        CameraComponent* FindCameraComponentInChildren(bool primaryMatters = true);
     };
 
     // --------------------------------

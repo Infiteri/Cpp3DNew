@@ -1,7 +1,4 @@
 #include "Geometry.h"
-#include "Math/Math.h"
-
-#include <cmath>
 
 namespace Core
 {
@@ -122,57 +119,47 @@ namespace Core
         Vertices.clear();
     }
 
-    SphereGeometry::SphereGeometry(float radius, int latitudeSegments, int longitudeSegments)
+    SphereGeometry::SphereGeometry(float radius, int subdiv)
     {
         type = Sphere;
+        Subdivision = subdiv;
         Radius = radius;
-        LatitudeSegments = latitudeSegments;
-        LongitudeSegments = longitudeSegments;
 
-        for (int lat = 0; lat <= LatitudeSegments; ++lat)
+        // Step 1: Create an icosahedron
+        const float t = (1.0f + sqrt(5.0f)) / 2.0f;
+
+        std::vector<Vector3> positions = {
+            {-1, t, 0}, {1, t, 0}, {-1, -t, 0}, {1, -t, 0}, {0, -1, t}, {0, 1, t}, {0, -1, -t}, {0, 1, -t}, {t, 0, -1}, {t, 0, 1}, {-t, 0, -1}, {-t, 0, 1}};
+
+        std::vector<CeU32> initialIndices = {
+            0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11,
+            1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8,
+            3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9,
+            4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7, 9, 8, 1};
+
+        for (const auto &p : positions)
         {
-            float theta = lat * CE_PI / LatitudeSegments;
-            float sinTheta = sin(theta);
-            float cosTheta = cos(theta);
-
-            for (int lon = 0; lon < LongitudeSegments; ++lon) // Exclude last longitude to avoid duplicate vertices
-            {
-                float phi = lon * 2 * CE_PI / LongitudeSegments;
-                float sinPhi = sin(phi);
-                float cosPhi = cos(phi);
-
-                Vector3 position(
-                    Radius * sinTheta * cosPhi,
-                    Radius * cosTheta,
-                    Radius * sinTheta * sinPhi);
-
-                Vector2 uv(
-                    static_cast<float>(lon) / LongitudeSegments,
-                    static_cast<float>(lat) / LatitudeSegments);
-
-                Vector3 normal = position; // Sphere normals are the same as the position vectors
-                normal.Normalize();
-
-                Vertices.push_back({position, uv, normal});
-            }
+            Vector3 pos = p;
+            pos.Normalize();
+            Vertex3D v;
+            v.Position = pos * Radius;
+            v.Normal = pos;
+            v.UV = {0, 0};
+            Vertices.push_back(v); // UVs will be updated later
         }
 
-        // Generate indices with wrapping along the longitude
-        for (int lat = 0; lat < LatitudeSegments; ++lat)
+        Indices = initialIndices;
+
+        // Step 2: Subdivide
+        for (int i = 0; i < Subdivision; ++i)
         {
-            for (int lon = 0; lon < LongitudeSegments; ++lon)
-            {
-                int first = (lat * LongitudeSegments) + lon;
-                int second = first + LongitudeSegments;
+            Subdivide();
+        }
 
-                Indices.push_back(first);
-                Indices.push_back(second);
-                Indices.push_back((first + 1) % LongitudeSegments + lat * LongitudeSegments);
-
-                Indices.push_back(second);
-                Indices.push_back((second + 1) % LongitudeSegments + (lat + 1) * LongitudeSegments);
-                Indices.push_back((first + 1) % LongitudeSegments + lat * LongitudeSegments);
-            }
+        // Optional: Compute UV coordinates
+        for (auto &vertex : Vertices)
+        {
+            ComputeUV(vertex.Position, vertex.UV);
         }
     }
 

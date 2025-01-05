@@ -21,9 +21,7 @@ namespace Core
         Set(r, i, j, k);
     }
 
-    Quaternion::~Quaternion()
-    {
-    }
+    Quaternion::~Quaternion() {}
 
     void Quaternion::Set(float r, float i, float j, float k)
     {
@@ -46,13 +44,13 @@ namespace Core
     void Quaternion::Normalize()
     {
         float d = r * r + i * i + j * j + k * k;
-        if (d < DBL_EPSILON)
+        if (d < FLT_EPSILON)
         {
-            r = 1;
+            Set(1, 0, 0, 0);
             return;
         }
 
-        d = 1.0f / Math::Sqrt(d);
+        d = 1.0f / sqrt(d);
         r *= d;
         i *= d;
         j *= d;
@@ -79,10 +77,12 @@ namespace Core
         float cy = cos(halfZ);
         float sy = sin(halfZ);
 
-        w = cr * cp * cy + sr * sp * sy;
-        x = sr * cp * cy - cr * sp * sy;
-        y = cr * sp * cy + sr * cp * sy;
-        z = cr * cp * sy - sr * sp * cy;
+        r = cr * cp * cy + sr * sp * sy;
+        i = sr * cp * cy - cr * sp * sy;
+        j = cr * sp * cy + sr * cp * sy;
+        k = cr * cp * sy - sr * sp * cy;
+
+        Normalize();
     }
 
     Vector3 Quaternion::GetEulerAngles(bool convertToDegree)
@@ -95,18 +95,16 @@ namespace Core
         float qz = k / norm;
         float qw = r / norm;
 
-        // Roll (x-axis rotation)
         float sinr_cosp = 2 * (qw * qx + qy * qz);
         float cosr_cosp = 1 - 2 * (qx * qx + qy * qy);
         angles.x = atan2(sinr_cosp, cosr_cosp);
 
         float sinp = 2 * (qw * qy - qz * qx);
         if (abs(sinp) >= 1)
-            angles.y = copysign(CE_PI / 2, sinp); // Clamp to ±90 degrees
+            angles.y = (sinp >= 0 ? 1 : -1) * CE_PI / 2;
         else
             angles.y = asin(sinp);
 
-        // Yaw (z-axis rotation)
         float siny_cosp = 2 * (qw * qz + qx * qy);
         float cosy_cosp = 1 - 2 * (qy * qy + qz * qz);
         angles.z = atan2(siny_cosp, cosy_cosp);
@@ -115,5 +113,4 @@ namespace Core
 
         return angles;
     }
-
 }

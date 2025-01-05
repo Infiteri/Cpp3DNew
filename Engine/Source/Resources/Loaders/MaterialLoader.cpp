@@ -37,7 +37,6 @@ namespace Core
 
     void MaterialLoader::DeserializeNonSpecific(YAML::Node data, Material::Configuration *config)
     {
-
         config->Name = data["Name"].as<std::string>();
         SerializerUtils::YAMLToColor(data["Color"], &config->Color);
         // TODO: Texture

@@ -123,7 +123,7 @@ namespace Core
 
     Shader::~Shader()
     {
-        glDeleteShader(id);
+        glDeleteProgram(id);
     }
 
     void Shader::Use()

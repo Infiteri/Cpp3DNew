@@ -49,7 +49,6 @@
 #include "Script/ScriptEngine.h"
 
 #include "Physics/PhysicsEngine.h"
-#include "Physics/Objects/Spring.h"
 #include "Physics/Body/PhysicsBody.h"
 #include "Physics/Body/StaticBody.h"
 #include "Physics/Body/RigidBody.h"

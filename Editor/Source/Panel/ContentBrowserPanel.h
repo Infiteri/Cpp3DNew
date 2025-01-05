@@ -4,6 +4,7 @@
 #include "Project/Project.h"
 #include "Platform/Platform.h"
 
+#include <fstream>
 #include <string>
 
 namespace Core
@@ -19,6 +20,14 @@ namespace Core
             void Render();
         };
 
+        struct ScriptCreateMenu
+        {
+            std::string Path;
+            std::string ClassName;
+            bool ShouldRender = false;
+            void Render();
+        };
+
     public:
         struct State
         {
@@ -30,6 +39,7 @@ namespace Core
             Texture *IconTexture;
 
             NewFileMenu NewFileMenu;
+            ScriptCreateMenu ScriptCreateMenu;
 
             Platform::DirectoryEntry RightClickedEntry;
         };

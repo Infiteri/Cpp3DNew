@@ -69,7 +69,6 @@ namespace Core
         filePath = "";
         this->state.From(config);
         SetType(Config);
-        config->TextureConfig.INTERNAL_IGNORE = config->TextureConfig.FilePath.empty();
         SetColorTexture(config->TextureConfig);
     }
 
@@ -81,7 +80,6 @@ namespace Core
         MaterialLoader l;
         l.Deserialize(configPath, &c);
         this->state.From(&c);
-        c.TextureConfig.INTERNAL_IGNORE = c.TextureConfig.FilePath.empty();
         SetColorTexture(c.TextureConfig);
     }
 
@@ -90,6 +88,11 @@ namespace Core
         SetType(Default);
         state.Color.Set(255, 255, 255, 255);
         SetColorTexture();
+    }
+
+    void Material::SetType(MaterialTypes t)
+    {
+        type = t;
     }
 
     void Material::SetColorTexture()
@@ -116,7 +119,7 @@ namespace Core
 
     void Material::SetColorTexture(TextureConfiguration &configuration)
     {
-        if (configuration.INTERNAL_IGNORE)
+        if (configuration.FilePath.empty())
         {
             SetColorTexture();
             return;

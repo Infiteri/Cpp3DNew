@@ -31,5 +31,19 @@ namespace Core
     void Camera::SetViewMatrix(const Matrix4 &other)
     {
         view = other;
+
+        // note: can update here i think
+        position = other.GetPositionXYZ();
+        rotation = other.GetEulerAnglesZYX(); // todo: degree or nah
+    }
+
+    Vector3 &Camera::GetPosition()
+    {
+        return position;
+    }
+
+    Vector3 &Camera::GetRotation()
+    {
+        return rotation;
     }
 }

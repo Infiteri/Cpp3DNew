@@ -1,7 +1,7 @@
 #pragma once
 
 /// @brief Version (MAJOR.MINOR.SUBTLE - DD/MM/YYYY)
-#define CE_VERSION "0.2.3 - 21.12.2024"
+#define CE_VERSION "0.2.4 - 05.01.2025"
 
 /// @brief Value for the unknown OS
 #define CE_UNKNOWN_PLATFORM_VALUE 0

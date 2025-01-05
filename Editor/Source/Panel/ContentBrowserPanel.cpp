@@ -49,6 +49,12 @@ namespace Core
                 state.NewFileMenu.ShouldRender = true;
             }
 
+            if (ImGui::MenuItem("Create Script"))
+            {
+                state.ScriptCreateMenu.Path = state.ActivePath;
+                state.ScriptCreateMenu.ShouldRender = true;
+            }
+
             ImGui::EndPopup();
         }
 
@@ -124,6 +130,7 @@ namespace Core
         ImGui::End();
 
         state.NewFileMenu.Render();
+        state.ScriptCreateMenu.Render();
     }
 
     void ContentBrowserPanel::NewFileMenu::Render()
@@ -155,4 +162,70 @@ namespace Core
         ImGui::End();
     }
 
+    void ContentBrowserPanel::ScriptCreateMenu::Render()
+    {
+        if (!ShouldRender)
+            return;
+
+        ImGui::Begin("Create Script");
+
+        ClassName = EditorUtils::ImGuiStringEditReturnString("Class Name", ClassName);
+
+        if (ImGui::Button("Create"))
+        {
+            ShouldRender = false;
+
+            std::string hName = Path + "/" + ClassName + ".h";
+            std::string cppName = Path + "/" + ClassName + ".cpp";
+
+            std::ofstream hFile(hName.c_str());
+            std::ofstream cppFile(cppName.c_str());
+            if (!hFile.good() || !cppFile.good())
+            {
+                ShouldRender = false;
+                CE_ERROR("Cannot create script, invalid file(s).");
+                ImGui::End();
+                return;
+            }
+
+            {
+                hFile << "#pragma once\n";
+                hFile << "\n";
+                hFile << "#include \"Core.h\"\n";
+                hFile << "\n";
+                hFile << "using namespace Core;\n";
+                hFile << "\n";
+                hFile << "class " << ClassName << " : public ActorScript {\n";
+                hFile << "public:\n";
+                hFile << "\n";
+                hFile << "    " << ClassName << "() {};\n";
+                hFile << "    "
+                      << "~" << ClassName << "() {};\n";
+                hFile << "\n";
+                hFile << "    void OnStart();";
+                hFile << "\n";
+                hFile << "    void OnUpdate();";
+                hFile << "\n";
+                hFile << "};\n";
+                hFile << "\n";
+                hFile << "CE_DEFINE_SCRIPT_EXPORT(" << ClassName << ");\n";
+            }
+
+            {
+                cppFile << "#include \"" << ClassName << ".h\"\n";
+                cppFile << "\n";
+                cppFile << "void " << ClassName << "::OnStart() {}\n";
+                cppFile << "\n";
+                cppFile << "void " << ClassName << "::OnUpdate() {}\n";
+                cppFile << "\n";
+            }
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel"))
+            ShouldRender = false;
+
+        ImGui::End();
+    }
 }

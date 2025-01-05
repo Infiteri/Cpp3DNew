@@ -81,6 +81,16 @@ namespace Core
         shaders = newOrder;
     }
 
+    bool PostProcessor::Exists(const std::string &name)
+    {
+        for (const auto &shader : shaders)
+        {
+            if (shader.shd->GetName() == name)
+                return true;
+        }
+        return false;
+    }
+
     std::vector<Shader *> PostProcessor::GetEnabledShaders()
     {
         std::vector<Shader *> enabledShaders;
@@ -94,5 +104,19 @@ namespace Core
         }
 
         return enabledShaders;
+    }
+
+    Shader *PostProcessor::Get(const std::string &name)
+    {
+
+        for (const auto &shader : shaders)
+        {
+            if (shader.shd->GetName() == name)
+            {
+                return shader.shd;
+            }
+        }
+
+        return nullptr;
     }
 }

@@ -20,20 +20,6 @@ namespace Core
     class CE_API Renderer
     {
     public:
-        struct MeshRenderData
-        {
-            Matrix4 Transform;
-            Material *Material;
-            Geometry *Geometry;
-
-            MeshRenderData() {};
-            MeshRenderData(const MeshRenderData &data)
-            {
-                Transform.From(data.Transform);
-                Material = data.Material;
-                Geometry = data.Geometry;
-            };
-        };
 
         struct Viewport
         {
@@ -49,10 +35,11 @@ namespace Core
 
             Sky *skyInstance;
             VertexArray *meshRenderArray;
-            std::vector<MeshRenderData> meshRenderData;
-
             bool initializedContext = false;
         };
+
+        static PostProcessor* _GetPostProcessor();
+        friend class Scene;
 
     public:
         Renderer() {};
@@ -72,6 +59,8 @@ namespace Core
 
         static void SetSkyInstance(Sky *sky, bool deleteOldSky = false);
 
-        static void AddMeshRenderData(MeshRenderData &data);
+        static void InitializePostShader(const std::string& shaderName);
+        static Shader* GetPostShader(const std::string& shaderName);
+        static void EnsureReloadingOfPostShaders();
     };
 }

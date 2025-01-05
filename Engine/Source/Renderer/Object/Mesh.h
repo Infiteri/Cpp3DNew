@@ -12,11 +12,13 @@ namespace Core
     class CE_API Mesh
     {
     private:
+        VertexArray *array;
         Material *material = nullptr;
         Geometry *geometry;
 
         void _ReleaseMaterial();
         void _ReleaseGeometry();
+        void _BufferGeometryArray();
 
     public:
         Mesh();

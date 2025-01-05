@@ -24,6 +24,12 @@ namespace Core
 {
     static Renderer::RendererState state;
 
+    PostProcessor *Renderer::_GetPostProcessor()
+    {
+        // todo: make function that turns off the wanted post effects at runtime
+        return &state.postProcessor;
+    }
+
     void Renderer::InitializeRenderingContext()
     {
         if (state.initializedContext)
@@ -70,7 +76,7 @@ namespace Core
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         // Necessary
-        glClearColor(255, 255, 255, 255);
+        glClearColor(0, 0, 255, 255); // note for debug, if the sky is this rgb and its not set to color mode then ... something is wrong
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (state.skyInstance != nullptr)
@@ -115,24 +121,6 @@ namespace Core
                 objShader->Mat4(activeCamera->GetViewInverted(), "uView");
             }
         }
-
-        state.meshRenderArray->Bind();
-
-        for (auto &data : state.meshRenderData)
-        {
-            state.meshRenderArray->GenVertexBuffer(data.Geometry->Vertices.data(), data.Geometry->Vertices.size() * sizeof(Vertex3D));
-            state.meshRenderArray->GenIndexBuffer(data.Geometry->Indices.data(), data.Geometry->Indices.size() * sizeof(CeU32));
-            state.meshRenderArray->GetVertexBuffer()->AddLayout(0, 0, 3);
-            state.meshRenderArray->GetVertexBuffer()->AddLayout(1, 3, 2);
-            state.meshRenderArray->GetVertexBuffer()->AddLayout(2, 5, 3);
-
-            data.Material->Use();
-            objShader->Mat4(data.Transform, "uTransform");
-
-            state.meshRenderArray->Bind();
-            state.meshRenderArray->GetVertexBuffer()->Bind();
-            state.meshRenderArray->GetIndexBuffer()->Draw();
-        }
     }
 
     void Renderer::EndFrame()
@@ -140,7 +128,6 @@ namespace Core
         if (!state.initializedContext)
             return;
         state.Screen.End();
-        state.meshRenderData.clear();
     }
 
     void Renderer::RenderScreenImage()
@@ -217,9 +204,30 @@ namespace Core
         state.skyInstance = sky;
     }
 
-    void Renderer::AddMeshRenderData(MeshRenderData &data)
+    void Renderer::InitializePostShader(const std::string &shaderName)
     {
-        state.meshRenderData.push_back(data);
+        if (!state.postProcessor.Exists(shaderName))
+            state.postProcessor.Add(shaderName, true);
+        else
+            state.postProcessor.Enable(shaderName);
+    }
+
+    Shader *Renderer::GetPostShader(const std::string &shaderName)
+    {
+        return state.postProcessor.Get(shaderName);
+    }
+
+    void Renderer::EnsureReloadingOfPostShaders()
+    {
+        for (auto &shader : state.postProcessor.shaders)
+        {
+            if (shader.enabled)
+            {
+                std::string name = shader.shd->GetName();
+                delete shader.shd;
+                shader.shd = new Shader(name);
+            }
+        }
     }
 
     void Renderer::Shutdown()

@@ -73,6 +73,12 @@ namespace Core
         friend class EditorLayer;
 
     public:
+        /// @brief Wether or not to ignore 'SetViewMatrix' on the Camera Instance.
+        /// @note This is not serialized / deserialized as its a runtime flag.
+        /// @note Set to true if you plan an updating the camera matrix on your own.
+        /// @todo Implement a better system.
+        bool IgnoreMatrixUpload = false;
+
         PerspectiveCamera *Camera;
         float FOV = 90.0f;
         float Far = 1000.0f;
@@ -117,7 +123,6 @@ namespace Core
     class CE_API RigidBodyComponent : public Component
     {
     public:
-        Collider *Collider;
         RigidBodyConfiguration Config;
         RigidBody *BodyInstance;
 
@@ -127,11 +132,9 @@ namespace Core
         void From(RigidBodyComponent *c);
     };
 
-
     class CE_API StaticBodyComponent : public Component
     {
     public:
-        Collider *Collider;
         StaticBodyConfiguration Config;
         StaticBody *BodyInstance;
 
@@ -139,5 +142,25 @@ namespace Core
         ~StaticBodyComponent();
 
         void From(StaticBodyComponent *c);
+    };
+
+    class CE_API ColliderComponent : public Component
+    {
+    public:
+        ColliderComponent() {};
+        ~ColliderComponent() {};
+    };
+
+    class CE_API BoxColliderComponent : public ColliderComponent
+    {
+    public:
+        float Width = 1.0f;
+        float Height = 1.0f;
+        float Depth = 1.0f;
+
+        BoxColliderComponent() {};
+        ~BoxColliderComponent() {};
+
+        void From(BoxColliderComponent *c);
     };
 }

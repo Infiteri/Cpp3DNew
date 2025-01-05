@@ -24,3 +24,6 @@ Where:
 - Refactor the way meshes are rendered so that the renderer does the rendering and maybe batching them?
 - Having no camera component crashes
 - Create collider components for better structure
+- Add drag-drop behavior (a lot) in the editor  
+- Reload shader on the sky doesn't take immediate effect
+- Switching between editor scenes breaks

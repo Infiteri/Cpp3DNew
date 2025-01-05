@@ -151,8 +151,6 @@ namespace Core
                 UUID *uid = (UUID *)payload->Data;
                 UUID rawUUID = UUID(uid->Get());
 
-                CE_CORE_TRACE("%uul to %ull", a->GetUUID().Get(), uid->Get());
-
                 // NOTE: Actor is target, data is name of the actor to move
                 auto moveActor = World::GetActiveScene()->GetActorInHierarchy(rawUUID);
                 if (moveActor)
@@ -187,6 +185,7 @@ namespace Core
     void RenderRigidBodyUI(RigidBodyComponent *c, Actor *a);
     void RenderTagUI(TagComponent *c, Actor *a);
     void RenderStaticBodyUI(StaticBodyComponent *c, Actor *a);
+    void RenderBoxColliderUI(BoxColliderComponent *c, Actor *a);
 
     void SceneHierarchyPanel::RenderActorComponents(Actor *a)
     {
@@ -214,6 +213,7 @@ namespace Core
         CE_UTIL_ADD_RENDER("Point Light Component", PointLightComponent, RenderPointLightUI);
         CE_UTIL_ADD_RENDER("Rigid Body Component", RigidBodyComponent, RenderRigidBodyUI);
         CE_UTIL_ADD_RENDER("Static Body Component", StaticBodyComponent, RenderStaticBodyUI);
+        CE_UTIL_ADD_RENDER("Box Collider Component", BoxColliderComponent, RenderBoxColliderUI);
 
         if (ImGui::Button("Add Component"))
             ImGui::OpenPopup("ComponentPopup");
@@ -228,6 +228,7 @@ namespace Core
             CE_ADD_COMPONENT(PointLight);
             CE_ADD_COMPONENT(RigidBody);
             CE_ADD_COMPONENT(StaticBody);
+            CE_ADD_COMPONENT(BoxCollider);
             ImGui::EndPopup();
         }
     }
@@ -348,13 +349,13 @@ namespace Core
 
                 auto b = (SphereGeometry *)g;
 
-                // edit the values, important that its done this way
-                bool radiusEdit = ImGui::DragFloat("Radius", &b->Radius, 0.05f, 0.0f);
-                bool longEdit = ImGui::DragInt("Latitude segments", &b->LatitudeSegments, 0.05f, 0);
-                bool latEdit = ImGui::DragInt("Longitude segments", &b->LongitudeSegments, 0.05f, 0);
+                // edit the values, important that its done this
 
-                if (radiusEdit || longEdit || latEdit)
-                    mesh->mesh->SetGeometry(new SphereGeometry(b->Radius, b->LatitudeSegments, b->LongitudeSegments));
+                if (ImGui::DragFloat("Radius", &b->Radius, 0.05f, 0.0f))
+                    mesh->mesh->SetGeometry(new SphereGeometry(b->Radius, b->Subdivision));
+
+                if (ImGui::DragInt("Subdivision", &b->Subdivision, 0.05f, 0))
+                    mesh->mesh->SetGeometry(new SphereGeometry(b->Radius, b->Subdivision));
 
                 // NOTE: If the geometry changes, the address changes as well, faults if this isn't done
                 g = mesh->mesh->GetGeometry();
@@ -460,22 +461,22 @@ namespace Core
         ImGui::DragFloat("Linear Damp", &c->Config.LinearDamp, 0.05f, 0.0f, 1.0f);
         ImGui::DragFloat("Angular Damp", &c->Config.AngularDamp, 0.05f, 0.0f, 1.0f);
         ImGui::DragFloat("Mass", &c->Config.Mass, 0.05f, 0.0f);
-
-        if (ImGui::TreeNode("Collider"))
-        {
-            EditorUtils::RenderColliderUI(c->Collider);
-            ImGui::TreePop();
-        }
     }
 
     void RenderStaticBodyUI(StaticBodyComponent *c, Actor *a)
     {
         ImGui::DragFloat("Mass", &c->Config.Mass, 0.05f, 0.0f);
+    }
 
-        if (ImGui::TreeNode("Collider"))
+    void RenderBoxColliderUI(BoxColliderComponent *c, Actor *a)
+    {
+        float data[3] = {c->Width, c->Height, c->Depth};
+
+        if (ImGui::DragFloat3("Size", data, 0.05f, 0.0f))
         {
-            EditorUtils::RenderColliderUI(c->Collider);
-            ImGui::TreePop();
+            c->Width = data[0];
+            c->Height = data[1];
+            c->Depth = data[2];
         }
     }
 }

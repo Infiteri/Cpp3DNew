@@ -4,10 +4,10 @@ OBJ_DIR := Bin-Obj
 
 ASSEMBLY := Engine
 EXTENSION := .dll
-COMPILER_FLAGS := -g -std=c++2a	
+COMPILER_FLAGS := -g -std=c++2a 
 VP := -IEngine/Vendor
-INCLUDE_FLAGS := -IEngine\Source $(VP)/GLFW/include $(VP)/glad/include $(VP)/ImGui $(VP)/stb $(VP)/YAML/include $(VP)/ImGuizmo
-LINKER_FLAGS := -g -shared -LBin -lglfw3 -lglad -lImGui -lcomdlg32 -lShlwapi -lyaml -lImGuizmo 
+INCLUDE_FLAGS := -IEngine\Source $(VP)/GLFW/include $(VP)/glad/include $(VP)/ImGui $(VP)/stb $(VP)/YAML/include $(VP)/ImGuizmo $(VP)/bullet/bullet3-master/src
+LINKER_FLAGS := -g -shared -LBin -lglfw3 -lglad -lImGui -lcomdlg32 -lShlwapi -lyaml -lImGuizmo -lBullet
 DEFINES := -D_DEBUG -DCE_BUILD_DLL -D_CRT_SECURE_NO_WARNINGS
 
 # Make does not offer a recursive wildcard function, so here's one:

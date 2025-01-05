@@ -35,11 +35,11 @@ namespace Core
 
         CeDataSet shaderData;
 
-        void DestroyCubeMap();
-        void DestroyShader();
-        void DestroyFromMode();
+        void _DestroyCubeMap();
+        void _DestroyShader();
+        void _DestroyFromMode();
 
-        void ReloadNewModeWithPreviousData();
+        void _ReloadNewModeWithPreviousData();
 
     public:
         Sky();

@@ -64,7 +64,7 @@ namespace Core
 
         /// @brief Do not call if you dont know what you doing (ultra bad btw)
         /// @param t The new type
-        void SetType(MaterialTypes t) { type = t; };
+        void SetType(MaterialTypes t);
 
         /// @brief Will set the texture to the default white.
         void SetColorTexture();

@@ -32,6 +32,9 @@ namespace Core
 
         void Rearrange(std::vector<std::string> shaderName);
 
+        bool Exists(const std::string& name);
+
         std::vector<Shader *> GetEnabledShaders();
+        Shader* Get(const std::string& name);
     };
 }

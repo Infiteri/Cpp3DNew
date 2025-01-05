@@ -45,7 +45,7 @@ namespace Core
         Matrix4 &GetView() { return view; };
         Matrix4 &GetProjection() { return projection; };
 
-        inline Vector3 &GetPosition() { return position; };
-        inline Vector3 &GetRotation() { return rotation; };
+        Vector3 &GetPosition();
+        Vector3 &GetRotation();
     };
 }
