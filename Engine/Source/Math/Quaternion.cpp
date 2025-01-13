@@ -11,6 +11,18 @@ namespace Core
         Set(1, 0, 0, 0);
     }
 
+    Quaternion::Quaternion(const Vector3 &axis, float angle)
+    {
+        float half = 0.5f * angle;
+        float s = sin(half);
+        float c = cos(half);
+
+        x = s * axis.x;
+        y = s * axis.y;
+        z = s * axis.z;
+        w = c;
+    }
+
     Quaternion::Quaternion(const Quaternion &q)
     {
         Set(q);
@@ -66,23 +78,21 @@ namespace Core
 
     void Quaternion::SetFromEuler(const Vector3 &euler, bool convertToRadians)
     {
-        float halfX = euler.x * (convertToRadians ? CE_DEG_TO_RAD : 1.0f) * 0.5f;
-        float halfY = euler.y * (convertToRadians ? CE_DEG_TO_RAD : 1.0f) * 0.5f;
+        float halfX = euler.y * (convertToRadians ? CE_DEG_TO_RAD : 1.0f) * 0.5f;
+        float halfY = euler.x * (convertToRadians ? CE_DEG_TO_RAD : 1.0f) * 0.5f;
         float halfZ = euler.z * (convertToRadians ? CE_DEG_TO_RAD : 1.0f) * 0.5f;
 
-        float cr = cos(halfX);
-        float sr = sin(halfX);
-        float cp = cos(halfY);
-        float sp = sin(halfY);
-        float cy = cos(halfZ);
-        float sy = sin(halfZ);
+        float cosA1 = cos(halfX);
+        float sinA1 = sin(halfX);
+        float cosA2 = cos(halfY);
+        float sinA2 = sin(halfY);
+        float cosA3 = cos(halfZ);
+        float sinA3 = sin(halfZ);
 
-        r = cr * cp * cy + sr * sp * sy;
-        i = sr * cp * cy - cr * sp * sy;
-        j = cr * sp * cy + sr * cp * sy;
-        k = cr * cp * sy - sr * sp * cy;
-
-        Normalize();
+        x = sinA1 * cosA2 * sinA3 + cosA1 * sinA2 * cosA3,
+        y = sinA1 * cosA2 * cosA3 - cosA1 * sinA2 * sinA3,
+        z = -sinA1 * sinA2 * cosA3 + cosA1 * cosA2 * sinA3,
+        w = sinA1 * sinA2 * sinA3 + cosA1 * cosA2 * cosA3;
     }
 
     Vector3 Quaternion::GetEulerAngles(bool convertToDegree)
@@ -112,5 +122,35 @@ namespace Core
         angles *= convertToDegree ? CE_RAD_TO_DEG : 1.0f;
 
         return angles;
+    }
+
+    Matrix4 Quaternion::GetMatrix() 
+    {
+        Quaternion n;
+        n.Set(*this);
+        Normalize();
+
+        Matrix4 m;
+        m.data[0] = 1 - 2 * (y * y + z * z);
+        m.data[1] = 2 * (x * y - z * w);
+        m.data[2] = 2 * (x * z + y * w);
+        m.data[3] = 0;
+
+        m.data[4] = 2 * (x * y + z * w);
+        m.data[5] = 1 - 2 * (x * x + z * z);
+        m.data[6] = 2 * (y * z - x * w);
+        m.data[7] = 0;
+
+        m.data[8] = 2 * (x * z - y * w);
+        m.data[9] = 2 * (y * z + x * w);
+        m.data[10] = 1 - 2 * (x * x + y * y);
+        m.data[11] = 0;
+
+        m.data[12] = 0;
+        m.data[13] = 0;
+        m.data[14] = 0;
+        m.data[15] = 1;
+
+        return m;
     }
 }

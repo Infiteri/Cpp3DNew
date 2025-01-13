@@ -95,6 +95,9 @@ namespace Core
         void OnAttach();
         void OnImGuiRender();
         void OnUpdate();
+
+        void Viewport();
+        inline ImVec2 &GetLastFrameViewportSize() { return state.LastFrameViewport; };
         // -------------------
 
         // --- UI FUNCTION ---
@@ -150,5 +153,7 @@ namespace Core
         void HandleDragDrop();
         void EndDockspace();
         // ---------------
+
+        static EditorLayer *GetInstance();
     };
 }

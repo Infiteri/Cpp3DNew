@@ -17,16 +17,18 @@
 
 namespace Core
 {
+    struct Viewport
+    {
+        int Width;
+        int Height;
+
+        /// @brief Composes and returns the aspect of this Viewport
+        inline float Aspect() const { return (float)Width / (float)Height; };
+    };
+
     class CE_API Renderer
     {
     public:
-
-        struct Viewport
-        {
-            int Width;
-            int Height;
-        };
-
         struct RendererState
         {
             GPUScreen Screen;
@@ -38,7 +40,7 @@ namespace Core
             bool initializedContext = false;
         };
 
-        static PostProcessor* _GetPostProcessor();
+        static PostProcessor *_GetPostProcessor();
         friend class Scene;
 
     public:
@@ -46,6 +48,9 @@ namespace Core
         ~Renderer() {};
 
         static void InitializeRenderingContext();
+
+        /// @brief Returns the viewport of the scene. Note that this is different from using screen size due to panels or other stuff.
+        static Viewport &GetViewport();
 
         static void Init();
         static void BeginFrame();
@@ -59,8 +64,8 @@ namespace Core
 
         static void SetSkyInstance(Sky *sky, bool deleteOldSky = false);
 
-        static void InitializePostShader(const std::string& shaderName);
-        static Shader* GetPostShader(const std::string& shaderName);
+        static void InitializePostShader(const std::string &shaderName);
+        static Shader *GetPostShader(const std::string &shaderName);
         static void EnsureReloadingOfPostShaders();
     };
 }

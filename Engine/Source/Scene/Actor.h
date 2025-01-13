@@ -104,6 +104,11 @@ namespace Core
         /// @return Actor * or nullptr.
         Actor *FindChild(const UUID &uuid);
 
+        /// @brief Searches for an actor in the children list of this actor. Goes only one level deep.
+        /// @param name The name. Keep in mind it finds either the first or nullptr. 
+        /// @return Actor * or nullptr.
+        Actor *FindChild(const std::string &name);
+
         /// @brief Searches for an actor in the children list of this actor. Goes fully deep (recursive).
         /// @param uuid The uuid.
         /// @return Actor * or nullptr.
@@ -208,9 +213,9 @@ namespace Core
             }
         };
 
-        ///@brief Searches for a camera component on this actor along side its children (recursive function) for a camera component.  
+        ///@brief Searches for a camera component on this actor along side its children (recursive function) for a camera component.
         ///@param primaryMatters Wether or not to check if the CameraComponent is primary. (Useful for finding any camera component in the list)
-        CameraComponent* FindCameraComponentInChildren(bool primaryMatters = true);
+        CameraComponent *FindCameraComponentInChildren(bool primaryMatters = true);
     };
 
     // --------------------------------

@@ -53,6 +53,7 @@ namespace Core
         CE_COPY_COMPONENT(PointLightComponent);
         CE_COPY_COMPONENT(RigidBodyComponent);
         CE_COPY_COMPONENT(StaticBodyComponent);
+        CE_COPY_COMPONENT(KinematicBodyComponent);
         CE_COPY_COMPONENT(BoxColliderComponent);
 
         for (Actor *a : other->GetChildren())
@@ -185,6 +186,18 @@ namespace Core
 
         for (auto c : children)
             if (c->GetUUID() == uuid)
+                return c;
+
+        return nullptr;
+    }
+
+    Actor *Actor::FindChild(const std::string &n)
+    {
+        if (name == n)
+            return this;
+
+        for (auto c : children)
+            if (c->name == n)
                 return c;
 
         return nullptr;

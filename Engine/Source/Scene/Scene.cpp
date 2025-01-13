@@ -56,6 +56,13 @@ namespace Core
             staticBody->BodyInstance = PhysicsEngine::CreateStatic(&staticBody->Config);
         }
 
+        for (auto kinematicBody : a->GetComponents<KinematicBodyComponent>())
+        {
+            kinematicBody->Config.ColliderInstance = _ComposeFirstPossibleColliderForBody(a);
+            kinematicBody->Config.Owner = a;
+            kinematicBody->BodyInstance = PhysicsEngine::CreateKinematic(&kinematicBody->Config);
+        }
+
         for (auto child : a->GetChildren())
             LoadRuntimeComponent(child);
     }

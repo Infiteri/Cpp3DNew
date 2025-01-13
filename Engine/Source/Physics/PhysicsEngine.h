@@ -3,6 +3,7 @@
 #include "Base.h"
 #include "Body/RigidBody.h"
 #include "Body/StaticBody.h"
+#include "Body/KinematicBody.h"
 
 #include <vector>
 
@@ -30,6 +31,7 @@ namespace Core
 
         static RigidBody *CreateRigid(RigidBodyConfiguration *config);
         static StaticBody *CreateStatic(StaticBodyConfiguration *config);
+        static KinematicBody *CreateKinematic(KinematicBodyConfiguration *config);
 
         static void UpdateRuntime();
         static void StopRuntime();

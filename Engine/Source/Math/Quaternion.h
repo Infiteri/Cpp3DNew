@@ -2,6 +2,7 @@
 
 #include "Base.h"
 #include "Vectors.h"
+#include "Matrix4.h"
 
 namespace Core
 {
@@ -30,6 +31,7 @@ namespace Core
         };
 
         Quaternion();
+        Quaternion(const Vector3 &axis, float angle);
         Quaternion(const Quaternion &q);
         Quaternion(float r, float i, float j, float k);
         ~Quaternion();
@@ -43,6 +45,20 @@ namespace Core
 
         void SetFromEuler(const Vector3 &euler, bool convertToRadians = true);
         Vector3 GetEulerAngles(bool convertToDegree = true);
+
+        Quaternion operator*(const Quaternion &q)
+        {
+            float W = (q.w * w) - (q.x * x) - (q.y * y) - (q.z * z);
+            float X = (q.w * x) + (q.x * w) + (q.y * z) - (q.z * y);
+            float Y = (q.w * y) - (q.x * z) - (q.y * w) - (q.z * x);
+            float Z = (q.w * z) - (q.x * y) - (q.y * x) - (q.z * w);
+            Quaternion ret;
+            ret.w = W;
+            ret.x = X;
+            ret.y = Y;
+            ret.z = Z;
+            return ret;
+        }
 
         void operator*=(const Quaternion &multiplier)
         {
@@ -70,17 +86,6 @@ namespace Core
             k += q.k * 0.5f;
         }
 
-        void AddScaledVector(const Vector3 &vector, float scale)
-        {
-            Quaternion q(0,
-                         vector.x * scale,
-                         vector.y * scale,
-                         vector.z * scale);
-            q *= *this;
-            r += q.r * 0.5f;
-            i += q.i * 0.5f;
-            j += q.j * 0.5f;
-            k += q.k * 0.5f;
-        }
+        Matrix4 GetMatrix();
     };
 }

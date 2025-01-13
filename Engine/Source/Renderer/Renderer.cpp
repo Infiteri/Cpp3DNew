@@ -65,6 +65,11 @@ namespace Core
         glEnable(GL_MULTISAMPLE);
     }
 
+    Viewport &Renderer::GetViewport()
+    {
+        return state.ScreenViewport;
+    }
+
     void Renderer::BeginFrame()
     {
         if (!state.initializedContext)

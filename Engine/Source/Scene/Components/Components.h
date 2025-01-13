@@ -8,6 +8,7 @@
 
 #include "Physics/Body/RigidBody.h"
 #include "Physics/Body/StaticBody.h"
+#include "Physics/Body/KinematicBody.h"
 
 namespace Core
 {
@@ -92,6 +93,26 @@ namespace Core
 
         void UpdateCameraState();
 
+        /// @brief Will correctly clamp a rotation angle of the camera.
+        /// @brief Due the nature of angles, and them going 0 - 360 range, clamping can get tricky. This function does however make it easy.
+        /// @param angle The angle to clamp, in degrees.
+        /// @param degree The degree to clamp the angle at (a.k.a. its limit).
+        /// @return The correct and clamped angle.
+        float ClampRotation(float angle, float degree = 89);
+
+        enum Angles
+        {
+            X = 1 << 0,
+            Y = 1 << 1,
+            Z = 1 << 2
+        };
+
+        /// @brief Will correctly clamp the specified rotation angle of the target.
+        /// @param angles The angles to clamp.
+        /// @param degree The degree to clamp at (a.k.a. limit).
+        /// @param isOnActor Wether or not to clamp actor rotation or camera rotation, goes with 'IgnoreMatrixUpload' in some way. todo: test with camera
+        void ClampRotation(Angles angles, float degree = 89, bool isOnActor = true);
+
         void From(CameraComponent *c);
     };
 
@@ -142,6 +163,18 @@ namespace Core
         ~StaticBodyComponent();
 
         void From(StaticBodyComponent *c);
+    };
+
+    class CE_API KinematicBodyComponent : public Component
+    {
+    public:
+        KinematicBodyConfiguration Config;
+        KinematicBody *BodyInstance;
+
+        KinematicBodyComponent();
+        ~KinematicBodyComponent();
+
+        void From(KinematicBodyComponent *c);
     };
 
     class CE_API ColliderComponent : public Component

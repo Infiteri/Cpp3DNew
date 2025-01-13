@@ -50,6 +50,7 @@ namespace Core
         CE_SERIALIZE_COMP_CALLBACK(RigidBody);
         CE_SERIALIZE_COMP_CALLBACK(Tag);
         CE_SERIALIZE_COMP_CALLBACK(StaticBody);
+        CE_SERIALIZE_COMP_CALLBACK(KinematicBody);
         CE_SERIALIZE_COMP_CALLBACK(BoxCollider);
     }
 
@@ -65,6 +66,7 @@ namespace Core
         CE_DESERIALIZE_COMPONENT("RigidBodyComponent", DeserializeRigidBodyComponent);
         CE_DESERIALIZE_COMPONENT("TagComponent", DeserializeTagComponent);
         CE_DESERIALIZE_COMPONENT("StaticBodyComponent", DeserializeStaticBodyComponent);
+        CE_DESERIALIZE_COMPONENT("KinematicBodyComponent", DeserializeKinematicBodyComponent);
         CE_DESERIALIZE_COMPONENT("BoxColliderComponent", DeserializeBoxColliderComponent);
 
         return true;
@@ -81,6 +83,7 @@ namespace Core
         CE_COMP_SIZE(RigidBody);
         CE_COMP_SIZE(Tag);
         CE_COMP_SIZE(StaticBody);
+        CE_COMP_SIZE(KinematicBody);
         CE_COMP_SIZE(BoxCollider);
     }
 
@@ -97,6 +100,7 @@ namespace Core
         CE_SERIALIZE_FIELD("RigidBodyComponentCount", count.RigidBodyCount);
         CE_SERIALIZE_FIELD("TagComponentCount", count.TagCount);
         CE_SERIALIZE_FIELD("StaticBodyComponentCount", count.StaticBodyCount);
+        CE_SERIALIZE_FIELD("KinematicBodyComponentCount", count.KinematicBodyCount);
         CE_SERIALIZE_FIELD("BoxColliderComponentCount", count.BoxColliderCount);
     }
 
@@ -254,7 +258,7 @@ namespace Core
         c->Near = node["Near"].as<float>();
         c->Far = node["Far"].as<float>();
         c->IsPrimary = node["IsPrimary"].as<bool>();
-         c->UpdateCameraState();
+        c->UpdateCameraState();
     }
 
     void ComponentSerializer::SerializePointLightComponent(PointLightComponent *c, int index, YAML::Emitter &out)
@@ -331,6 +335,18 @@ namespace Core
     {
         auto c = a->AddComponent<StaticBodyComponent>();
         c->Config.Mass = node["Mass"].as<float>();
+    }
+
+    void ComponentSerializer::SerializeKinematicBodyComponent(KinematicBodyComponent *c, int index, YAML::Emitter &out)
+    {
+        out << YAML::Key << "KinematicBodyComponent " + std::to_string(index);
+        out << YAML::BeginMap;
+        out << YAML::EndMap;
+    }
+
+    void ComponentSerializer::DeserializeKinematicBodyComponent(YAML::Node node)
+    {
+        auto c = a->AddComponent<KinematicBodyComponent>();
     }
 
     void ComponentSerializer::SerializeBoxColliderComponent(BoxColliderComponent *c, int index, YAML::Emitter &out)

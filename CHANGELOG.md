@@ -232,3 +232,9 @@
 - Fixed bug where one actor couldn't have multiple scripts
 - Removed unnecessary complexity between Renderer and Mesh (should have better performance)
 - Encountered bugs with rotations (changing soon to Quaternions maybe)
+
+# 0.2.5 - 13.01.2025
+
+- Fixed some bugs with rotations
+- Fixed aspect ratio being wrong in CameraComponent
+- Added KinematicBodies and KinematicComponent (along serialization/deserialization)

@@ -59,6 +59,8 @@ namespace Core
         void SetPosition(const Vector3 &pos);
         void SetRotation(const Vector3 &rot);
 
+        void RotateBy(const Vector3& deltaRotation);
+
         void SetAngularVelocity(const Vector3& vec);
     };
 }

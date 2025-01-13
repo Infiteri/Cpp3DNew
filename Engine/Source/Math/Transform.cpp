@@ -1,6 +1,7 @@
 #include "Transform.h"
 
-#include "Math/Math.h"
+#include "Math.h"
+#include "Quaternion.h"
 
 namespace Core
 {
@@ -47,20 +48,27 @@ namespace Core
 
     void Transform::SetRotation(float x, float y, float z)
     {
-        Rotation.Set(x,y,z);
+        Rotation.Set(x, y, z);
     }
 
     void Transform::SetScale(float x, float y, float z)
     {
-        Scale.Set(x,y,z);
+        Scale.Set(x, y, z);
     }
 
     Matrix4 Transform::GetTransformMatrix()
     {
-        Matrix4 pos = Matrix4::Translate(&Position);
-        Matrix4 rot = Matrix4::RotationXYZ(Rotation * CE_DEG_TO_RAD);
-        Matrix4 scale = Matrix4::Scale(&Scale);
+        Quaternion quatX{{1, 0, 0}, Rotation.x * CE_DEG_TO_RAD};
+        Quaternion quatY{{0, 1, 0}, Rotation.y * CE_DEG_TO_RAD};
+        Quaternion quatZ{{0, 0, 1}, Rotation.z * CE_DEG_TO_RAD};
+        Quaternion quat = quatX * quatY * quatZ;
 
-        return (pos * rot) * scale;
+        Matrix4 translationMatrix = Matrix4::Translate(&Position);
+        Matrix4 scaleMatrix = Matrix4::Scale(&Scale);
+        Matrix4 rotationMatrix = quat.GetMatrix();
+
+        // todo: think this thru
+        // def not the best way but for now im tired of quaternion maths and trouble with bullet physics
+        return scaleMatrix * (translationMatrix * (quatX.GetMatrix() * quatY.GetMatrix() * quatZ.GetMatrix()));
     }
 }

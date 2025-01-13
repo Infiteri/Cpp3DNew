@@ -42,6 +42,7 @@ namespace Core
         Actor *GetActorInScene(const std::string &name) { return GetOwnerScene()->GetActor(name); };
         Actor *GetActorInScene(const UUID &uid) { return GetOwnerScene()->GetActor(uid); };
         Actor *GetActorInSceneByTag(const std::string &tag) { return GetOwnerScene()->GetActorByTag(tag); };
+        Actor *GetChild(const std::string &name) { return Owner->FindChild(name); };
 
         void RemoveActorInScene(const std::string &name) { GetOwnerScene()->RemoveActor(name); };
         void RemoveActorInScene(const UUID &uid) { GetOwnerScene()->RemoveActor(uid); };

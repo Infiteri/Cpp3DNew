@@ -27,3 +27,5 @@ Where:
 - Add drag-drop behavior (a lot) in the editor  
 - Reload shader on the sky doesn't take immediate effect
 - Switching between editor scenes breaks
+- Script component that doesn't exist breaks
+- Change to using 'Registry' for ___System (allows for consistency)

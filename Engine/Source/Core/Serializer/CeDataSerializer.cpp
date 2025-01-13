@@ -73,7 +73,6 @@ namespace Core
                 Vector2 *data = new Vector2();
                 SerializerUtils::YAMLToVector2(v, data);
                 DataSet->Add(data, CeData::DataVec2, name);
-                // todo - optional delete data;
             }
             break;
 
@@ -82,7 +81,6 @@ namespace Core
                 Vector3 *data = new Vector3();
                 SerializerUtils::YAMLToVector3(v, data);
                 DataSet->Add(data, CeData::DataVec3, name);
-                // todo - optional delete data;
             }
             break;
 
@@ -90,7 +88,6 @@ namespace Core
             {
                 CeData::FloatContainer *data = new CeData::FloatContainer(v.as<float>());
                 DataSet->Add(data, CeData::DataFloat, name);
-                // todo - optional delete data;
             }
             break;
 
@@ -99,7 +96,6 @@ namespace Core
                 Color *data = new Color();
                 SerializerUtils::YAMLToColor(v, data);
                 DataSet->Add(data, CeData::DataColor, name);
-                // todo - optional delete data;
             }
             break;
             }

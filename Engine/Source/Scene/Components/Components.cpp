@@ -1,7 +1,10 @@
+
 #include "Components.h"
 #include "Scene/Actor.h"
 #include "Core/Logger.h"
 #include "Core/Engine.h"
+
+#include "Renderer/Renderer.h"
 
 #include "Physics/Body/RigidBody.h"
 
@@ -121,8 +124,39 @@ namespace Core
         Camera->SetFOV(FOV);
         Camera->SetNear(Near);
         Camera->SetFar(Far);
-        Camera->SetAspect(Engine::GetWindow()->GetWidth() / Engine::GetWindow()->GetHeight());
+        Camera->SetAspect(Renderer::GetViewport().Aspect());
         Camera->UpdateProjection();
+    }
+
+    float CameraComponent::ClampRotation(float angle, float degree)
+    {
+        float rot = angle;
+        if (rot > 180.0f)
+            rot -= 360.0f;
+
+        if (rot < -degree)
+            rot = -degree;
+        else if (rot > degree)
+            rot = degree;
+
+        if (rot < 0.0f)
+            rot += 360.0f;
+
+        return rot;
+    }
+
+    void CameraComponent::ClampRotation(Angles angles, float degree, bool isOnActor)
+    {
+        Vector3 *rot = isOnActor ? &Owner->GetTransform()->Rotation : &Camera->GetRotation();
+
+        if (angles & X)
+            rot->x = ClampRotation(rot->x, degree);
+
+        if (angles & Y)
+            rot->y = ClampRotation(rot->y, degree);
+
+        if (angles & Z)
+            rot->z = ClampRotation(rot->z, degree);
     }
 
     void CameraComponent::From(CameraComponent *c)
@@ -198,6 +232,19 @@ namespace Core
     }
 
     void StaticBodyComponent::From(StaticBodyComponent *c)
+    {
+        Config.From(&c->Config);
+    }
+
+    KinematicBodyComponent::KinematicBodyComponent()
+    {
+    }
+
+    KinematicBodyComponent::~KinematicBodyComponent()
+    {
+    }
+
+    void KinematicBodyComponent::From(KinematicBodyComponent *c)
     {
         Config.From(&c->Config);
     }

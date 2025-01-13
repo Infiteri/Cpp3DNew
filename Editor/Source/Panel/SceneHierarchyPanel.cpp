@@ -1,5 +1,6 @@
 #include "SceneHierarchyPanel.h"
 #include "EditorUtils.h"
+#include "EditorLayer.h"
 
 #define CE_UTIL_ADD_RENDER(name, type, cb)                                           \
     int index##type = -1;                                                            \
@@ -72,7 +73,7 @@ namespace Core
 
     void SceneHierarchyPanel::RenderActor(Actor *a, Actor *parent, bool parentNodeOpen)
     {
-        CE_VERIFY(a || a != nullptr);
+        CE_VERIFY(a && a != nullptr);
 
         // Flags setup
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_AllowItemOverlap;
@@ -185,6 +186,7 @@ namespace Core
     void RenderRigidBodyUI(RigidBodyComponent *c, Actor *a);
     void RenderTagUI(TagComponent *c, Actor *a);
     void RenderStaticBodyUI(StaticBodyComponent *c, Actor *a);
+    void RenderKinematicBodyUI(KinematicBodyComponent *c, Actor *a);
     void RenderBoxColliderUI(BoxColliderComponent *c, Actor *a);
 
     void SceneHierarchyPanel::RenderActorComponents(Actor *a)
@@ -213,8 +215,10 @@ namespace Core
         CE_UTIL_ADD_RENDER("Point Light Component", PointLightComponent, RenderPointLightUI);
         CE_UTIL_ADD_RENDER("Rigid Body Component", RigidBodyComponent, RenderRigidBodyUI);
         CE_UTIL_ADD_RENDER("Static Body Component", StaticBodyComponent, RenderStaticBodyUI);
+        CE_UTIL_ADD_RENDER("Kinematic Body Component", KinematicBodyComponent, RenderKinematicBodyUI);
         CE_UTIL_ADD_RENDER("Box Collider Component", BoxColliderComponent, RenderBoxColliderUI);
 
+        ImGui::NewLine();
         if (ImGui::Button("Add Component"))
             ImGui::OpenPopup("ComponentPopup");
 
@@ -228,6 +232,7 @@ namespace Core
             CE_ADD_COMPONENT(PointLight);
             CE_ADD_COMPONENT(RigidBody);
             CE_ADD_COMPONENT(StaticBody);
+            CE_ADD_COMPONENT(KinematicBody);
             CE_ADD_COMPONENT(BoxCollider);
             ImGui::EndPopup();
         }
@@ -425,15 +430,57 @@ namespace Core
 
     void RenderCameraUI(CameraComponent *c, Actor *a)
     {
-        ImGui::DragFloat("FOV", &c->FOV, 0.05f, 0.0f, 360.0f);
-        ImGui::DragFloat("Near", &c->Near, 0.05f, 0.01f);
-        ImGui::DragFloat("Far", &c->Far, 0.05f, 0.01f);
+        bool fovChange = ImGui::DragFloat("FOV", &c->FOV, 0.05f, 0.0f, 360.0f);
+        bool nearChange = ImGui::DragFloat("Near", &c->Near, 0.05f, 0.01f);
+        bool farChange = ImGui::DragFloat("Far", &c->Far, 0.05f, 0.01f);
+
+        // note: changing camera values results in outdated projection
+        // this wasn't a problem before 'View POV' was added
+        // also note that calling 'UpdateCameraState' won't work as of now due to a problem with aspect ratio, more details in the comments of that function
+        if (fovChange || nearChange || farChange)
+        {
+#if 0
+            PerspectiveCamera *cam = c->Camera;
+            cam->SetFOV(c->FOV);
+            cam->SetNear(c->Near);
+            cam->SetFar(c->Far);
+
+            ImVec2 &size = EditorLayer::GetInstance()->GetLastFrameViewportSize();
+            cam->SetAspect(size.x / size.y);
+
+            cam->UpdateProjection();
+#else
+            c->UpdateCameraState();
+#endif
+        }
 
         bool primary = c->IsPrimary;
         if (ImGui::Checkbox("Is Primary", &primary))
         {
             World::GetActiveScene()->SetPrimaryCameraToNone(); // Automatically tick off every single camera to be non primary
             c->IsPrimary = primary;
+        }
+
+        ImGui::SameLine();
+
+        static bool renderPov = false; // todo: move
+        if (ImGui::Checkbox("View POV", &renderPov))
+        {
+            if (renderPov)
+                EditorLayer::GetInstance()->ActivateCamera(SceneStatePlay);
+            else
+                EditorLayer::GetInstance()->ActivateCamera(SceneStateStop);
+
+            // note: ensures correct aspect ratio and all
+            EditorLayer::GetInstance()->Viewport();
+        }
+
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort) && ImGui::BeginTooltip())
+        {
+            ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+            ImGui::TextUnformatted("When this is toggled, the camera changes to the selected camera.\n This helps with changing the POV of the camera as needed (FOV, Near, Far, Position and other.)");
+            ImGui::PopTextWrapPos();
+            ImGui::EndTooltip();
         }
     }
 
@@ -466,6 +513,10 @@ namespace Core
     void RenderStaticBodyUI(StaticBodyComponent *c, Actor *a)
     {
         ImGui::DragFloat("Mass", &c->Config.Mass, 0.05f, 0.0f);
+    }
+
+    void RenderKinematicBodyUI(KinematicBodyComponent *c, Actor *a)
+    {
     }
 
     void RenderBoxColliderUI(BoxColliderComponent *c, Actor *a)

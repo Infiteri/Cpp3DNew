@@ -12,8 +12,10 @@
 
 namespace Core
 {
+    static EditorLayer *GInstance;
     void EditorLayer::OnAttach()
     {
+        GInstance = this;
         CE_DEFINE_LOG_CATEGORY("CE_ED", "Editor");
 
         state.OpenedScenes = {};
@@ -63,6 +65,9 @@ namespace Core
     void EditorLayer::OnImGuiRender()
     {
         BeginDockspace();
+
+        // ImGui::ShowDemoWindow();
+
         PreparePanelInfo();
         state.Panels.RenderImGui(&state.PanelInfo);
         RenderSceneViewport();
@@ -77,6 +82,11 @@ namespace Core
         state.ImgViewer.Render();
 
         EndDockspace();
+    }
+
+    void EditorLayer::Viewport()
+    {
+        Renderer::Viewport(state.LastFrameViewport.x, state.LastFrameViewport.y);
     }
 
     void EditorLayer::OnUpdate()
@@ -551,7 +561,7 @@ namespace Core
         if (viewportSize.x != state.LastFrameViewport.x || viewportSize.y != state.LastFrameViewport.y)
         {
             state.LastFrameViewport = viewportSize;
-            Renderer::Viewport(viewportSize.x, viewportSize.y);
+            Viewport();
         }
 
         state.Dockspace.ViewportLeftTop = ImGui::GetWindowPos();
@@ -828,4 +838,10 @@ namespace Core
 
         ImGui::End();
     }
+
+    EditorLayer *EditorLayer::GetInstance()
+    {
+        return GInstance;
+    }
+
 }

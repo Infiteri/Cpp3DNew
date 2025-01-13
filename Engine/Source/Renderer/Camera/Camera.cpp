@@ -18,7 +18,7 @@ namespace Core
         case TransformMatrix:
         default:
             view = Matrix4::Translate(&position);
-            view *= Matrix4::RotationZYX(&rotation);
+            view *= Matrix4::RotationZYX(&rotation); // todo: some quaternions maybe?
             break;
         }
     }

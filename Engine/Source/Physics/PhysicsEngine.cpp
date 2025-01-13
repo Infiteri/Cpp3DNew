@@ -46,6 +46,16 @@ namespace Core
         return b;
     }
 
+    KinematicBody *PhysicsEngine::CreateKinematic(KinematicBodyConfiguration *config)
+    {
+        auto b = new KinematicBody();
+        b->UseConfiguration(config);
+        state.Bodies.push_back(b);
+        b->Update();
+        btWorld->addRigidBody(b->GetHandle());
+        return b;
+    }
+
     void PhysicsEngine::UpdateRuntime()
     {
         btWorld->stepSimulation(Engine::GetDeltaTime());
@@ -67,10 +77,20 @@ namespace Core
     {
         for (auto body : state.Bodies)
         {
-            if (body->GetType() == PhysicsBody::Static)
-                btWorld->removeRigidBody(body->As<StaticBody>()->GetHandle());
-            else
+            switch (body->GetType())
+            {
+            case PhysicsBody::Rigid:
                 btWorld->removeRigidBody(body->As<RigidBody>()->GetHandle());
+                break;
+
+            case PhysicsBody::Static:
+                btWorld->removeRigidBody(body->As<StaticBody>()->GetHandle());
+                break;
+
+            case PhysicsBody::Kinematic:
+                btWorld->removeRigidBody(body->As<KinematicBody>()->GetHandle());
+                break;
+            }
 
             delete body;
         }
