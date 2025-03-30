@@ -11,18 +11,20 @@ namespace Core
 {
     class PhysicsEngine
     {
+    private:
+        static void _RigidCollisionCallbackRoutine();
+        static void _OnCollision(Actor *a1, Actor *a2);
+
+        friend class RigidBody;
+        friend class StaticBody;
+        friend class KinematicBody;
+
     public:
         PhysicsEngine() {};
         ~PhysicsEngine() {};
 
-        struct NumericValues
-        {
-            float MathFPS = 600.0f;
-        };
-
         struct PhysicsEngineState
         {
-            NumericValues Numeric;
             std::vector<PhysicsBody *> Bodies;
         };
 
@@ -37,8 +39,5 @@ namespace Core
         static void StopRuntime();
 
         static void DestroyBodies();
-
-        static NumericValues &GetNumericValueSet();
     };
-
 }

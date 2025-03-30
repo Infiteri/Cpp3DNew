@@ -18,29 +18,30 @@ namespace Core
     {
         for (auto d : DataSet->GetSet())
         {
+            CeData* set = d.second;
             out << YAML::BeginMap;
-            out << YAML::Key << "Name" << YAML::Value << d->GetName();
-            out << YAML::Key << "Type" << YAML::Value << (int)d->GetType();
+            out << YAML::Key << "Name" << YAML::Value << set->GetName();
+            out << YAML::Key << "Type" << YAML::Value << (int)set->GetType();
 
-            switch (d->GetType())
+            switch (set->GetType())
             {
             case CeData::DataVec2:
             {
-                Vector2 *v = (Vector2 *)d->GetData();
+                Vector2 *v = (Vector2 *)set->GetData();
                 SerializerUtils::Vector2ToYAML(out, "Value", v);
                 break;
             }
 
             case CeData::DataVec3:
             {
-                Vector3 *v = (Vector3 *)d->GetData();
+                Vector3 *v = (Vector3 *)set->GetData();
                 SerializerUtils::Vector3ToYAML(out, "Value", v);
                 break;
             }
 
             case CeData::DataColor:
             {
-                Color *v = (Color *)d->GetData();
+                Color *v = (Color *)set->GetData();
                 SerializerUtils::ColorToYAML(out, "Value", v);
 
                 break;
@@ -48,7 +49,7 @@ namespace Core
 
             case CeData::DataFloat:
             {
-                CeData::FloatContainer *v = (CeData::FloatContainer *)d->GetData();
+                CeData::FloatContainer *v = (CeData::FloatContainer *)set->GetData();
                 out << YAML::Key << "Value" << v->Value;
                 break;
             }

@@ -67,5 +67,7 @@ namespace Core
         static void InitializePostShader(const std::string &shaderName);
         static Shader *GetPostShader(const std::string &shaderName);
         static void EnsureReloadingOfPostShaders();
+
+        static void UploadCameraToShader(Shader* shader, PerspectiveCamera* camera);
     };
 }

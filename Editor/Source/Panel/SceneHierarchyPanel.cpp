@@ -507,6 +507,8 @@ namespace Core
     {
         ImGui::DragFloat("Linear Damp", &c->Config.LinearDamp, 0.05f, 0.0f, 1.0f);
         ImGui::DragFloat("Angular Damp", &c->Config.AngularDamp, 0.05f, 0.0f, 1.0f);
+        ImGui::DragFloat("Friction", &c->Config.Friction, 0.05f, 0.0f, 1.0f);
+        ImGui::DragFloat("Restitution", &c->Config.Restitution, 0.05f, 0.0f, 1.0f);
         ImGui::DragFloat("Mass", &c->Config.Mass, 0.05f, 0.0f);
     }
 

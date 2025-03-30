@@ -2,6 +2,13 @@
 
 namespace Core
 {
+    SceneEnvironment::~SceneEnvironment()
+    {
+        CE_VERIFY(SkyInst);
+        delete SkyInst;
+        SkyInst = nullptr;
+    }
+
     void SceneEnvironment::Setup()
     {
         SkyInst = new Sky();

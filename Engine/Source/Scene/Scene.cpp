@@ -90,6 +90,7 @@ namespace Core
     {
         Scene *out = new Scene();
         out->environemnt.From(&scene->environemnt);
+        out->_SetSkyInstance(); // bad bad bad bad bad bad bad
         out->name = scene->name;
 
         for (auto actor : scene->GetActors())

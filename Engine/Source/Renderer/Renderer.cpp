@@ -111,21 +111,12 @@ namespace Core
             return;
 
         Shader *objShader = ShaderSystem::GetFromEngineResource("Object");
-        CE_VERIFY(objShader);
+        PerspectiveCamera *activeCamera = CameraSystem::GetPerspectiveActive();
+        CE_VERIFY(objShader && activeCamera);
 
-        objShader->Use();
-
-        // Camera
-        {
-            auto activeCamera = CameraSystem::GetPerspectiveActive();
-            if (activeCamera)
-            {
-                activeCamera->UpdateView();
-                objShader->Vec3(activeCamera->GetPosition(), "uCameraPosition");
-                objShader->Mat4(activeCamera->GetProjection(), "uProjection");
-                objShader->Mat4(activeCamera->GetViewInverted(), "uView");
-            }
-        }
+        activeCamera->UpdateView();
+        UploadCameraToShader(objShader, activeCamera);
+        objShader->Vec3(activeCamera->GetPosition(), "uCameraPosition");
     }
 
     void Renderer::EndFrame()
@@ -233,6 +224,13 @@ namespace Core
                 shader.shd = new Shader(name);
             }
         }
+    }
+
+    void Renderer::UploadCameraToShader(Shader *shader, PerspectiveCamera *camera)
+    {
+        shader->Use();
+        shader->Mat4(camera->GetProjection(), "uProjection");
+        shader->Mat4(camera->GetViewInverted(), "uView");
     }
 
     void Renderer::Shutdown()

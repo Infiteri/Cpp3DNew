@@ -219,8 +219,6 @@ namespace Core
         // serialize each component
         // serialize children with
 
-        CE_CORE_TRACE("Serializing actor: %s", a->GetName().c_str());
-
         out << YAML::BeginMap;
         out << YAML::Key << "Actor";
         out << YAML::Value << "Filed";
@@ -229,7 +227,6 @@ namespace Core
         CE_SERIALIZE_FIELD("UUID", a->GetUUID().Get());
         CE_SERIALIZE_FIELD("ParentUUID", ((a->GetParent() != nullptr) ? a->GetParent()->GetUUID().Get() : 0));
 
-        // Serialize transform
         {
             out << YAML::Key << "Transform";
             out << YAML::Value << YAML::BeginMap;

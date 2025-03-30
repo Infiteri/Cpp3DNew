@@ -67,8 +67,6 @@ namespace Core
         Matrix4 scaleMatrix = Matrix4::Scale(&Scale);
         Matrix4 rotationMatrix = quat.GetMatrix();
 
-        // todo: think this thru
-        // def not the best way but for now im tired of quaternion maths and trouble with bullet physics
-        return scaleMatrix * (translationMatrix * (quatX.GetMatrix() * quatY.GetMatrix() * quatZ.GetMatrix()));
+        return scaleMatrix * (translationMatrix * (quat.GetMatrix()));
     }
 }

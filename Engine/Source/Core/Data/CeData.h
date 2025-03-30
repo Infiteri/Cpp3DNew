@@ -8,8 +8,9 @@
 
 namespace Core
 {
+    /// @brief Individual Data component, used in "CeDataSet".
     class CE_API CeData
-     {
+    {
     public:
         enum DataType
         {
@@ -42,9 +43,9 @@ namespace Core
 
         inline std::string GetName() { return name; };
         inline DataType GetType() { return type; };
-        inline void *GetData() { return data; };
         inline void SetName(const std::string &n) { name = n; }
         inline void SetType(DataType t) { type = t; }
+        inline void *GetData() { return data; };
 
         void ClearDataBasedOnCurrentType();
 

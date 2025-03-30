@@ -238,3 +238,11 @@
 - Fixed some bugs with rotations
 - Fixed aspect ratio being wrong in CameraComponent
 - Added KinematicBodies and KinematicComponent (along serialization/deserialization)
+
+# 0.2.6 - 30.03.2025
+
+- Changed CeDataSet to use unordered_map for faster lookups
+- Fixed stuff
+- Physics stuff
+- Refactored
+- Fixed a lot of sky issues including massive memory leaks

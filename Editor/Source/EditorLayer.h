@@ -58,29 +58,29 @@ namespace Core
 
     struct EditorState
     {
-        PanelInformation PanelInfo;
-        PanelSystem Panels;
-        DockspaceSettings Dockspace;
-        ImVec2 LastFrameViewport;
-        EditorCamera Camera;
-        ImGuizmo::OPERATION GuizmoOperation;
-
-        Textures TextureSet;
-        CurrentSceneState StateScene;
-
-        Scene *EditorScene = nullptr;
-
-        // std::string ActiveScenePath; TODO: Is this needed anymore. Shouldn't be but things always go wrong somehow
-        std::string ActiveProjectPath;
-
-        EditorSettings Settings;
-
         bool RenderSettings = false;
         bool RenderEditProject = false;
+        bool HasInitialProject = false;
+        bool HasInitialScene = false;
+
+        std::string ActiveProjectPath;
+
+        PanelInformation PanelInfo;
+        PanelSystem Panels;
+        EditorSettings Settings;
+
+        ImageViewer ImgViewer;
+        EditorCamera Camera;
+        CurrentSceneState StateScene;
+        Textures TextureSet;
+        Scene *EditorScene = nullptr;
+
+        DockspaceSettings Dockspace;
+        ImVec2 LastFrameViewport;
+        ImGuizmo::OPERATION GuizmoOperation;
 
         std::vector<OpenedEditorScene> OpenedScenes;
         OpenedEditorScene ActiveOpenedScene;
-        ImageViewer ImgViewer;
     };
 
     class EditorLayer : public Layer
@@ -95,7 +95,7 @@ namespace Core
         void OnAttach();
         void OnImGuiRender();
         void OnUpdate();
-
+        void ReloadLibrary();
         void Viewport();
         inline ImVec2 &GetLastFrameViewportSize() { return state.LastFrameViewport; };
         // -------------------

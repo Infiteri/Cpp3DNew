@@ -81,7 +81,7 @@ namespace Core
         for (auto d : c->Set.GetSet())
         {
             CeData *c = new CeData();
-            c->From(d);
+            c->From(d.second);
             Set.Add(c);
         }
     }

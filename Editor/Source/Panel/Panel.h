@@ -10,6 +10,9 @@ namespace Core
     struct PanelInformation
     {
         std::string AssetDirectory;
+
+        bool PLP_HasProject = false;
+        bool PLP_HasScene = false;
     };
 
     /// @brief Abstract class for panels

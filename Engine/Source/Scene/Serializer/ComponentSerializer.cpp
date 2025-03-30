@@ -296,6 +296,8 @@ namespace Core
         out << YAML::BeginMap;
         CE_SERIALIZE_FIELD("LinearDamp", c->Config.LinearDamp);
         CE_SERIALIZE_FIELD("AngularDamp", c->Config.AngularDamp);
+        CE_SERIALIZE_FIELD("Friction", c->Config.Friction);
+        CE_SERIALIZE_FIELD("Restitution", c->Config.Restitution);
         CE_SERIALIZE_FIELD("Mass", c->Config.Mass);
         out << YAML::EndMap;
     }
@@ -306,6 +308,8 @@ namespace Core
 
         c->Config.LinearDamp = node["LinearDamp"].as<float>();
         c->Config.AngularDamp = node["AngularDamp"].as<float>();
+        c->Config.Friction = node["Friction"].as<float>();
+        c->Config.Restitution = node["Restitution"].as<float>();
         c->Config.Mass = node["Mass"].as<float>();
     }
 

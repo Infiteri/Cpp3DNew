@@ -8,6 +8,7 @@
 #include "Physics/Collider.h"
 
 #include "btBulletDynamicsCommon.h"
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
 
 namespace Core
 {
@@ -27,23 +28,24 @@ namespace Core
         KinematicBodyConfiguration config;
 
         btRigidBody *handle;
+        btPairCachingGhostObject *ghost;
 
         friend class PhysicsEngine;
 
-        void UpdateTransform();
+        void _UpdateWithTransform(const btTransform& transform);
+        void _CheckCollisions();
 
     public:
         KinematicBody();
         ~KinematicBody();
 
         inline KinematicBodyConfiguration &GetConfiguration() { return config; };
-        inline btRigidBody *GetHandle() { return handle; }; // todo: maybe use the friend class ?
 
         void UseConfiguration(KinematicBodyConfiguration *config);
 
         void Update();
 
-        void Move(const Vector3& offset);
-        void Rotate(const Vector3& offset);
+        void Move(const Vector3 &offset);
+        void Rotate(const Vector3 &offset);
     };
 }

@@ -13,6 +13,8 @@ namespace Core
         Owner = c->Owner;
         LinearDamp = c->LinearDamp;
         AngularDamp = c->AngularDamp;
+        Friction = c->Friction;
+        Restitution = c->Restitution;
         Mass = c->Mass;
     }
 
@@ -58,7 +60,10 @@ namespace Core
 
         handle = new btRigidBody(info);
         handle->setDamping(config->LinearDamp, config->AngularDamp);
+        handle->setFriction(config->Friction);
+        handle->setRestitution(config->Restitution);
         handle->activate(true);
+        handle->setUserPointer(owner);
     }
 
     void RigidBody::Update()

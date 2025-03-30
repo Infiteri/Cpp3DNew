@@ -20,6 +20,8 @@ namespace Core
 
         float LinearDamp = 0.1f;
         float AngularDamp = 0.1f;
+        float Friction = 0.5f;
+        float Restitution = 0.5f;
         float Mass = 1.0f;
 
         void From(RigidBodyConfiguration *c);

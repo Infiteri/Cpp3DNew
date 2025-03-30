@@ -2,6 +2,11 @@
 
 namespace Core
 {
+    bool CeDataSet::_Exists(const std::string &name)
+    {
+        return set.find(name) != set.end();
+    }
+
     CeDataSet::CeDataSet()
     {
     }
@@ -10,7 +15,8 @@ namespace Core
     {
         for (auto i : set)
         {
-            i->ClearDataBasedOnCurrentType();
+            i.second->ClearDataBasedOnCurrentType();
+            delete i.second;
         }
 
         set.clear();
@@ -18,41 +24,42 @@ namespace Core
 
     void CeDataSet::Add(void *Data, CeData::DataType dataType, const std::string &name)
     {
+        if (_Exists(name))
+            return;
+
         CeData *d = new CeData(Data, dataType, name);
-        set.push_back(d);
+        set[name] = d;
     }
 
     void CeDataSet::Add(CeData *data)
     {
-        set.push_back(data);
+        if (_Exists(data->GetName()))
+            return;
+
+        set[data->GetName()] = data;
     }
 
     CeData *CeDataSet::Get(const std::string &name)
     {
-        for (auto i : set)
-        {
-            if (i->GetName() == name)
-                return i;
-        }
+        if (!_Exists(name))
+            return nullptr;
 
-        return nullptr;
+        return set[name];
     }
 
     void CeDataSet::Remove(const std::string &name)
     {
-        auto it = set.begin();
-        while (it != set.end())
-        {
-            if ((*it)->GetName() == name)
-            {
-                (*it)->ClearDataBasedOnCurrentType();
-                delete *it;
-                it = set.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
+        if (!_Exists(name))
+            return;
+        delete set[name];
+        set.erase(name);
+    }
+
+    void CeDataSet::Clear()
+    {
+        for (auto it : set)
+            delete it.second;
+
+        set.clear();
     }
 }

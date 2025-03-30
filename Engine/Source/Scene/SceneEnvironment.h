@@ -10,6 +10,8 @@ namespace Core
 {
     struct SceneEnvironment
     {
+        SceneEnvironment() = default;
+        ~SceneEnvironment();
         Sky *SkyInst;
         DirectionalLight DirectionalLight;
 

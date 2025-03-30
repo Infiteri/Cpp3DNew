@@ -1,6 +1,7 @@
 #include "PhysicsEngine.h"
 #include "Core/Logger.h"
 #include "Core/Engine.h"
+#include "Scene/Actor.h"
 #include "Body/RigidBody.h"
 #include "Body/StaticBody.h"
 
@@ -15,9 +16,39 @@ namespace Core
     static btSequentialImpulseConstraintSolver solver;
     static btDiscreteDynamicsWorld *btWorld;
 
+    void PhysicsEngine::_RigidCollisionCallbackRoutine()
+    {
+        int numManifolds = dispatcher.getNumManifolds();
+        for (int i = 0; i < numManifolds; i++)
+        {
+            btPersistentManifold *contactManifold = dispatcher.getManifoldByIndexInternal(i);
+            const btCollisionObject *objA = contactManifold->getBody0();
+            const btCollisionObject *objB = contactManifold->getBody1();
+
+            int numContacts = contactManifold->getNumContacts();
+            for (int j = 0; j < numContacts; j++)
+            {
+                btManifoldPoint &pt = contactManifold->getContactPoint(j);
+                if (pt.getDistance() < 0.0f)
+                {
+                    Actor *a1 = (Actor *)objA->getUserPointer();
+                    Actor *a2 = (Actor *)objB->getUserPointer();
+                    _OnCollision(a1, a2);
+                }
+            }
+        }
+    }
+
+    void PhysicsEngine::_OnCollision(Actor *a1, Actor *a2)
+    {
+        CE_VERIFY(a1 && a2);
+
+        if (a1->GetUUID().Get() == a2->GetUUID().Get())
+            return;
+    }
+
     void PhysicsEngine::Init()
     {
-        state.Numeric.MathFPS = 240.0f;
         btWorld = new btDiscreteDynamicsWorld(&dispatcher, &broadphase, &solver, &collisionConfiguration);
         btWorld->setGravity(btVector3(0.0f, -9.81f, 0.0f));
     }
@@ -52,13 +83,16 @@ namespace Core
         b->UseConfiguration(config);
         state.Bodies.push_back(b);
         b->Update();
-        btWorld->addRigidBody(b->GetHandle());
+        btWorld->addRigidBody(b->handle);
+        btWorld->addCollisionObject(b->ghost, btBroadphaseProxy::CharacterFilter, btBroadphaseProxy::AllFilter);
         return b;
     }
 
     void PhysicsEngine::UpdateRuntime()
     {
         btWorld->stepSimulation(Engine::GetDeltaTime());
+
+        _RigidCollisionCallbackRoutine();
 
         for (int i = 0; i < state.Bodies.size(); i++)
         {
@@ -88,7 +122,8 @@ namespace Core
                 break;
 
             case PhysicsBody::Kinematic:
-                btWorld->removeRigidBody(body->As<KinematicBody>()->GetHandle());
+                btWorld->removeRigidBody(body->As<KinematicBody>()->handle);
+                btWorld->removeCollisionObject(body->As<KinematicBody>()->ghost);
                 break;
             }
 
@@ -96,10 +131,5 @@ namespace Core
         }
 
         state.Bodies.clear();
-    }
-
-    PhysicsEngine::NumericValues &PhysicsEngine::GetNumericValueSet()
-    {
-        return state.Numeric;
     }
 }

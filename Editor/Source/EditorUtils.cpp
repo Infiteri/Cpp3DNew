@@ -248,8 +248,9 @@ namespace Core
 
     bool EditorUtils::DrawDataSetUI(CeDataSet *dSet)
     {
-        for (auto set : dSet->GetSet())
+        for (auto pair : dSet->GetSet())
         {
+            CeData* set = pair.second;
             if (ImGui::TreeNodeEx((void *)(CeU64)(CeU32)SetID, 0, set->GetName().c_str()))
             { // todo: change
                 static char Name[256];

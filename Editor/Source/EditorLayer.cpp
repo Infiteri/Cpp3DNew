@@ -42,6 +42,8 @@ namespace Core
             SetContextToProject();
             OpenEditorScene(spf);
 
+            ReloadLibrary(); // ensures game library is linked with the most up-to-date Engine.dll
+
             // Check if scene is valid
             if (!World::GetActiveScene())
             {
@@ -49,6 +51,7 @@ namespace Core
             }
 
             // TODO: Better structure
+            // 2 months later, im looking at this code and im wondering what the fk is this bro
             if (!Project::GetActiveConfiguration().AssetDirectory.empty())
             {
                 ((ContentBrowserPanel *)(state.Panels.panels[2]))->state.ActivePath = Project::GetActiveConfiguration().AssetDirectory;
@@ -109,6 +112,11 @@ namespace Core
             UpdateEditor();
             break;
         }
+    }
+
+    void EditorLayer::ReloadLibrary()
+    {
+        ScriptEngine::ReloadScriptLibrary(Project::GetActiveConfiguration().GetScriptLibPathFormatted());
     }
 
     void EditorLayer::UI_TopBar()
@@ -244,9 +252,7 @@ namespace Core
             if (ImGui::BeginPopup("ScriptMenu"))
             {
                 if (ImGui::MenuItem("Reload Library"))
-                {
-                    ScriptEngine::ReloadScriptLibrary(Project::GetActiveConfiguration().GetScriptLibPathFormatted());
-                }
+                    ReloadLibrary();
 
                 if (ImGui::MenuItem("Build Library"))
                 {
@@ -465,10 +471,7 @@ namespace Core
         MapInputToGuizmoOperation(Keys::S, ImGuizmo::SCALE);
 
         if (state.Camera.updateWithMouse)
-        {
             state.Camera.UpdateMouse();
-            state.Camera.UpdateMovement();
-        }
 
         if (Input::GetButton(Buttons::Right))
         {

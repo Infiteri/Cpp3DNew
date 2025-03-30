@@ -24,21 +24,25 @@ namespace Core
 
     private:
         Mode mode;
-
-        CubeMapTexture *cubeTexture = nullptr;
-        std::string cubeMapPath;
-
         VertexArray *array = nullptr;
         Color color;
-        std::string shaderName = "";
-        Shader *shader = nullptr;
 
-        CeDataSet shaderData;
+        struct CubemapState
+        {
+            CubeMapTexture *texture = nullptr;
+            std::string path;
+        } cubemap;
+
+        struct ShaderState
+        {
+            std::string name = "";
+            Shader *shader = nullptr;
+            CeDataSet data;
+        } shader;
 
         void _DestroyCubeMap();
         void _DestroyShader();
         void _DestroyFromMode();
-
         void _ReloadNewModeWithPreviousData();
 
     public:
@@ -53,14 +57,13 @@ namespace Core
         void SetModeToCubeMap(CubeMapTexture::Configuration &config);
         void SetModeToCubeMap(const std::string &configPath);
         void SetModeToShader(const std::string &shader);
-
-        inline Color &GetColor() { return color; };
-        inline std::string GetShaderName() { return shaderName; };
-        inline std::string GetCubemapPath() { return cubeMapPath; };
         void SetColor(const Color &color);
 
+        inline Color &GetColor() { return color; };
+        inline std::string GetShaderName() { return shader.name; };
+        inline std::string GetCubemapPath() { return cubemap.path; };
+        inline CeDataSet &GetShaderDataSet() { return shader.data; };
+        
         void From(Sky *other);
-
-        inline CeDataSet &GetShaderDataSet() { return shaderData; };
     };
 }

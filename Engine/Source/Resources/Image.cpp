@@ -17,6 +17,7 @@ namespace Core
         {
             valid = false;
             CE_WARN("Image invalid: %s.", imagePath.c_str());
+            return;
         }
 
         valid = true;
@@ -24,13 +25,14 @@ namespace Core
 
     Image::~Image()
     {
+        FreeData();
     }
 
     void Image::FreeData()
     {
-        if (!data)
-            return;
+        CE_VERIFY(data);
 
         stbi_image_free(data);
+        data = nullptr;
     }
 }

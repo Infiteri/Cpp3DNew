@@ -13,10 +13,9 @@ namespace Core
         PerspectiveCamera *camera = nullptr;
         bool updateWithMouse = false;
 
-        EditorCamera();
-        ~EditorCamera();
+        EditorCamera() = default;
+        ~EditorCamera() = default;
 
-        void UpdateMovement();
         void UpdateMouse();
     };
 

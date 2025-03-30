@@ -1,4 +1,5 @@
 #include "Sky.h"
+#include "Renderer/Renderer.h"
 #include "Renderer/Camera/CameraSystem.h"
 #include "Renderer/Shader/ShaderSystem.h"
 #include "Math/Matrix4.h"
@@ -7,20 +8,59 @@
 
 namespace Core
 {
+    static float cubeVertices[] = {
+        -1.0f, 1.0f, 1.0f,
+        -1.0f, -1.0f, 1.0f,
+        1.0f, -1.0f, 1.0f,
+        1.0f, -1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, 1.0f, -1.0f,
+        -1.0f, 1.0f, -1.0f,
+        -1.0f, 1.0f, 1.0f,
+        -1.0f, -1.0f, 1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, 1.0f, -1.0f,
+        -1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, -1.0f, 1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, 1.0f, -1.0f,
+        1.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f, -1.0f,
+        -1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, -1.0f,
+        -1.0f, 1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f, 1.0f,
+        1.0f, -1.0f, 1.0f,
+        1.0f, -1.0f, 1.0f,
+        1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f};
+
     void Sky::_DestroyCubeMap()
     {
-        if (cubeTexture)
-            delete cubeTexture;
+        if (cubemap.texture)
+            delete cubemap.texture;
 
-        cubeTexture = nullptr;
+        cubemap.texture = nullptr;
     }
 
     void Sky::_DestroyShader()
     {
-        if (shader)
-            delete shader;
+        if (shader.shader)
+            delete shader.shader;
 
-        shader = nullptr;
+        shader.shader = nullptr;
+        shader.data.Clear();
     }
 
     void Sky::_DestroyFromMode()
@@ -44,80 +84,33 @@ namespace Core
         case CubeMapMode:
         {
             // c++ pros dont kill me for copying the code below pls 🙏🙏🙏 i swear i will refactor it someday rn i got better things to do then worry this, i cant call SetModeToCubeMap.
-            // Due to the fact that i calls back in SetMode, which will call this functions again, which calls SetModeToCubeMap, repeating this cycle over and over and the app never continues
+            // Due to the fact that it calls back in SetMode, which will call this functions again, which calls SetModeToCubeMap, repeating this cycle over and over and the app never continues
             // Call stack exceeds or something, but im 100% it wont work
             // also it will call into destroy from mode which is prob. not safe to do
             // it does check weather or not its safe to delete the object that has to be deleted but still im no professional c++ programmer so ill stay safe from calling DestroyFromMode twice for a while
             // TODO: Fix this bs
             CubeMapTexture::Configuration c;
             CubeMapLoader l;
-            l.Deserialize(cubeMapPath, &c);
-            cubeTexture = new CubeMapTexture(c);
+            l.Deserialize(cubemap.path, &c);
+            cubemap.texture = new CubeMapTexture(c);
         }
         break;
 
         case ShaderMode:
         {
-            shader = new Shader(shaderName);
+            shader.shader = new Shader(shader.name);
         }
         break;
         }
     }
 
-    static float cubeVertices[] = {
-        // Front face
-        -1.0f, 1.0f, 1.0f,
-        -1.0f, -1.0f, 1.0f,
-        1.0f, -1.0f, 1.0f,
-        1.0f, -1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f,
-        -1.0f, 1.0f, 1.0f,
-
-        // Back face
-        -1.0f, 1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f, 1.0f, -1.0f,
-        -1.0f, 1.0f, -1.0f,
-
-        // Left face
-        -1.0f, 1.0f, 1.0f,
-        -1.0f, -1.0f, 1.0f,
-        -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f,
-        -1.0f, 1.0f, -1.0f,
-        -1.0f, 1.0f, 1.0f,
-
-        // Right face
-        1.0f, 1.0f, 1.0f,
-        1.0f, -1.0f, 1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f, 1.0f, -1.0f,
-        1.0f, 1.0f, 1.0f,
-
-        // Top face
-        -1.0f, 1.0f, -1.0f,
-        -1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, -1.0f,
-        -1.0f, 1.0f, -1.0f,
-
-        // Bottom face
-        -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f, 1.0f,
-        1.0f, -1.0f, 1.0f,
-        1.0f, -1.0f, 1.0f,
-        1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f};
-
     Sky::Sky()
     {
         color = {255, 255, 255, 255};
-        shader = nullptr;
+        shader.shader = nullptr;
+        cubemap.texture = nullptr;
         mode = ColorMode;
+
         // Generate vertex array
         array = new VertexArray();
         array->GenVertexBuffer(cubeVertices, sizeof(cubeVertices));
@@ -135,10 +128,11 @@ namespace Core
 
     void Sky::Render()
     {
-        array->Bind();
-        array->GetVertexBuffer()->Bind();
-
         auto camera = CameraSystem::GetPerspectiveActive();
+        CE_VERIFY(camera);
+
+        array->Bind();
+        camera->UpdateView();
 
         switch (mode)
         {
@@ -146,69 +140,62 @@ namespace Core
         {
             auto cubeMapShader = ShaderSystem::GetFromEngineResource("CubeMap");
 
-            if (camera && cubeTexture && cubeMapShader && cubeMapShader->GetValid())
+            if (cubemap.texture && cubeMapShader)
             {
                 cubeMapShader->Use();
                 camera->UpdateProjection();
                 camera->UpdateView();
-                cubeMapShader->Mat4(camera->GetProjection(), "uProjection");
-                cubeMapShader->Mat4(camera->GetViewInverted(), "uView"); // todo: inverted?
+
+                Renderer::UploadCameraToShader(cubeMapShader, camera);
                 cubeMapShader->Mat4(Matrix4::Translate(camera->GetPosition()), "uModel");
 
-                cubeTexture->Use();
+                cubemap.texture->Use();
                 cubeMapShader->Vec4(color, "uTint");
-
-                cubeMapShader->Int(cubeTexture->GetGeneration(), "uSkybox");
+                cubeMapShader->Int(cubemap.texture->GetGeneration(), "uSkybox");
             }
             break;
         }
 
         case ShaderMode:
         {
-            if (shaderName.empty())
-                break;
+            CE_VERIFY(shader.shader);
+            CE_VERIFY(shader.shader->GetValid());
+            shader.shader->Use();
 
-            if (!shader || (shader && !shader->GetValid()))
-                return;
-
-            shader->Use();
-
-            for (auto data : shaderData.GetSet())
+            for (auto pair : shader.data.GetSet())
             {
+                CeData *data = pair.second;
                 switch (data->GetType())
                 {
-
                 case CeData::DataVec2:
                 {
-                    shader->Vec2(data->As<Vector2>(), data->GetName().c_str());
+                    shader.shader->Vec2(data->As<Vector2>(), data->GetName().c_str());
                 }
+                break;
 
                 case CeData::DataVec3:
                 {
-                    shader->Vec3(data->As<Vector3>(), data->GetName().c_str());
+                    shader.shader->Vec3(data->As<Vector3>(), data->GetName().c_str());
                 }
                 break;
 
                 case CeData::DataColor:
                 {
-                    Color *c = (Color *)data->GetData();
-                    shader->Vec4(*c, data->GetName().c_str());
+                    Color *c = data->As<Color>();
+                    shader.shader->Vec4(*c, data->GetName().c_str());
                 }
                 break;
-
                 case CeData::DataFloat:
                 {
-                    CeData::FloatContainer *c = (CeData::FloatContainer *)data->GetData();
-                    shader->Float(c->Value, data->GetName().c_str());
+                    CeData::FloatContainer *c = data->As<CeData::FloatContainer>();
+                    shader.shader->Float(c->Value, data->GetName().c_str());
                 }
                 break;
                 }
             }
 
-            shader->Mat4(camera->GetProjection(), "uProjection");
-            shader->Mat4(camera->GetViewInverted(), "uView");
-            shader->Mat4(Matrix4::Translate(camera->GetPosition()), "uModel");
-
+            Renderer::UploadCameraToShader(shader.shader, camera);
+            shader.shader->Mat4(Matrix4::Translate(camera->GetPosition()), "uModel");
             break;
         }
         case ColorMode:
@@ -237,14 +224,14 @@ namespace Core
     {
         _DestroyFromMode();
         SetMode(CubeMapMode);
-        cubeTexture = new CubeMapTexture(config);
+        cubemap.texture = new CubeMapTexture(config);
     }
 
     void Sky::SetModeToCubeMap(const std::string &configPath)
     {
         CubeMapTexture::Configuration c;
         CubeMapLoader l;
-        cubeMapPath = configPath;
+        cubemap.path = configPath;
         l.Deserialize(configPath, &c);
         SetModeToCubeMap(c);
     }
@@ -253,8 +240,8 @@ namespace Core
     {
         _DestroyFromMode();
         SetMode(ShaderMode);
-        shaderName = shaderFile;
-        shader = new Shader(shaderName);
+        shader.name = shaderFile;
+        shader.shader = new Shader(shader.name);
     }
 
     void Sky::SetColor(const Color &color)
@@ -264,18 +251,17 @@ namespace Core
 
     void Sky::From(Sky *other)
     {
+        _DestroyFromMode();
         SetMode(other->GetMode());
         color.Set(other->GetColor());
-        shaderName = other->shaderName;
-
-        if (other->GetMode() == CubeMapMode)
-            SetModeToCubeMap(other->cubeTexture->GetConfig());
+        shader.name = other->shader.name;
+        cubemap.path = other->cubemap.path;
 
         //? Copy over the shader data
-        for (auto o : other->shaderData.GetSet())
+        for (auto o : other->shader.data.GetSet())
         {
-            CeData *newSet = new CeData(o);
-            shaderData.Add(newSet);
+            CeData *newSet = new CeData(o.second);
+            shader.data.Add(newSet);
         }
 
         // setup new sky >

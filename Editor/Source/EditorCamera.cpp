@@ -2,18 +2,6 @@
 
 namespace Core
 {
-    EditorCamera::EditorCamera()
-    {
-    }
-
-    EditorCamera::~EditorCamera()
-    {
-    }
-
-    void EditorCamera::UpdateMovement()
-    {
-    }
-
     void EditorCamera::UpdateMouse()
     {
         float speedActual = 0.0f;
@@ -31,41 +19,33 @@ namespace Core
 
             if (Input::GetKey(Keys::W))
             {
-                Matrix4 cameraMatrixRotation = Matrix4::RotationZYX(camera->GetRotation());
-                Vector3 way = Matrix4::Forward(&cameraMatrixRotation);
-                camera->GetPosition().x += way.x * speedActual;
-                camera->GetPosition().y += way.y * speedActual;
-                camera->GetPosition().z += way.z * speedActual;
+                Matrix4 rotation = Matrix4::RotationZYX(camera->GetRotation());
+                Vector3 way = Matrix4::Forward(&rotation);
+                camera->GetPosition() += way * speedActual;
                 camera->UpdateView();
             }
 
             if (Input::GetKey(Keys::S))
             {
-                Matrix4 cameraMatrixRotation = Matrix4::RotationZYX(camera->GetRotation());
-                Vector3 way = Matrix4::Forward(&cameraMatrixRotation);
-                camera->GetPosition().x -= way.x * speedActual;
-                camera->GetPosition().y -= way.y * speedActual;
-                camera->GetPosition().z -= way.z * speedActual;
+                Matrix4 rotation = Matrix4::RotationZYX(camera->GetRotation());
+                Vector3 way = Matrix4::Forward(&rotation);
+                camera->GetPosition() -= way * speedActual;
                 camera->UpdateView();
             }
 
             if (Input::GetKey(Keys::A))
             {
-                Matrix4 cameraMatrixRotation = Matrix4::RotationZYX(camera->GetRotation());
-                Vector3 way = Matrix4::Right(&cameraMatrixRotation);
-                camera->GetPosition().x -= way.x * speedActual;
-                camera->GetPosition().y -= way.y * speedActual;
-                camera->GetPosition().z -= way.z * speedActual;
+                Matrix4 rotation = Matrix4::RotationZYX(camera->GetRotation());
+                Vector3 way = Matrix4::Right(&rotation);
+                camera->GetPosition() -= way * speedActual;
                 camera->UpdateView();
             }
 
             if (Input::GetKey(Keys::D))
             {
-                Matrix4 cameraMatrixRotation = Matrix4::RotationZYX(camera->GetRotation());
-                Vector3 way = Matrix4::Right(&cameraMatrixRotation);
-                camera->GetPosition().x += way.x * speedActual;
-                camera->GetPosition().y += way.y * speedActual;
-                camera->GetPosition().z += way.z * speedActual;
+                Matrix4 rotation = Matrix4::RotationZYX(camera->GetRotation());
+                Vector3 way = Matrix4::Right(&rotation);
+                camera->GetPosition() += way * speedActual;
                 camera->UpdateView();
             }
 
